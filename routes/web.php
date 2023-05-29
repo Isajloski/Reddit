@@ -7,6 +7,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+use App\Http\Controllers\CommunityController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -45,6 +47,12 @@ Route::resource('markdown', MarkdownController::class)
     ->only(['index'])
     ->middleware(['auth', 'verified']);
 
+//Comunities:
+Route::get('/communities', [CommunityController::class, 'index'])->name('communities.index');
+Route::post('/communities', [CommunityController::class, 'store'])->name('communities.store');
+Route::get('/communities/{id}/edit', [CommunityController::class, 'edit'])->name('communities.edit');
+Route::put('/communities/{id}', [CommunityController::class, 'update'])->name('communities.update');
+Route::delete('/communities/{id}', [CommunityController::class, 'destroy'])->name('communities.destroy');
 
 
 require __DIR__.'/auth.php';
