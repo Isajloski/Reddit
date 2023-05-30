@@ -1,6 +1,7 @@
 <script setup>
 import {Head, Link} from '@inertiajs/vue3';
 import Navbar from "@/Components/Navbar.vue";
+import Content from "@/Layouts/Content.vue";
 
 defineProps({
     canLogin: Boolean,
@@ -13,6 +14,7 @@ defineProps({
 <template>
     <Head title="Welcome"/>
     <Navbar/>
+    <Content/>
 </template>
 
 <!--<style>-->
