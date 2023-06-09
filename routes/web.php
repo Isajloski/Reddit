@@ -50,9 +50,10 @@ Route::resource('markdown', MarkdownController::class)
 //Comunities:
 Route::get('/communities', [CommunityController::class, 'index'])->name('communities.index');
 Route::post('/communities', [CommunityController::class, 'store'])->name('communities.store');
+Route::get('/communities/{id}', [CommunityController::class, 'findById'])->name('communities.findById');
 Route::get('/communities/{id}/edit', [CommunityController::class, 'edit'])->name('communities.edit');
-Route::put('/communities/{id}', [CommunityController::class, 'update'])->name('communities.update');
-Route::delete('/communities/{id}', [CommunityController::class, 'destroy'])->name('communities.destroy');
+Route::post('/communities/{id}/edit', [CommunityController::class, 'update'])->name('communities.update');
+Route::post('/communities/{id}/delete', [CommunityController::class, 'destroy'])->name('communities.destroy');
 
 
 require __DIR__.'/auth.php';

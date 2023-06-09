@@ -33,10 +33,10 @@
                     <p>description: {{ community.description }}</p>
                     <p>Rules: {{ community.rules }}</p>
                     <img :src="community.image" alt="Community Image" >
-                    <form :action="route('communities.destroy', { id: community.id })" method="DELETE" style="display: inline;">
 
-                        <button type="submit">Delete</button>
-                    </form>
+                    <button @click="deleteCommunity(community.id)">Delete</button>
+                    <button>Edit</button>
+
                 </li>
             </ul>
         </div>
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import {ref} from 'vue';
+import axios from 'axios';
 import { useForm, Head } from '@inertiajs/vue3';
 
 export default {
@@ -91,5 +91,22 @@ export default {
 
 
     },
+
+    methods: {
+        deleteCommunity(id) {
+            if (confirm('Are you sure you want to delete this community?')) {
+                axios.post(`/communities/${id}/delete`)
+                    .then(response => {
+                        // Handle successful deletion, e.g., update UI or show success message
+                        console.log('Community deleted successfully!');
+                    })
+                    .catch(error => {
+                        // Handle error case, e.g., show error message
+                        console.error('Error deleting community:', error);
+                    });
+            }
+        }
+    }
+
 };
 </script>

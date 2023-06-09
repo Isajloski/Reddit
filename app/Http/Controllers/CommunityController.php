@@ -14,7 +14,7 @@ class CommunityController extends Controller
     {
         $communities = Community::with('user')->get();
 
-        return Inertia::render('Communities/Index', [
+        return Inertia::render('Communities/Community', [
             'communities' => $communities,
         ]);
     }
@@ -85,4 +85,21 @@ class CommunityController extends Controller
         // Optionally, you can redirect the user to a specific page after deleting the community.
         // For example, return redirect()->route('communities.index');
     }
+
+    public function findById($id)
+    {
+        $community = Community::with('user')->find($id);
+
+        if (!$community) {
+            return response()->json(['message' => 'Community not found'], 404);
+        }
+
+        return Inertia::render('Communities/Community', [
+            'communities' => [$community],
+        ]);
+    }
+
+
+
+
 }
