@@ -1,24 +1,31 @@
 <template>
-    <div class="container bg-gray-100">
-        <div class="font-medium">
-            <form @submit.prevent="createCommunity">
-                <label htmlFor="name">Name:</label>
-                <input type="text" id="name" v-model="form.name" placeholder="name">
-                <br>
-
-                <label htmlFor="description">Description:</label>
-                <textarea id="description" v-model="form.description" placeholder="description" ></textarea>
-                <br>
-
-                <label htmlFor="rules">Rules:</label>
-                <textarea id="rules" v-model="form.rules" ></textarea>
-                <br>
-
-                <label htmlFor="rules">Image:</label>
-                <input  id="image" v-model="form.image" placeholder="image"  >
-                <br>
-
-                <button type="submit">Create Community</button>
+    <Navbar/>
+    <div class="w-auto md:w-3/5 mx-5 md:mx-auto mt-48 md:mt-20 rounded-xl relative bg-[#2d2d2d]">
+        <div class="">
+            <form @submit.prevent="createCommunity" class="p-5">
+                <h1 class="text-white text-2xl pb-5 text-center font-bold">Create Community</h1>
+                <div class="pb-5">
+                    <div htmlFor="name" class="py-1 text-white">Name:</div>
+                    <input type="text" id="name" v-model="form.name" placeholder="name" class="rounded bg-[#515151] text-white">
+                </div>
+                <div class="pb-5">
+                    <div htmlFor="description" class="py-1 text-white">Description:</div>
+                    <textarea id="description" v-model="form.description" placeholder="description" class="rounded bg-[#515151] w-96 text-white"></textarea>
+                </div>
+                <div class="pb-5">
+                    <div htmlFor="rules" class="py-1 text-white">Rules:</div>
+                    <textarea id="rules" v-model="form.rules" class="rounded bg-[#515151] w-96 text-white"></textarea>
+                </div>
+                <div class="pb-5">
+                    <div htmlFor="rules" class="py-1 text-white">Image:</div>
+                    <input  id="image" v-model="form.image" placeholder="image"  class="rounded bg-[#515151] text-white">
+                </div>
+                <div class="bg-[#CC0974] rounded-2xl inline-block">
+                    <button type="submit" class="px-4 py-2">Create</button>
+                </div>
+                <div class="border border-[#515151] rounded-2xl inline-block float-right">
+                    <button type="button" class="px-4 py-2 text-white">Cancel</button>
+                </div>
             </form>
         </div>
 
@@ -46,8 +53,10 @@
 <script>
 import axios from 'axios';
 import { useForm, Head } from '@inertiajs/vue3';
+import Navbar from "@/Components/Navbar.vue";
 
 export default {
+    components: {Navbar},
     props:{
         communities: {
             type: Array,

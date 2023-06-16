@@ -3,6 +3,7 @@
 use App\Http\Controllers\MarkdownController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\test;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,7 +41,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('posts', PostController::class)
-    ->only(['index', 'store', 'update', 'destroy'])
+    ->only(['index', 'create', 'store', 'update', 'destroy'])
     ->middleware(['auth', 'verified']);
 
 Route::resource('markdown', MarkdownController::class)
@@ -48,12 +49,15 @@ Route::resource('markdown', MarkdownController::class)
     ->middleware(['auth', 'verified']);
 
 //Comunities:
-Route::get('/communities', [CommunityController::class, 'index'])->name('communities.index');
+Route::get('/makeCommunity', [CommunityController::class, 'index'])->name('communities.index');
+Route::get('/makePost', [PostController::class, 'create'])->name('posts.create');
 Route::post('/communities', [CommunityController::class, 'store'])->name('communities.store');
 Route::get('/communities/{id}', [CommunityController::class, 'findById'])->name('communities.findById');
 Route::get('/communities/{id}/edit', [CommunityController::class, 'edit'])->name('communities.edit');
 Route::post('/communities/{id}/edit', [CommunityController::class, 'update'])->name('communities.update');
 Route::post('/communities/{id}/delete', [CommunityController::class, 'destroy'])->name('communities.destroy');
 
+//test
+Route::get('/community', [test::class, 'index'])->name('test.index');
 
 require __DIR__.'/auth.php';
