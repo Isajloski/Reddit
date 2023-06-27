@@ -24,7 +24,6 @@ class CommunityController extends Controller
     {
         $existingCommunity = Community::where('name', $request->input('name'))->first();
         if ($existingCommunity) {
-            // Handle the case where the name is not unique
             echo "Error";
             return Inertia::render('communities.index');
         }
@@ -33,7 +32,6 @@ class CommunityController extends Controller
             'name' => 'required',
             'description' => 'required',
             'rules' => 'required',
-            // other validation rules
         ]);
 
         $user = Auth::user();
@@ -53,9 +51,6 @@ class CommunityController extends Controller
     public function edit($id)
     {
         $community = Community::find($id);
-
-        // You can pass the $community variable to a view to display the edit form.
-        // For example, return view('communities.edit', compact('community'));
     }
 
     public function update(Request $request, $id)
@@ -66,23 +61,13 @@ class CommunityController extends Controller
         $community->rules = $request->input('rules');
         $community->image = $request->input('image');
         $community->save();
-
-        // Optionally, you can redirect the user to a specific page after updating the community.
-        // For example, return redirect()->route('communities.index');
     }
 
     public function destroy($id)
     {
         $community = Community::findOrFail($id);
-
-        // Add any additional logic or checks here if needed
-
         $community->delete();
-
-        // Optionally, you can redirect the user to a different page after deletion
         return redirect()->route('communities.index');
-        // Optionally, you can redirect the user to a specific page after deleting the community.
-        // For example, return redirect()->route('communities.index');
     }
 
     public function findById($id)
