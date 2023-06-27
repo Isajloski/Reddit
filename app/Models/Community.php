@@ -21,5 +21,11 @@ class Community extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function flairs()
+    {
+        return $this->hasMany(Flair::class);
+    }
+
+
 
 }

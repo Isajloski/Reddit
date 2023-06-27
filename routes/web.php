@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FlairController;
 use App\Http\Controllers\MarkdownController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
@@ -51,6 +52,8 @@ Route::resource('markdown', MarkdownController::class)
 //Comunities:
 Route::get('/makeCommunity', [CommunityController::class, 'index'])->name('communities.index');
 Route::get('/makePost', [PostController::class, 'create'])->name('posts.create');
+Route::get('/communities', [CommunityController::class, 'index'])->name('communities.index');
+
 Route::post('/communities', [CommunityController::class, 'store'])->name('communities.store');
 Route::get('/communities/{id}', [CommunityController::class, 'findById'])->name('communities.findById');
 Route::get('/communities/{id}/edit', [CommunityController::class, 'edit'])->name('communities.edit');
@@ -59,5 +62,14 @@ Route::post('/communities/{id}/delete', [CommunityController::class, 'destroy'])
 
 //test
 Route::get('/community', [test::class, 'index'])->name('test.index');
+
+//FLAIR
+Route::post('/flair/{id}/delete', [FlairController::class, 'destroy'])->name('flair.destroy');
+Route::post('/flair/{id}/edit', [FlairController::class, 'update'])->name('flair.update');
+
+Route::post('/flair/create', [FlairController::class, 'store'])->name('flair.create');
+
+
+
 
 require __DIR__.'/auth.php';

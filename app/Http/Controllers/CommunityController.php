@@ -12,7 +12,7 @@ class CommunityController extends Controller
 {
     public function index()
     {
-        $communities = Community::with('user')->get();
+        $communities = Community::with('user', 'flairs')->get();
 
         return Inertia::render('Communities/Community', [
             'communities' => $communities,
@@ -43,8 +43,7 @@ class CommunityController extends Controller
 
         $community->description = $request->input('description');
         $community->rules = $request->input('rules');
-        $community->image = $request->input('image') ?? 'https://www.historyofmacedonia.org/IndependentMacedonia/images/mak_flag.jpg';
-        // Associate the community with the authenticated user
+        $community->image = $request->input('image') ?? 'https://w0.peakpx.com/wallpaper/906/498/HD-wallpaper-auora-borealis-northern-lights-nature-iceland-mountain-auora-snow.jpg';
         $community->user()->associate($user);
         $community->save();
 
@@ -88,7 +87,7 @@ class CommunityController extends Controller
 
     public function findById($id)
     {
-        $community = Community::with('user')->find($id);
+        $community = Community::with('user', 'flairs')->find($id);
 
         if (!$community) {
             return response()->json(['message' => 'Community not found'], 404);
