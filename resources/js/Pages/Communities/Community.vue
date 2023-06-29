@@ -17,8 +17,8 @@
                     <textarea id="rules" v-model="form.rules" class="rounded bg-[#515151] w-96 text-white"></textarea>
                 </div>
                 <div class="pb-5">
-                    <div htmlFor="rules" class="py-1 text-white">Image:</div>
-                    <input  id="image" v-model="form.image" placeholder="image"  class="rounded bg-[#515151] text-white">
+                    <div htmlFor="image" class="py-1 text-white">Image:</div>
+                    <input type="file" id="image" @change="handleFileUpload" class="rounded bg-[#515151] text-white">
                 </div>
                 <div class="bg-[#CC0974] rounded-2xl inline-block">
                     <button type="submit" class="px-4 py-2">Create</button>
@@ -40,6 +40,9 @@
                     <h3>r/{{ community.name }}</h3>
                     <p>description: {{ community.description }}</p>
                     <p>Rules: {{ community.rules }}</p>
+                    <img :src="community.image.path" alt="Community Image">
+
+
                     <ul v-if="community.flairs != null">
                         <p>Flair</p>
                         <li v-for="flair in community.flairs" :key="flair.id">
@@ -73,10 +76,6 @@
                         </li>
                     </ul>
 
-
-
-
-                    <img :src="community.image" alt="Community Image" >
                     <br/>
                     <br/>
                     <form @submit.prevent="createFlair(community.id)">
@@ -126,8 +125,8 @@
                                 <textarea id="rules" :placeholder="community.rules"  v-model="editForm.rules" ></textarea>
                                 <br>
 
-                                <label htmlFor="rules">Image:</label>
-                                <input  id="image" :placeholder="community.image" v-model="editForm.image" placeholder="image"  >
+                                <label htmlFor="image">Image:</label>
+                                <input type="file" id="image" @change="handleFileUpload" class="rounded bg-[#515151] text-white">
                                 <br>
 
                                 <button class="text-white bg-red-400 py-2 px-5 rounded" type="submit">Change the settings</button>
@@ -257,6 +256,14 @@ export default {
                 name: this.flairName,
             };
             Repository.editFlair(id, formData);
+        },
+
+
+
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            // You can now perform actions with the selected file, such as uploading it to a server or displaying it on the page.
+            this.form.image = file; // Assign the selected file to the form's image property
         }
 
 

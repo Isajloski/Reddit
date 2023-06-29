@@ -14,7 +14,7 @@ class Community extends Model
     /**
      * @var int|mixed|string|null
      */
-    protected $fillable = ['user_id', 'name', 'description', 'rules', 'image'];
+    protected $fillable = ['user_id', 'name', 'description', 'rules', 'image_id'];
 
     public function user()
     {
@@ -25,6 +25,13 @@ class Community extends Model
     {
         return $this->hasMany(Flair::class);
     }
+
+    public function image()
+    {
+        return $this->belongsTo(Image::class, 'image_id');
+    }
+
+
 
 
 

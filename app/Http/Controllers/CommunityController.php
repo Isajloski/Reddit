@@ -12,7 +12,7 @@ class CommunityController extends Controller
 {
     public function index()
     {
-        $communities = Community::with('user', 'flairs')->get();
+        $communities = Community::with('user', 'flairs', 'image')->get();
 
         return Inertia::render('Communities/Community', [
             'communities' => $communities,
@@ -22,31 +22,39 @@ class CommunityController extends Controller
 
     public function store(Request $request)
     {
-        $existingCommunity = Community::where('name', $request->input('name'))->first();
-        if ($existingCommunity) {
-            echo "Error";
-            return Inertia::render('communities.index');
+        if (!auth()->check()) {
+            return redirect()->route('login');
         }
 
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:communities',
             'description' => 'required',
             'rules' => 'required',
+            'image' => 'nullable|file'
         ]);
 
         $user = Auth::user();
         $community = new Community();
         $community->name = $request->input('name');
-
-
         $community->description = $request->input('description');
         $community->rules = $request->input('rules');
-        $community->image = $request->input('image') ?? 'https://w0.peakpx.com/wallpaper/906/498/HD-wallpaper-auora-borealis-northern-lights-nature-iceland-mountain-auora-snow.jpg';
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $imageController = new ImageController();
+            $imageId = $imageController->storeImage($file, '/communities');
+            $community->image_id = $imageId;
+        }
+        else{
+            $community->image_id = null;
+        }
+
         $community->user()->associate($user);
         $community->save();
 
         return redirect()->route('communities.index');
     }
+
 
     public function edit($id)
     {
@@ -66,13 +74,24 @@ class CommunityController extends Controller
     public function destroy($id)
     {
         $community = Community::findOrFail($id);
+
+        if ($community->image) {
+            $imageId = $community->image_id;
+        }
+
+
         $community->delete();
+
+        $imageController = new ImageController();
+
+        $imageController->delete($imageId);
+
         return redirect()->route('communities.index');
     }
 
     public function findById($id)
     {
-        $community = Community::with('user', 'flairs')->find($id);
+        $community = Community::with('user', 'flairs', 'image')->find($id);
 
         if (!$community) {
             return response()->json(['message' => 'Community not found'], 404);
