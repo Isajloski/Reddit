@@ -52,6 +52,7 @@ Route::resource('markdown', MarkdownController::class)
 //Comunities:
 Route::get('/makeCommunity', [CommunityController::class, 'index'])->name('communities.index');
 Route::get('/makePost', [PostController::class, 'create'])->name('posts.create');
+
 Route::get('/communities', [CommunityController::class, 'index'])->name('communities.index');
 
 Route::post('/communities', [CommunityController::class, 'store'])->name('communities.store');

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const Repository = {
     fetchCommunity(id) {
-        return axios.get(`/api/community/${id}`);
+        return axios.get(`/community/${id}`);
     },
     createFlair(formData) {
         return axios.post('/flair/create', formData);
@@ -12,7 +12,12 @@ const Repository = {
     },
     editFlair(id, formData) {
         return axios.post(`/flair/${id}/edit`, formData);
-    }
+    },
+    editCommunity(id, editForm) {
+        console.log(id);
+        console.log(editForm);
+        return axios.post(`/communities/${id}/edit`, editForm);
+    },
 };
 
 export default Repository;

@@ -42,7 +42,7 @@ class CommunityController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageController = new ImageController();
-            $imageId = $imageController->storeImage($file, '/communities');
+            $imageId = $imageController->store($file, '/communities');
             $community->image_id = $imageId;
         }
         else{
@@ -61,15 +61,29 @@ class CommunityController extends Controller
         $community = Community::find($id);
     }
 
-    public function update(Request $request, $id)
+    public function update($id, Request $request)
     {
-        $community = Community::find($id);
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'rules' => 'required',
+        ]);
+
+        $community = Community::findOrFail($id);
         $community->name = $request->input('name');
         $community->description = $request->input('description');
         $community->rules = $request->input('rules');
-        $community->image = $request->input('image');
+
         $community->save();
+
+        return redirect()->route('communities.index');
     }
+
+
 
     public function destroy($id)
     {
@@ -82,9 +96,10 @@ class CommunityController extends Controller
 
         $community->delete();
 
-        $imageController = new ImageController();
-
-        $imageController->delete($imageId);
+        if($community->image_id != null) {
+            $imageController = new ImageController();
+            $imageController->delete($imageId);
+        }
 
         return redirect()->route('communities.index');
     }

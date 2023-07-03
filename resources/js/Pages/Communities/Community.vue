@@ -40,7 +40,8 @@
                     <h3>r/{{ community.name }}</h3>
                     <p>description: {{ community.description }}</p>
                     <p>Rules: {{ community.rules }}</p>
-                    <img :src="community.image.path" alt="Community Image">
+
+                    <img v-if="community.image" :src="community.image.path" alt="Community Image">
 
 
                     <ul v-if="community.flairs != null">
@@ -108,10 +109,7 @@
 
                     <div v-if="showDiv">
                         <div class="font-medium">
-                            <form @submit.prevent="editCommunity">
-
-                                <input type="number" id="id" :value="community.id" readonly>
-                                <br/>
+                            <form @submit.prevent="editCommunity(community.id)">
 
                                 <label htmlFor="name">Name:</label>
                                 <input type="text" id="name" v-model="editForm.name" :placeholder="community.name">
@@ -125,9 +123,6 @@
                                 <textarea id="rules" :placeholder="community.rules"  v-model="editForm.rules" ></textarea>
                                 <br>
 
-                                <label htmlFor="image">Image:</label>
-                                <input type="file" id="image" @change="handleFileUpload" class="rounded bg-[#515151] text-white">
-                                <br>
 
                                 <button class="text-white bg-red-400 py-2 px-5 rounded" type="submit">Change the settings</button>
                             </form>
@@ -170,16 +165,15 @@ export default {
         });
 
         const editForm = useForm({
-            id: 1,
             name: '',
             description: '',
             rules: '',
-            image: '',
         });
 
         const handleFileUpload = (event) => {
             const file = event.target.files[0];
             form.data.image = file;
+            editForm.data.image = file;
         };
 
         const createCommunity = () => {
@@ -195,26 +189,10 @@ export default {
             });
         };
 
-        const editCommunity = () => {
-            editForm.post(route('communities.update'), {
-                onSuccess: () => {
-                    // Handle success, e.g., redirect to communities index
-                    // You can customize this based on your application's flow
-                    console.log("I edited the community!")
-                },
-                onError: () =>{
-                    console.log("The /r/" + document.getElementById('text').toString().valueOf() + " already exsist!");
-                },
-            });
-        };
-
-
-
         return {
             form,
             handleFileUpload,
             createCommunity,
-            editCommunity,
             editForm
         };
 
@@ -239,7 +217,7 @@ export default {
             this.showDiv = !this.showDiv;
         },
         editCommunity(id) {
-            Repository.fetchCommunity()
+            Repository.editCommunity(id,this.editForm);
         },
         deleteFlair(id){
             Repository.deleteFlair(id);
@@ -262,8 +240,8 @@ export default {
 
         handleFileUpload(event) {
             const file = event.target.files[0];
-            // You can now perform actions with the selected file, such as uploading it to a server or displaying it on the page.
-            this.form.image = file; // Assign the selected file to the form's image property
+            this.form.image = file;
+            this.editForm.image = file;
         }
 
 
