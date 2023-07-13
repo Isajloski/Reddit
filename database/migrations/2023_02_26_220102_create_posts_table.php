@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->integer('community_id')->unsigned();
             $table->foreign('community_id')->references('id')->on('communities');
-            $table->integer('flair_id')->unsigned();
+            $table->integer('flair_id')->unsigned()->nullable();
             $table->foreign('flair_id')->references('id')->on('flairs');
             $table->integer('image_id')->unsigned()->nullable();
             $table->foreign('image_id')->references('id')->on('images');

@@ -15,12 +15,12 @@
 </template>
 
 <script>
-import Button from "@/Components/Button.vue";
-import Post from "@/Components/Post.vue";
-import Filter from "@/Components/Filter.vue";
-import Create from "@/Components/Create.vue";
-import CommunityCard from "@/Components/CommunityCard.vue";
-import AboutCard from "@/Components/AboutCard.vue";
+import Button from "@/Components/Button/Button.vue";
+import Post from "@/Components/Post/Post.vue";
+import Filter from "@/Components/Filter/Filter.vue";
+import Create from "@/Pages/Home/Create.vue";
+import CommunityCard from "@/Pages/Community/CommunityCard.vue";
+import AboutCard from "@/Pages/Community/AboutCard.vue";
 export default {
     name: "Content",
     components: {AboutCard, CommunityCard, Create, Filter, Post, Button}

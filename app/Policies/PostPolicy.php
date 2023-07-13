@@ -9,7 +9,7 @@ use Illuminate\Auth\Access\Response;
 class PostPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the user can view any Models.
      */
     public function viewAny(User $user): bool
     {
@@ -25,7 +25,7 @@ class PostPolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the user can create Models.
      */
     public function create(User $user): bool
     {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const Repository = {
+const ApiUtilis = {
     fetchCommunity(id) {
         return axios.get(`/community/${id}`);
     },
@@ -14,10 +14,20 @@ const Repository = {
         return axios.post(`/flair/${id}/edit`, formData);
     },
     editCommunity(id, editForm) {
-        console.log(id);
-        console.log(editForm);
         return axios.post(`/communities/${id}/edit`, editForm);
     },
+    createPost(formData) {
+        return axios.post(`/makePost`, formData);
+    },
+    editPost(id, editForm){
+        return axios.post(`/posts/${id}/edit`, editForm);
+    },
+    fetchPost(id){
+        return axios.get(`/posts/${id}`);
+    },
+    deletePost(id){
+        return axios.delete(`/posts/${id}/delete`)
+    }
 };
 
-export default Repository;
+export default ApiUtilis;

@@ -1,12 +1,12 @@
 <script setup>
 import {Head, Link} from '@inertiajs/vue3';
-import Navbar from "@/Components/Navbar.vue";
-import Filter from "@/Components/Filter.vue";
-import Flairs from "@/Components/Flairs.vue";
-import Create from "@/Components/Create.vue";
-import Rules from "@/Components/Rules.vue";
+import Navbar from "@/Components/Navbar/Navbar.vue";
+import Filter from "@/Components/Filter/Filter.vue";
+import Flairs from "@/Components/Flairs/Flairs.vue";
+import Create from "@/Pages/Home/Create.vue";
+import Rules from "@/Pages/Community/Rules.vue";
 import Content from "@/Layouts/Content.vue";
-import AboutCard from "@/Components/AboutCard.vue";
+import AboutCard from "@/Pages/Community/AboutCard.vue";
 
 defineProps({
     canLogin: Boolean,

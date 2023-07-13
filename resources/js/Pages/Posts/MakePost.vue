@@ -3,7 +3,7 @@
     <div class="w-auto md:w-3/5 mx-5 md:mx-auto mt-48 md:mt-20 rounded-xl relative bg-[#2d2d2d]">
         <div class="">
             <h1 class="text-white text-2xl pb-5 text-center font-bold">Create Post</h1>
-            <form class="p-5">
+            <form class="p-5" @submit.prevent="createPost">
                 <div class="pb-5">
                     <div htmlFor="name" class="py-1 text-white">Community</div>
                     <input type="text" id="community" class="rounded bg-[#515151] text-white">
@@ -36,10 +36,46 @@
 </template>
 
 <script>
-import Navbar from "@/Components/Navbar.vue";
+import Navbar from "@/Components/Navbar/Navbar.vue";
+import {useForm} from "@inertiajs/vue3";
 export default {
     name: "MakePost",
-    components: {Navbar}
+    components: {Navbar},
+    setup(){
+
+        const form = useForm({
+            name: '',
+            description: '',
+            rules: '',
+            image: ''
+        })
+
+        const handleFileUpload = (event) => {
+            const file = event.target.files[0];
+            form.data.image = file;
+            editForm.data.image = file;
+        };
+
+        const createPost = () => {
+            form.post(route('posts.store'), {
+                onSuccess: () => {
+                    // Handle success, e.g., redirect to communities index
+                    // You can customize this based on your application's flow
+                    console.log("I saved the community!")
+                },
+                onError: () =>{
+                    console.log("The /r/" + document.getElementById('text').toString().valueOf() + " already exsist!");
+                },
+            });
+        }
+
+        return {
+            createPost
+        }
+    },
+    methods: {
+
+    }
 }
 </script>
 

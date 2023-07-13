@@ -138,8 +138,8 @@
 <script>
 import axios from 'axios';
 import { useForm, Head } from '@inertiajs/vue3';
-import Repository from "@/Repository/Repository";
-import Navbar from "@/Components/Navbar.vue";
+import ApiUtilis from "@/Helpers/ApiUtilis";
+import Navbar from "@/Components/Navbar/Navbar.vue";
 export default {
     components: {Navbar},
     data(){
@@ -217,23 +217,23 @@ export default {
             this.showDiv = !this.showDiv;
         },
         editCommunity(id) {
-            Repository.editCommunity(id,this.editForm);
+            ApiUtilis.editCommunity(id,this.editForm);
         },
         deleteFlair(id){
-            Repository.deleteFlair(id);
+            ApiUtilis.deleteFlair(id);
         },
         createFlair(id) {
             const formData = {
                 name: this.flairName,
                 community_id: id,
             };
-            Repository.createFlair(formData);
+            ApiUtilis.createFlair(formData);
         },
         editFlair(id){
             const formData = {
                 name: this.flairName,
             };
-            Repository.editFlair(id, formData);
+            ApiUtilis.editFlair(id, formData);
         },
 
 

@@ -1,8 +1,8 @@
 <script setup>
 import {Head, Link} from '@inertiajs/vue3';
-import Navbar from "@/Components/Navbar.vue";
-import Filter from "@/Components/Filter.vue";
-import Create from "@/Components/Create.vue";
+import Navbar from "@/Components/Navbar/Navbar.vue";
+import Filter from "@/Components/Filter/Filter.vue";
+import Create from "@/Pages/Home/Create.vue";
 import Content from "@/Layouts/Content.vue";
 
 defineProps({

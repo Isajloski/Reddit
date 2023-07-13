@@ -43,10 +43,10 @@ class CommunityController extends Controller
             $file = $request->file('image');
             $imageController = new ImageController();
             $imageId = $imageController->store($file, '/communities');
-            $community->image_id = $imageId;
+            $community->image = $imageId;
         }
         else{
-            $community->image_id = null;
+            $community->image = null;
         }
 
         $community->user()->associate($user);

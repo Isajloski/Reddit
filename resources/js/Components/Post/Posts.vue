@@ -1,9 +1,9 @@
 <script setup>
 
-import Dropdown from '@/Components/Dropdown.vue';
-import InputError from '@/Components/InputError.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
+import Dropdown from '@/Components/Dropdown/Dropdown.vue';
+import InputError from '@/Components/Input/InputError.vue';
+import PrimaryButton from '@/Components/Button/PrimaryButton.vue';
+import DropdownLink from '@/Components/Dropdown/DropdownLink.vue';
 
 
 

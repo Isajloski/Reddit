@@ -1,11 +1,11 @@
 <script setup>
 
-import Dropdown from '@/Components/Dropdown.vue';
-import InputError from '@/Components/InputError.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
+import Dropdown from '@/Components/Dropdown/Dropdown.vue';
+import InputError from '@/Components/Input/InputError.vue';
+import PrimaryButton from '@/Components/Button/PrimaryButton.vue';
 import { ref } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import Posts from '@/Components/Posts.vue';
+import Posts from '@/Components/Post/Posts.vue';
 import { useForm, Head } from '@inertiajs/vue3';
 
 
