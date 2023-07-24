@@ -64,6 +64,7 @@ Route::get('/community', [test::class, 'index'])->name('test.index');
 
 //post
 Route::get('/makePost', [PostController::class, 'create'])->name('posts.create');
+Route::post('/makePost', [PostController::class, 'store'])->name('posts.store');
 
 //FLAIR
 Route::post('/flair/{id}/delete', [FlairController::class, 'destroy'])->name('flair.destroy');

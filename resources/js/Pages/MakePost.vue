@@ -6,19 +6,19 @@
             <form class="p-5" @submit.prevent="createPost">
                 <div class="pb-5">
                     <div htmlFor="name" class="py-1 text-white">Community</div>
-                    <input type="text" id="community" class="rounded bg-[#515151] text-white">
+                    <input type="text" id="communityId" v-model="form.communityId" class="rounded bg-[#515151] text-white">
                 </div>
                 <div class="pb-5">
                     <div htmlFor="" class="py-1 text-white">Title:</div>
-                    <input type="text" id="title" class="rounded bg-[#515151] text-white w-full">
+                    <input type="text" id="title" v-model="form.title" class="rounded bg-[#515151] text-white w-full">
                 </div>
                 <div class="pb-5">
                     <div htmlFor="" class="py-1 text-white">Content:</div>
-                    <textarea type="text" id="content" class="rounded bg-[#515151] w-96 text-white w-full"></textarea>
+                    <textarea type="text" id="content" v-model="form.body" class="rounded bg-[#515151] w-96 text-white w-full"></textarea>
                 </div>
                 <div class="pb-5">
                     <div class="py-1 text-white">Image:</div>
-                    <input type="text" id="image" class="rounded bg-[#515151] text-white">
+                    <input type="text" id="image"  @change="handleFileUpload" class="rounded bg-[#515151] text-white">
                 </div>
                 <div class="pb-5">
                     <div class="py-1 text-white">Link:</div>
@@ -38,38 +38,40 @@
 <script>
 import Navbar from "@/Components/Navbar/Navbar.vue";
 import {useForm} from "@inertiajs/vue3";
+
 export default {
     name: "MakePost",
     components: {Navbar},
     setup(){
 
         const form = useForm({
-            name: '',
-            description: '',
-            rules: '',
+            communityId: '',
+            title: '',
+            body: '',
             image: ''
         })
 
         const handleFileUpload = (event) => {
-            const file = event.target.files[0];
-            form.data.image = file;
-            editForm.data.image = file;
+            form.data.image = event.target.files[0];
         };
 
         const createPost = () => {
-            form.post(route('posts.store'), {
+            console.log(form)
+            form.post(route('posts.create'), {
                 onSuccess: () => {
                     // Handle success, e.g., redirect to communities index
                     // You can customize this based on your application's flow
-                    console.log("I saved the community!")
+                    console.log("I saved the post!")
                 },
                 onError: () =>{
-                    console.log("The /r/" + document.getElementById('text').toString().valueOf() + " already exsist!");
+                    console.log("error");
                 },
             });
         }
 
         return {
+            form,
+            handleFileUpload,
             createPost
         }
     },

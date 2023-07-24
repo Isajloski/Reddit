@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
@@ -33,11 +34,27 @@ class PostController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'message' => 'required|string|max:255',
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+            'communityId' => 'required',
+            'image' => 'nullable|file'
         ]);
 
-        $request->user()->posts()->create($validated);
+        $user = Auth::user();
+        $post = new Post();
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+        $post->image_id = null;
+        $post->karma=1;
+
+        $post->user()->associate($user);
+        $post->community()->associate($request->input('communityId'));
+        $post->save();
 
         return redirect(route('posts.index'));
     }

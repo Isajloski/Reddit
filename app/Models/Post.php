@@ -11,12 +11,29 @@ class Post extends Model
 {
     use HasFactory;
 
+    /**
+     * @var int|mixed|string|null
+     */
+    protected $fillable =
+        ['community_id, user_id, title, body, flair_id, image_id, karma'];
+
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    protected $fillable = [
-        'message',
-    ];
+    public function community()
+    {
+        return $this->belongsTo(Community::class, 'community_id');
+    }
+
+    public function flairs()
+    {
+        return $this->hasMany(Flair::class);
+    }
+
+    public function image()
+    {
+        return $this->belongsTo(Image::class, 'image_id');
+    }
 }
