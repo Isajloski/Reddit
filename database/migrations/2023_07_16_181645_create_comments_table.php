@@ -15,11 +15,13 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id')->unsigned();
             $table->integer('post_id')->unsigned();
-            $table->integer('comment_id')->unsigned();
+            $table->integer('parent_comment_id')->nullable();
             $table->string('body');
+            $table->integer('karma')->default(1);
+            $table->integer('replies')->default(0);
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('post_id')->references('id')->on('posts');
-            $table->foreign('comment_id')->references('id')->on('comments');
+            $table->foreign('parent_comment_id')->references('id')->on('comments');
             $table->timestamps();
         });
     }

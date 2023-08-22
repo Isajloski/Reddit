@@ -42,7 +42,7 @@ class CommunityController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $imageController = new ImageController();
-            $imageId = $imageController->store($file, '/communities');
+            $imageId = $imageController->storeImage($file, '/communities');
             $community->image_id = $imageId;
         }
         else{

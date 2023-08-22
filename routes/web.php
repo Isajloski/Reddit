@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FlairController;
 use App\Http\Controllers\MarkdownController;
 use App\Http\Controllers\PostController;
@@ -50,7 +51,7 @@ Route::resource('markdown', MarkdownController::class)
     ->middleware(['auth', 'verified']);
 
 
-//Comunities:
+//Communities:
 Route::get('/makeCommunity', [CommunityController::class, 'index'])->name('communities.index');
 Route::post('/makeCommunity', [CommunityController::class, 'store'])->name('communities.store');
 Route::get('/communities', [CommunityController::class, 'index'])->name('communities.index');
@@ -63,14 +64,34 @@ Route::post('/communities/{id}/delete', [CommunityController::class, 'destroy'])
 Route::get('/community', [test::class, 'index'])->name('test.index');
 
 //post
+//to-do with pagination
 Route::get('/makePost', [PostController::class, 'create'])->name('posts.create');
 Route::post('/makePost', [PostController::class, 'store'])->name('posts.store');
+Route::get('/post/{id}', [PostController::class, 'get']) ->name('posts.get');
+Route::delete('/post/{id}/delete', [PostController::class, 'delete'])->name('posts.delete');
+Route::get('/post/{id}/edit', [PostController::class, 'edit']) ->name('posts.edit');
+Route::post('/post/{id}/edit', [PostController::class, 'update']) ->name('posts.update');
+Route::post('/post/{id}/vote', [PostController::class, 'votePost'])->name('posts.votePost');
+Route::get('/posts/sort/popular', [PostController::class, 'sortByPopular'])->name('posts.sortByPopular');
+Route::get('/posts/sort/newest', [PostController::class, 'sortByNewest'])->name('posts.sortByNewest');
+Route::get('/posts/recent', [PostController::class, 'getRecentPosts'])->name('posts.getRecentPosts');
 
 //FLAIR
 Route::post('/flair/{id}/delete', [FlairController::class, 'destroy'])->name('flair.destroy');
 Route::post('/flair/{id}/edit', [FlairController::class, 'update'])->name('flair.update');
 
 Route::post('/flair/create', [FlairController::class, 'store'])->name('flair.create');
+
+//COMMENTS
+Route::get('/post/{id}/comments', [CommentController::class, 'getPostComments'])->name('posts.getPostComments');
+Route::get('/comment/{id}', [CommentController::class, 'getCommentReplies'])->name('comments.getCommentReplies');
+Route::post('/comment/{id}/edit', [CommentController::class, 'edit'])->name('comments.edit');
+Route::delete('/comment/{id}/delete', [CommentController::class, 'delete'])->name('comments.delete');
+Route::post('comment/{id}/upvote', [CommentController::class, 'upvote'])->name('comments.upvote');
+Route::post('comment/{id}/downvote', [CommentController::class, 'downvote'])->name('comments.downvote');
+Route::get('post/{id}/comments/sort/newest', [CommentController::class, 'sortByNewest'])->name('comments.sortByNewest');
+Route::get('post/{id}/comments/sort/popular', [CommentController::class, 'sortByPopular'])->name('comments.sortByPopular');
+
 
 
 

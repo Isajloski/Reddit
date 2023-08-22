@@ -1,15 +1,15 @@
 <template>
     <div class="w-full mx-auto z-0">
-        <div class="py-5 px-5 md:px-7">
+        <div class="pt-2 px-5 md:px-7">
             <div class="grid grid-cols-2 relative">
                 <div class="inline-block relative">
                     <TestIcon class="z-10 inline-block w-4 h-4"/>
-                    <div class="ml-2 text-white inline-block text-base md:text-lg">Photography</div>
+                    <div class="ml-2 text-white inline-block text-base md:text-lg">{{communityName}}</div>
                     <span class="text-xs ml-0.5 bottom-0 absolute text-[#898989] mb-1 font-light">/community</span>
                 </div>
                 <div class="inline-block text-right mr-20">
                     <span class="text-xs bottom-0 text-[#898989] mb-1 font-light hidden md:inline-block">Posted by</span>
-                    <span class="text-xs ml-1 bottom-0 absolute text-white mb-1.5">mimziphery</span>
+                    <span class="text-xs ml-1 bottom-0 absolute text-white mb-1.5">{{ byUser }}</span>
                 </div>
             </div>
             <div class="pt-3">
@@ -22,11 +22,15 @@
                         <div class="inline-block mr-2">
                             <VoteUpIcon class="w-4 h-4 inline-block mx-1"/>
                             <div class="inline-block">
-                                <span class="text-white text-sm">13.5K</span>
+                                <span class="text-white text-sm">{{karma }}</span>
                             </div>
                         </div>
                         <div class="inline-block">
                             <VoteDownIcon class="w-4 h-4 inline-block mx-1"/>
+                        </div>
+                        <div class="inline-block">
+                            <CommentIcon class="w-4 h-4 inline-block ml-3"/>
+                            <span class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">{{comments}} Comments</span>
                         </div>
                         <div class="inline-block">
                             <ShareIcon class="w-4 h-4 inline-block ml-3"/>
@@ -34,14 +38,13 @@
                         </div>
                     </div>
                     <div class="right-0 absolute">
-                        <span class="text-xs text-[#898989]">04.06.2023</span>
+                        <span class="text-xs text-[#898989]">{{ date }}</span>
                     </div>
                 </div>
                 <div class="py-2">
-                    <p class="text-[#898989] pt-2 line-clamp-4 w-full text-sm md:text-base">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse in nunc et lectus malesuada
-                        tempus. Donec sollicitudin gravida nisi, quis suscipit nisl elementum eu. Vestibulum purus lectus,
-                        ullamcorper non gravida nec, facilisis tincidunt lacus.Donec sollicitudin gravida nisi, quis suscipit nisl elementum eu. Vestibulum purus lectus,
-                        ullamcorper non gravida nec, facilisis tincidunt lacus</p>
+                    <p class="text-[#898989] pt-2 line-clamp-4 w-full text-sm md:text-base">{{
+                            description
+                        }}</p>
                     <p class="pt-1 text-white"> Expand post</p>
                 </div>
             </div>
@@ -55,20 +58,22 @@ import TestIcon from "@/Components/Icons/TestIcon.vue";
 import ShareIcon from "@/Components/Icons/ShareIcon.vue";
 import VoteUpIcon from "@/Components/Icons/VoteUpIcon.vue";
 import VoteDownIcon from "@/Components/Icons/VoteDownIcon.vue";
+import CommentIcon from "@/Components/Icons/CommentIcon.vue";
 
 export default {
     name: "Post",
-    components: {VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon},
+    components: {CommentIcon, VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon},
     //or Post as an Object
     props: {
         id: String,
-        community : String,
-        user: String,
-        likes: Number,
+        communityName : String,
+        byUser: String,
+        karma: Number,
         title: String,
+        image: String,
+        description: String,
+        date: Date,
         comments: Number,
-        photo: String,
-        description: String
     }
 }
 </script>

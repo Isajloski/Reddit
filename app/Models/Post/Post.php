@@ -1,16 +1,19 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Post;
 
+use App\Models\Comment\Comment;
+use App\Models\Community;
+use App\Models\Flair;
+use App\Models\Image;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 
 class Post extends Model
 {
     use HasFactory;
-
     /**
      * @var int|mixed|string|null
      */
@@ -25,6 +28,11 @@ class Post extends Model
     public function community()
     {
         return $this->belongsTo(Community::class, 'community_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function flairs()
