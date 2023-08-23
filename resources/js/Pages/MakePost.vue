@@ -6,7 +6,12 @@
             <form class="p-5" @submit.prevent="createPost">
                 <div class="pb-5">
                     <div htmlFor="name" class="py-1 text-white">Community</div>
-                    <input type="text" id="communityId" v-model="form.communityId" class="rounded bg-[#515151] text-white">
+                    <Dropdown
+                        placeholder="Select"
+                        :options="dropdownOptions"
+                        @option-selected="handleSelectedOption"
+                        v-model="form.communityId"></Dropdown>
+<!--                    <input type="text" id="communityId" v-model="form.communityId" class="rounded bg-[#515151] text-white">-->
                 </div>
                 <div class="pb-5">
                     <div htmlFor="" class="py-1 text-white">Title:</div>
@@ -38,10 +43,27 @@
 <script>
 import Navbar from "@/Components/Navbar/Navbar.vue";
 import {useForm} from "@inertiajs/vue3";
+import Dropdown from '@/Components/Dropdown/Dropdown.vue';
+import ApiUtilis from "@/Helpers/ApiUtilis";
 
 export default {
     name: "MakePost",
-    components: {Navbar},
+    components: {Dropdown, Navbar},
+    data(){
+        return {
+            dropdownOptions: [],
+            selectedOptionInParent: null,
+        }
+    },
+    async created() {
+        try {
+            // Fetch options from an API
+            const response  = await ApiUtilis.fetchUserCommunities();
+            this.dropdownOptions = response.data; // Set the fetched options
+        } catch (error) {
+            console.error('Error fetching options:', error);
+        }
+    },
     setup(){
 
         const form = useForm({
@@ -76,7 +98,9 @@ export default {
         }
     },
     methods: {
-
+        handleSelectedOption(option){
+            this.selectedOptionInParent = option;
+        }
     }
 }
 </script>

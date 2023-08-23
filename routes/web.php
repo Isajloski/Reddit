@@ -58,6 +58,7 @@ Route::get('/communities/{id}', [CommunityController::class, 'findById'])->name(
 Route::get('/communities/{id}/edit', [CommunityController::class, 'edit'])->name('communities.edit');
 Route::post('/communities/{id}/edit', [CommunityController::class, 'update'])->name('communities.update');
 Route::post('/communities/{id}/delete', [CommunityController::class, 'destroy'])->name('communities.destroy');
+Route::get('communities/user/following', [CommunityController::class, 'userCommunities'])->name('communities.userCommunities');
 
 //test
 Route::get('/community', [test::class, 'index'])->name('test.index');

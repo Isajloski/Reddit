@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Models\Community;
+use App\Models\Follow;
+use App\Models\User;
 
 class CommunityService
 {
 
-    public function getUserCommunities(){
-
+    public function getUserCommunities(User $user){
+        return Follow::with('community')->where('user_id', $user->id)->get();
     }
 
     public function searchCommunities(){

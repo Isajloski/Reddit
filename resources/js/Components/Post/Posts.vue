@@ -75,3 +75,34 @@ const editing = ref(false);
         </div>
     </div>
 </template>
+
+<script>
+export default {
+    props: {
+        options: {
+            type: Array,
+            required: true
+        },
+        placeholder: {
+            type: String,
+            default: 'Select an option',
+        },
+    },
+    data() {
+        return {
+            isOpen: false,
+            selectedOption: null,
+            // options: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
+        };
+    },
+    methods: {
+        toggleDropdown() {
+            this.isOpen = !this.isOpen;
+        },
+        selectOption(option) {
+            this.selectedOption = option;
+            this.isOpen = false;
+        },
+    },
+};
+</script>

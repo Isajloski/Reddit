@@ -13,4 +13,14 @@ class Follow extends Model
         'user_id',
         'community_id',
     ];
+
+    public function community()
+    {
+        return $this->belongsTo(Community::class, 'community_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

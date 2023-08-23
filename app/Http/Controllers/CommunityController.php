@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mappers\CommunityMapper;
 use App\Models\Community;
+use App\Services\CommunityService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +12,9 @@ use Illuminate\Support\Facades\Auth;
 
 class CommunityController extends Controller
 {
+
+    public function __construct(private readonly CommunityService $communityService,
+                                private readonly CommunityMapper $communityMapper){}
     public function index()
     {
         $communities = Community::with('user', 'flairs', 'image')->get();
@@ -117,7 +122,14 @@ class CommunityController extends Controller
         ]);
     }
 
-
-
+    public function userCommunities()
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+        $user = Auth::user();
+        return $this->communityMapper->mapCollectionToDto($this->communityService->getUserCommunities($user));
+    }
+    
 
 }

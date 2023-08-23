@@ -4,6 +4,9 @@ const ApiUtilis = {
     fetchCommunity(id) {
         return axios.get(`/community/${id}`);
     },
+    fetchUserCommunities(){
+        return axios.get('communities/user/following');
+    },
     createFlair(formData) {
         return axios.post('/flair/create', formData);
     },
