@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FlairController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\MarkdownController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
@@ -47,9 +48,7 @@ Route::resource('posts', PostController::class)
     ->middleware(['auth', 'verified']);
 
 Route::resource('markdown', MarkdownController::class)
-    ->only(['index'])
-    ->middleware(['auth', 'verified']);
-
+    ->only(['index']);
 
 //Communities:
 Route::get('/makeCommunity', [CommunityController::class, 'index'])->name('communities.index');
@@ -81,6 +80,9 @@ Route::post('/flair/{id}/delete', [FlairController::class, 'destroy'])->name('fl
 Route::post('/flair/{id}/edit', [FlairController::class, 'update'])->name('flair.update');
 
 Route::post('/flair/create', [FlairController::class, 'store'])->name('flair.create');
+        // routes/api.php
+Route::post('/follow/{communityId}', [FollowController::class, 'follow'])->name('follow');
+Route::post('/unfollow/{communityId}', [FollowController::class, 'unfollow'])->name('unfollow');
 
 //COMMENTS
 Route::get('/post/{id}/comments', [CommentController::class, 'getPostComments'])->name('posts.getPostComments');
