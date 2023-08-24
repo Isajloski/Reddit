@@ -10,6 +10,7 @@
                         placeholder="Select"
                         :options="dropdownOptions"
                         @option-selected="handleSelectedOption"
+                        id="communityId"
                         v-model="form.communityId"></Dropdown>
 <!--                    <input type="text" id="communityId" v-model="form.communityId" class="rounded bg-[#515151] text-white">-->
                 </div>
@@ -52,20 +53,18 @@ export default {
     data(){
         return {
             dropdownOptions: [],
-            selectedOptionInParent: null,
+            selectedCommunity: null,
         }
     },
     async created() {
         try {
-            // Fetch options from an API
             const response  = await ApiUtilis.fetchUserCommunities();
-            this.dropdownOptions = response.data; // Set the fetched options
+            this.dropdownOptions = response.data;
         } catch (error) {
             console.error('Error fetching options:', error);
         }
     },
     setup(){
-
         const form = useForm({
             communityId: '',
             title: '',
@@ -78,7 +77,6 @@ export default {
         };
 
         const createPost = () => {
-            console.log(form)
             form.post(route('posts.create'), {
                 onSuccess: () => {
                     // Handle success, e.g., redirect to communities index
@@ -99,7 +97,8 @@ export default {
     },
     methods: {
         handleSelectedOption(option){
-            this.selectedOptionInParent = option;
+            this.selectedCommunity = option;
+            this.form.communityId = option;
         }
     }
 }

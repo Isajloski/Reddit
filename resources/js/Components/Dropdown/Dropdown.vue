@@ -4,7 +4,7 @@
             {{ selectedOption || placeholder }}
         </button>
         <ul v-if="isOpen" class="dropdown-list">
-            <li v-for="{id, name} in options" :key="id" @click="selectOption(id)" class="cursor-pointer">
+            <li v-for="{id, name} in options" :key="id" @click="selectOption({id, name})" class="cursor-pointer">
                 {{ name }}
             </li>
         </ul>
@@ -34,10 +34,10 @@ export default {
         toggleDropdown() {
             this.isOpen = !this.isOpen;
         },
-        selectOption(option) {
-            this.selectedOption = option;
+        selectOption({id, name}) {
+            this.selectedOption = name;
             this.isOpen = false;
-            this.$emit('option-selected', option);
+            this.$emit('option-selected', id);
         },
 
     },
