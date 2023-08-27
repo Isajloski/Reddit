@@ -64,7 +64,6 @@ Route::get('communities/user/following', [CommunityController::class, 'userCommu
 Route::get('/community', [test::class, 'index'])->name('test.index');
 
 //post
-//to-do with pagination
 Route::get('/makePost', [PostController::class, 'create'])->name('posts.create');
 Route::post('/makePost', [PostController::class, 'store'])->name('posts.store');
 Route::get('/post/{id}', [PostController::class, 'get']) ->name('posts.get');
@@ -75,6 +74,7 @@ Route::post('/post/{id}/vote', [PostController::class, 'votePost'])->name('posts
 Route::get('/posts/sort/popular', [PostController::class, 'sortByPopular'])->name('posts.sortByPopular');
 Route::get('/posts/sort/newest', [PostController::class, 'sortByNewest'])->name('posts.sortByNewest');
 Route::get('/posts/recent', [PostController::class, 'getRecentPosts'])->name('posts.getRecentPosts');
+Route::get('/posts/paginate/{id}', [PostController::class, 'paginate'])->name('posts.paginate');
 
 //FLAIR
 Route::post('/flair/{id}/delete', [FlairController::class, 'destroy'])->name('flair.destroy');

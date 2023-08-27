@@ -177,6 +177,7 @@ export default {
         };
 
         const createCommunity = () => {
+            console.log(form)
             form.post(route('communities.store'), {
                 onSuccess: () => {
                     // Handle success, e.g., redirect to communities index
@@ -184,7 +185,7 @@ export default {
                     console.log("I saved the community!")
                 },
                 onError: () =>{
-                    console.log("The /r/" + document.getElementById('text').toString().valueOf() + " already exsist!");
+                    // console.log("The /r/" + document.getElementById('text').toString().valueOf() + " already exsist!");
                 },
             });
         };

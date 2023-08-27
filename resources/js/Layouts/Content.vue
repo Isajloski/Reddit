@@ -1,4 +1,4 @@
-<template class="relative">
+<template class="relative scrollable-container" ref="scrollContainer" @scroll="handleScroll">
 <div class="w-auto md:w-3/5 mx-5 md:mx-auto mt-48 md:mt-20 rounded-xl relative bg-[#2d2d2d]">
     <div class="py-3 float-right" style="margin-top: -70px;">
 <!--        do not show button if its on subreddit-->
@@ -6,11 +6,11 @@
     </div>
     <div class="px-1 md:px-10">
 <!--        <CommunityCard/>-->
-        <div class="md:py-10"  v-for="post in posts" :key="post.id">
+        <div class="md:py-10" v-for="(post) in posts" :key="post.id">
             <Post :id="post.id"
                   :description="post.body"
-                  :by-user="post.user.userName"
-                  :community-name="post.community.name"
+                  :by-user="post.user"
+                  :community-name="post.community?.name"
                   :comments="post.comments_number"
                   :karma="post.karma"
                   :date="post.date"
@@ -35,21 +35,30 @@ export default {
     data() {
         return {
             posts: [],
+            currentPage: 1,
         };
     },
     mounted() {
+        // this.fetchData();
+    },
+    created() {
         this.fetchData();
     },
     methods: {
         async fetchData() {
             try {
-                const response = await axios.get('/posts/recent');
-                this.posts = response.data;
-            }
-            catch (error) {
+                let newData = [await axios.get('/posts/paginate/' + this.currentPage)]; // Fetch data using your method here
+                const dataD = await newData[0].data;
+                console.log(dataD)
+                this.posts.push(dataD);
+                // this.posts = [...this.posts, ...response];
+                // const response = await axios.get('/posts/recent');
+                // this.posts = response.data;
+            } catch (error) {
                 console.error('Error fetching data:', error);
             }
         },
+
     },
 }
 </script>

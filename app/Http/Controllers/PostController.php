@@ -34,6 +34,17 @@ class PostController extends Controller
         ]);
     }
 
+    public function paginate(int $number){
+        $paginatedPosts =  Post::paginate($number);
+        return $paginatedPosts
+            ->getCollection()
+            ->map(function($post) {
+                return [
+                    $this->postMapper->mapToDto($post)
+                ];
+            });
+    }
+
 
     /**
      * Show the form for creating a new resource.
