@@ -18,8 +18,12 @@
     },
     "dependencies": {
         "@tailwindcss/line-clamp": "^0.4.4",
+        "@tiptap/pm": "^2.1.7",
+        "@tiptap/starter-kit": "^2.1.7",
+        "@tiptap/vue-3": "^2.1.7",
         "@vueup/vue-quill": "^1.1.0",
         "dayjs": "^1.11.7",
-        "marked": "^4.2.12"
+        "marked": "^4.2.12",
+        "vue2-editor": "^2.10.3"
     }
 }
