@@ -74,7 +74,7 @@ Route::post('/post/{id}/vote', [PostController::class, 'votePost'])->name('posts
 Route::get('/posts/sort/popular', [PostController::class, 'sortByPopular'])->name('posts.sortByPopular');
 Route::get('/posts/sort/newest', [PostController::class, 'sortByNewest'])->name('posts.sortByNewest');
 Route::get('/posts/recent', [PostController::class, 'getRecentPosts'])->name('posts.getRecentPosts');
-Route::get('/posts/paginate/{id}', [PostController::class, 'paginate'])->name('posts.paginate');
+Route::get('/posts/paginate', [PostController::class, 'paginate'])->name('posts.paginate');
 
 //FLAIR
 Route::post('/flair/{id}/delete', [FlairController::class, 'destroy'])->name('flair.destroy');

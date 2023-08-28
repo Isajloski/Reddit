@@ -34,15 +34,20 @@ class PostController extends Controller
         ]);
     }
 
-    public function paginate(int $number){
-        $paginatedPosts =  Post::paginate($number);
-        return $paginatedPosts
-            ->getCollection()
-            ->map(function($post) {
+    public function paginate(){
+
+        $posts = Post::paginate(2);
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
                 return [
                     $this->postMapper->mapToDto($post)
                 ];
             });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
     }
 
 

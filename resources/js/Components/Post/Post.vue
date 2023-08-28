@@ -63,16 +63,15 @@ import CommentIcon from "@/Components/Icons/CommentIcon.vue";
 export default {
     name: "Post",
     components: {CommentIcon, VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon},
-    //or Post as an Object
     props: {
-        id: String,
+        id: Number,
         communityName : String,
         byUser: String,
         karma: Number,
         title: String,
         image: String,
         description: String,
-        date: Date,
+        date: String,
         comments: Number,
     }
 }
