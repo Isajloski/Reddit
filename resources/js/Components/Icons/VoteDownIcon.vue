@@ -9,11 +9,11 @@
 export default {
     name: "VoteDownIcon",
     props: {
-        voteDownState : Boolean
+        voteDown : Boolean
     },
     methods : {
         colorAttr() {
-            if (this.voteDownState) {
+            if (this.voteDown) {
                 return '#F20085'
             } else {
                 return 'white';
