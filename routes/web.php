@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/logout', [ProfileController::class, 'logout'])->name('profile.logout');
 });
 
 Route::resource('posts', PostController::class)
@@ -51,6 +52,7 @@ Route::resource('markdown', MarkdownController::class)
     ->only(['index']);
 
 //Communities:
+
 Route::get('/makeCommunity', [CommunityController::class, 'index'])->name('communities.index');
 Route::post('/makeCommunity', [CommunityController::class, 'store'])->name('communities.store');
 Route::get('/communities', [CommunityController::class, 'index'])->name('communities.index');
@@ -71,6 +73,7 @@ Route::delete('/post/{id}/delete', [PostController::class, 'delete'])->name('pos
 Route::get('/post/{id}/edit', [PostController::class, 'edit']) ->name('posts.edit');
 Route::post('/post/{id}/edit', [PostController::class, 'update']) ->name('posts.update');
 Route::post('/post/{id}/vote', [PostController::class, 'votePost'])->name('posts.votePost');
+Route::delete('/post/{id}/vote/delete', [PostController::class, 'deleteVotePost'])->name('posts.deleteVotePost');
 Route::get('/posts/sort/popular', [PostController::class, 'sortByPopular'])->name('posts.sortByPopular');
 Route::get('/posts/sort/newest', [PostController::class, 'sortByNewest'])->name('posts.sortByNewest');
 Route::get('/posts/recent', [PostController::class, 'getRecentPosts'])->name('posts.getRecentPosts');

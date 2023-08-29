@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('post_votes', function (Blueprint $table) {
             $table->integer('user_id')->unsigned();
             $table->integer('post_id')->unsigned();
+            $table->primary(array('user_id', 'post_id'));
             $table->boolean('vote');
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('post_id')->references('id')->on('posts');

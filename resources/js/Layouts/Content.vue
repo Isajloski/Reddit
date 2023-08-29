@@ -6,17 +6,18 @@
         </div>
         <div class="px-1 md:px-10">
             <!--        <CommunityCard/>-->
-            <div class="md:py-10" v-for="post in posts">
-                <div v-for="x in post" :key="post.id">
-                    <Post :id="x.id"
-                          :description="x.body"
-                          :by-user="x.user.userName"
-                          :community-name="x.community?.name"
-                          :comments="x.comments_number"
-                          :karma="x.karma"
-                          :date="x.date"
-                          :image="x.image"
-                          :title="x.title"
+            <div class="md:py-10" v-for="array in posts">
+                <div v-for="post in array" :key="post.id">
+                    <Post :id="post.id"
+                          :description="post.body"
+                          :by-user="post.user.userName"
+                          :community-name="post.community?.name"
+                          :comments="post.comments_number"
+                          :vote = "post.vote"
+                          :karma="post.karma"
+                          :date="post.date"
+                          :image="post.image"
+                          :title="post.title"
                     />
                 </div>
             </div>
@@ -60,9 +61,9 @@ export default {
     methods: {
         async fetchData() {
             try {
-                let newData = await axios.get('/posts/paginate?page=' + this.currentPage);
-                const dataD = newData.data.data;
-                this.posts = [...this.posts, ...dataD];
+                let response = await axios.get('/posts/paginate?page=' + this.currentPage);
+                const newData = response.data.data;
+                this.posts = [...this.posts, ...newData];
             } catch (error) {
                 console.error('Error fetching data:', error);
             }

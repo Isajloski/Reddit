@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Mappers\PostMapper;
+use App\Models\Community;
 use App\Models\Post\dto\PostCreationDto;
-use App\Models\Post\dto\PostDetailedDto;
 use App\Models\Post\Post;
 use App\Models\Vote\dto\PostVoteDto;
 use App\Models\Vote\PostVote;
+use App\Services\CommunityService;
 use App\Services\PostService;
+use App\Services\VoteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -21,6 +23,8 @@ class PostController extends Controller
 {
 
     public function __construct(private readonly PostService $postService,
+                                private readonly CommunityService $communityService,
+                                private readonly VoteService $voteService,
                                 private readonly PostMapper $postMapper) {}
 
 
@@ -36,7 +40,8 @@ class PostController extends Controller
 
     public function paginate(){
 
-        $posts = Post::paginate(2);
+        $posts = $this->getUserPosts()->paginate(2);
+
 
         $updatedPosts = $posts->getCollection()->map(function($post) {
                 return [
@@ -48,6 +53,11 @@ class PostController extends Controller
         $posts->setCollection($updatedPosts);
 
         return $posts;
+    }
+
+    public function deleteVotePost($postId){
+        $user = Auth::user();
+        return $this->voteService->delete($user->id, $postId);
     }
 
 
@@ -115,6 +125,14 @@ class PostController extends Controller
         return $this->postService->getRecentPosts();
     }
 
+    public function getUserPosts() {
+        $user = Auth::user();
+        $communityIds = $this->communityService->getUserCommunities($user)->map(function ($community) {
+            return $community->id;
+        });
+        return Post::whereIn('community_id', $communityIds);
+    }
+
 
 
     /**
@@ -141,10 +159,16 @@ class PostController extends Controller
 
     }
 
-    public function votePost(PostVoteDto $postVoteDto){
+    public function votePost($id, Request $request){
         $user = Auth::user();
 
-        $this->postService->vote_Post($postVoteDto, $user);
+        $jsonData = json_decode($request->getContent(), true);
+
+        $postVoteDto = new PostVoteDto();
+        $postVoteDto->post_id = $id;
+        $postVoteDto->vote = $jsonData['vote'];
+
+        return $this->postService->vote_Post($postVoteDto, $user);
 
     }
 

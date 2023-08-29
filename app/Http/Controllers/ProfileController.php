@@ -24,6 +24,13 @@ class ProfileController extends Controller
         ]);
     }
 
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect('/login');
+    }
+
     /**
      * Update the user's profile information.
      */

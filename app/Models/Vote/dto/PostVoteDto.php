@@ -6,4 +6,9 @@ class PostVoteDto
 {
     public int $post_id;
     public bool $vote;
+
+
+    public function __construct( )
+    {
+    }
 }

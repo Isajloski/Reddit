@@ -2,9 +2,6 @@
 
 namespace App\Models\Post\dto;
 
-use App\Models\dto\CommunityDto;
-use App\Models\dto\UserDto;
-use Illuminate\Database\Eloquent\Collection;
 
 class PostCreationDto
 {

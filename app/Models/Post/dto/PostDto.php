@@ -13,6 +13,7 @@ class PostDto
     public string $body;
     public CommunityDto $community;
     public UserDto $user;
+    public bool | null $vote;
     public int $karma;
     public int $comments_number;
     public string $date;
@@ -55,6 +56,10 @@ class PostDto
 
     public function setKarma(int $karma) {
         $this->karma = $karma;
+    }
+
+    public function setVote($vote) {
+        $this->vote = $vote;
     }
 
     public function setCommentsNumber(int $comments_number) {

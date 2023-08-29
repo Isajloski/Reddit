@@ -7,13 +7,17 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class PostVote extends Model
 {
     use HasFactory;
     /**
      * @var int|mixed|string|null
      */
-    protected $fillable = ['user_id, post_id, vote'];
+    public $fillable = ['user_id, post_id, vote'];
+    protected $primaryKey = ['user_id', 'post_id'];
+    public $incrementing = false;
+
 
     public function user()
     {

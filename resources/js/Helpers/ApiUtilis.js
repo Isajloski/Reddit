@@ -30,7 +30,13 @@ const ApiUtilis = {
     },
     deletePost(id){
         return axios.delete(`/posts/${id}/delete`)
-    }
+    },
+    votePost(postVoteDto){
+        return axios.post(`/post/${postVoteDto.postId}/vote`, postVoteDto);
+    },
+    deleteVotePost(postVoteDto){
+        return axios.delete(`/post/${postVoteDto.postId}/vote/delete`);
+    },
 };
 
 export default ApiUtilis;

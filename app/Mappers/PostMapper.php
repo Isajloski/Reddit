@@ -7,15 +7,23 @@ use App\Models\dto\UserDto;
 use App\Models\Post\dto\PostDetailedDto;
 use App\Models\Post\dto\PostDto;
 use App\Models\Post\Post;
+use App\Services\VoteService;
+use Illuminate\Support\Facades\Auth;
 
 class PostMapper
 {
+    public function __construct(private readonly VoteService $voteService){}
+
+
     public function mapToDto(Post $post): PostDto
     {
 
         $postDto =  new PostDto($post->id, $post->title, $post->body, $post->created_at, $post->karma, $post->comments_number);
         $communityDto = new CommunityDto($post->community_id, $post->community->name);
         $userDto = new UserDto($post->user_id, $post->user->name);
+        $user = Auth::user();
+        $voted = $this->voteService->getPersonVote($user->id, $post->id);
+        $postDto->setVote($voted);
         $postDto->setCommunityDto($communityDto);
         $postDto->setUserDto($userDto);
 
