@@ -1,7 +1,8 @@
 <template>
+    {{voteUpState}}
     <svg width="26" height="30" viewBox="0 0 26 30" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M13.1333 0.0927724C14.38 0.0927725 15.6145 0.569459 16.5679 1.51061L24.3537 9.78537C25.3927 10.8243 25.6982 12.3399 25.1238 13.7211C24.5493 15.1022 23.2659 15.9701 21.7625 15.9823L19.2447 15.9823L19.2447 25.7604C19.2447 27.7772 17.5946 29.4272 15.5778 29.4272L10.6888 29.4272C8.67202 29.4272 7.02196 27.7772 7.02196 25.7604L7.02196 15.9823L4.50408 15.9823C3.00069 15.9823 1.71731 15.1145 1.14284 13.7211C0.568372 12.3399 0.873939 10.8121 1.93731 9.76093C1.93731 9.76093 9.6865 1.52283 9.69873 1.51061C10.6399 0.569459 11.8866 0.0927723 13.1333 0.0927724Z"
-              :fill="colorAttr()"/>
+              :fill="voteUpState ? '#F20085' : 'white'"/>
     </svg>
 </template>
 
@@ -9,19 +10,18 @@
 export default {
     name: "VoteUpIcon",
     props: {
-        voteUp : Boolean
+        voteUpState : Boolean
     },
-    methods :{
-        colorAttr(){
-            if(this.voteUp){
-                return '#F20085'
-            }
-            else{
-                return 'white';
-            }
-
-        }
-    }
+    // methods :{
+    //     colorAttr(){
+    //         if(this.voteUpState){
+    //             return '#F20085'
+    //         }
+    //         else{
+    //             return 'white';
+    //         }
+    //     }
+    // }
 }
 </script>
 

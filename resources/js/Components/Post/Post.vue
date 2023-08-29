@@ -22,7 +22,7 @@
                     <div>
                         <div class="inline-block mr-2">
                             <VoteUpIcon
-                                :voteUp="this.voteUpState" class="w-4 h-4 inline-block mx-1"
+                                :voteUp="this.voteUpState" class="cursor-pointer w-4 h-4 inline-block mx-1"
                                 @click="voteUp(id)"/>
                             <div class="inline-block">
                                 <span class="text-white text-sm">{{ childKarma }}</span>
@@ -30,7 +30,7 @@
                         </div>
                         <div class="inline-block">
                             <VoteDownIcon
-                                :voteDown="this.voteDownState" class="w-4 h-4 inline-block mx-1"
+                                :voteDown="this.voteDownState" class="cursor-pointer w-4 h-4 inline-block mx-1"
                                 @click="voteDown(id)"/>
                         </div>
                         <div class="inline-block">
@@ -83,11 +83,11 @@ export default {
             this.voteUpState = false;
             this.voteDownState = false;
         }
-        if (this.vote === 1) {
+        if (this.vote === true) {
             this.voteUpState = true;
             this.voteDownState = false;
         }
-        if (this.vote === 0) {
+        if (this.vote === false) {
             this.voteDownState = true;
             this.voteUpState = false;
         }
