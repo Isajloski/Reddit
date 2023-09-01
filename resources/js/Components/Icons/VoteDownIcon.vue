@@ -9,7 +9,7 @@
 export default {
     name: "VoteDownIcon",
     props: {
-        voteDown : Boolean
+        voteDown : Boolean | Number
     },
     methods : {
         colorAttr() {

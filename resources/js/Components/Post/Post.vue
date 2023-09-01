@@ -22,7 +22,7 @@
                     <div>
                         <div class="inline-block mr-2">
                             <VoteUpIcon :voteUp="this.voteUpState" class="cursor-pointer w-4 h-4 inline-block mx-1"
-                                @click="voteUp(id)"/>
+                                @click="voteUp(id)" />
                             <div class="inline-block">
                                 <span class="text-white text-sm">{{ childKarma }}</span>
                             </div>

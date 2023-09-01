@@ -19,6 +19,7 @@
                           :image="post.image"
                           :title="post.title"
                     />
+                    <Comment/>
                 </div>
             </div>
         </div>
@@ -28,6 +29,7 @@
 <script>
 import Button from "@/Components/Button/Button.vue";
 import Post from "@/Components/Post/Post.vue";
+import Comment from "@/Components/Comment/Comment.vue";
 import Filter from "@/Components/Filter/Filter.vue";
 import Create from "@/Pages/Home/Create.vue";
 import CommunityCard from "@/Pages/Community/CommunityCard.vue";
@@ -35,7 +37,7 @@ import AboutCard from "@/Pages/Community/AboutCard.vue";
 
 export default {
     name: "Content",
-    components: {AboutCard, CommunityCard, Create, Filter, Post, Button},
+    components: {AboutCard, CommunityCard, Create, Filter, Post, Button, Comment},
     data() {
         return {
             data: [],
