@@ -23,8 +23,6 @@ return new class extends Migration
             $table->foreign('image_id')->references('id')->on('images');
             $table->string('title');
             $table->string('body');
-            $table->integer('karma')->default(1);
-            $table->integer('comments_number')->default(0);
             $table->timestamps();
         });
     }

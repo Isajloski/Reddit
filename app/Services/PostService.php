@@ -49,16 +49,10 @@ class PostService
         $postVoteNew->save();
         $post = Post::with('image')->find($postVoteDto->post_id);
 
-        if($postVoteDto->vote==1){
-            $post->karma = $post->karma+=1;
-        }
-        else{
-            $post->karma = $post->karma-=1;
-        }
 
         $post->save();
 
-        return $post->karma;
+        return $this->voteService->getPostKarma($post->id);
     }
 
     public function delete(int $id): int

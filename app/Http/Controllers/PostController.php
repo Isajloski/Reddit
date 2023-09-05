@@ -100,7 +100,6 @@ class PostController extends Controller
         $post->title = $request->input('title');
         $post->body = $request->input('body');
         $post->image_id = null;
-        $post->karma=1;
 
         $post->user()->associate($user);
         $post->community()->associate($request->input('communityId'));

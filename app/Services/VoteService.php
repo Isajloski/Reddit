@@ -17,6 +17,18 @@ class VoteService
 
     }
 
+    public function getPostKarma($postId){
+
+        $positiveVotes = PostVote::all()->where('post_id', $postId)
+            ->where('vote', 1)->count();
+
+        $negativeVotes = PostVote::all()->where('post_id', $postId)
+            ->where('vote', 0)->count();
+
+        return $positiveVotes - $negativeVotes;
+
+    }
+
     public function getPersonVote($userId, $postId){
 
         $vote = $this->getByIds($userId, $postId);
@@ -34,14 +46,13 @@ class VoteService
     }
 
     public function delete($userId, $postId){
-        $post = Post::with('image')->find($postId);
-        $post->karma = $post->karma-1;
-        $post->save();
+
         PostVote::where([
             'user_id' => $userId,
             'post_id' => $postId
         ])->delete();
-        return $post->karma;
+
+        return $this->getPostKarma($postId);
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Mappers;
 
+use App\Models\Comment\Comment;
 use App\Models\dto\CommunityDto;
 use App\Models\dto\UserDto;
 use App\Models\Post\dto\PostDetailedDto;
@@ -17,8 +18,9 @@ class PostMapper
 
     public function mapToDto(Post $post): PostDto
     {
-
-        $postDto =  new PostDto($post->id, $post->title, $post->body, $post->created_at, $post->karma, $post->comments_number);
+        $karma = $this->voteService->getPostKarma($post->id);
+        $comments_number = Comment::all()->where('post_id', $post->id)->count();
+        $postDto =  new PostDto($post->id, $post->title, $post->body, $post->created_at, $karma, $comments_number);
         $communityDto = new CommunityDto($post->community_id, $post->community->name);
         $userDto = new UserDto($post->user_id, $post->user->name);
         $user = Auth::user();

@@ -1,6 +1,6 @@
 <template>
     <div class="dropdown rounded bg-[#515151] text-white p-2 inline-block">
-        <button @click="toggleDropdown" class="dropdown-button">
+        <button type="button" @click="toggleDropdown" class="dropdown-button">
             {{ selectedOption || placeholder }}
         </button>
         <ul v-if="isOpen" class="dropdown-list">
@@ -27,7 +27,6 @@ export default {
         return {
             isOpen: false,
             selectedOption: null,
-            // options: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
         };
     },
     methods: {
