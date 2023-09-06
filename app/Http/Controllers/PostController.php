@@ -57,7 +57,7 @@ class PostController extends Controller
 
     public function deleteVotePost($postId){
         $user = Auth::user();
-        return $this->voteService->delete($user->id, $postId);
+        return $this->voteService->deletePostVote($user->id, $postId);
     }
 
 

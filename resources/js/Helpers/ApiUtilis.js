@@ -37,6 +37,24 @@ const ApiUtilis = {
     deleteVotePost(postVoteDto){
         return axios.delete(`/post/${postVoteDto.postId}/vote/delete`);
     },
+    writeComment(commentCreationDto){
+        return axios.post(`/comment/write`, commentCreationDto);
+    },
+    getPostComments(postId){
+        return axios.get(`post/${postId}/comments`);
+    },
+    deleteComment(commentId){
+        return axios.delete(`comment/${commentId}/delete`);
+    },
+    voteComment(commentVoteDto){
+        return axios.post(`/comment/${commentVoteDto.id}/vote`, commentVoteDto);
+    },
+    deleteVoteComment(commentVoteDto){
+        return axios.delete(`/comment/${commentVoteDto.id}/vote/delete`);
+    },
+    getCommentReplies($commentId){
+        return axios.get(`/comment/${$commentId}/replies`);
+    }
 };
 
 export default ApiUtilis;

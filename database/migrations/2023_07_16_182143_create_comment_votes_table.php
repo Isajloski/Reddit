@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('comment_votes', function (Blueprint $table) {
             $table->integer('user_id')->unsigned();
             $table->integer('comment_id')->unsigned();
+            $table->primary(array('user_id', 'comment_id'));
             $table->boolean('vote');
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('comment_id')->references('id')->on('comments');

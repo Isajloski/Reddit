@@ -35,10 +35,10 @@ class PostService
 
         $userr = Auth::user();
 
-        $postVote = $this->voteService->getByIds($user->id, $postVoteDto->post_id);
+        $postVote = $this->voteService->getPostVotesByIds($user->id, $postVoteDto->post_id);
 
         if($postVote != null){
-            $this->voteService->delete($user->id, $postVoteDto->post_id);
+            $this->voteService->deletePostVote($user->id, $postVoteDto->post_id);
         }
         $postVoteNew = new PostVote();
         $postVoteNew->user_id = $userr->id;

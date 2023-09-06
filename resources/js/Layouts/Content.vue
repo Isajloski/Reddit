@@ -12,14 +12,13 @@
                           :description="post.body"
                           :by-user="post.user.userName"
                           :community-name="post.community?.name"
-                          :comments="post.comments_number"
+                          :comments-number="post.comments_number"
                           :vote = "post.vote"
                           :karma="post.karma"
                           :date="post.date"
                           :image="post.image"
                           :title="post.title"
                     />
-                    <Comment/>
                 </div>
             </div>
         </div>

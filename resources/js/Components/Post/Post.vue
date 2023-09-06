@@ -21,21 +21,24 @@
                 <div class="w-full grid grid-cols-2 relative">
                     <div>
                         <div class="inline-block mr-2">
-                            <VoteUpIcon :voteUp="this.voteUpState" class="cursor-pointer w-4 h-4 inline-block mx-1"
-                                @click="voteUp(id)" />
+                            <VoteUpIcon :voteUp="this.voteUpState"
+                                        class="cursor-pointer w-4 h-4 inline-block mx-1"
+                                        @click="voteUp(id)" />
                             <div class="inline-block">
                                 <span class="text-white text-sm">{{ childKarma }}</span>
                             </div>
                         </div>
                         <div class="inline-block">
                             <VoteDownIcon
-                                :voteDown="this.voteDownState" class="cursor-pointer w-4 h-4 inline-block mx-1"
+                                :voteDown="this.voteDownState"
+                                class="cursor-pointer w-4 h-4 inline-block mx-1"
                                 @click="voteDown(id)"/>
                         </div>
                         <div class="inline-block">
-                            <CommentIcon class="w-4 h-4 inline-block ml-3"/>
+                            <CommentIcon class="w-4 h-4 inline-block ml-3 cursor-pointer"
+                                         @click="this.toggleComments()"/>
                             <span
-                                class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">{{ comments }} Comments</span>
+                                class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">{{ commentsNumber }} Comments</span>
                         </div>
                         <div class="inline-block">
                             <ShareIcon class="w-4 h-4 inline-block ml-3"/>
@@ -56,26 +59,52 @@
             <hr class="text-[#505050] border-[#505050] border-2"/>
         </div>
     </div>
+    <div v-if="openCommentSection" class=" border-[#505050] border-2 rounded-lg p-1 md:p-3 m-10">
+        <h3 class=" p-1 text-gray-400">Discussion</h3>
+        <div class="flex flex-col gap-5 m-3" v-for="comment in comments" :key="comment.id">
+            <Comment :body="comment.body"
+                     :id="comment.id"
+                     :date="comment.date"
+                     :karma="comment.karma"
+                     :replies-number="comment.replies"
+                     :post_id="comment.post_id"
+                     :vote="comment.vote"
+                     :user-name="comment.user?.userName"
+                     @commentDeleteEmitter="handleDelete"
+            />
+        </div>
+        <WriteComment :postId="this.id" @commentEmitter="handleComment"/>
+    </div>
 </template>
 
 <script>
 import TestIcon from "@/Components/Icons/TestIcon.vue";
 import ShareIcon from "@/Components/Icons/ShareIcon.vue";
 import VoteUpIcon from "@/Components/Icons/VoteUpIcon.vue";
+import Comment from "@/Components/Comment/Comment.vue";
 import VoteDownIcon from "@/Components/Icons/VoteDownIcon.vue";
 import CommentIcon from "@/Components/Icons/CommentIcon.vue";
 import ApiUtilis from "@/Helpers/ApiUtilis";
+import WriteComment from "@/Components/Comment/WriteComment.vue";
 
 export default {
     name: "Post",
-    components: {CommentIcon, VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon},
+    components: {WriteComment, CommentIcon, VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon, Comment},
     data() {
         return {
             childKarma: this.karma,
-            childVote: this.vote, // null - not a vote, 1 is voteUp, 0 is voteDown
+            childVote: this.vote,
             voteUpState: false,
             voteDownState: false,
+            openCommentSection: false,
+            comments: []
         }
+    },
+    mounted() {
+        ApiUtilis.getPostComments(this.id)
+            .then((response) => {
+                this.comments = response.data;
+            })
     },
     created() {
         if (this.vote == null) {
@@ -101,7 +130,7 @@ export default {
         description: String,
         date: String,
         vote: Boolean | null,
-        comments: Number,
+        commentsNumber: Number,
     },
     methods: {
         async voteUp(postId) {
@@ -136,16 +165,28 @@ export default {
 
             try {
                 if (dto.vote) {
-                    const response = await ApiUtilis.votePost(dto);
+                    const response = await ApiUtilis.deleteVotePost(dto);
                     this.childKarma = response.data;
                 } else {
-                    const response = await ApiUtilis.deleteVotePost(dto);
+                    const response = await ApiUtilis.votePost(dto);
                     this.childKarma = response.data;
                 }
             } catch (error) {
                 console.error('Error fetching options:', error);
             }
         },
+        toggleComments(){
+            this.openCommentSection = !this.openCommentSection;
+        },
+        handleComment(data) {
+            this.comments.push(data[0])
+        },
+        handleDelete(id){
+            const index = this.comments.findIndex(comment => comment.id === id);
+            if (index !== -1) {
+                this.comments.splice(index, 1);
+            }
+        }
     }
 }
 </script>

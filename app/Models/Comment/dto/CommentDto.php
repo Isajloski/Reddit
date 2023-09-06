@@ -7,12 +7,14 @@ use App\Models\dto\UserDto;
 class CommentDto
 {
     public int $id;
-    public int $parent_comment_id;
-    public UserDto $userDto;
-    public int $post_id;
+    public int | null $parent_comment_id;
+    public UserDto $user;
+    public int | null $post_id;
     public string $body;
     public int $karma;
-    public int $replies;
+    public string $date;
+    public int | null $replies;
+    public bool | null $vote;
 
 
     public function __construct( ){}
@@ -27,7 +29,17 @@ class CommentDto
         return $this->id;
     }
 
-    public function setParentCommentId(int $parentCommentId): void
+    public function setDate(string $date): void
+    {
+        $this->date = $date;
+    }
+
+    public function getDate(): int
+    {
+        return $this->date;
+    }
+
+    public function setParentCommentId(int | null $parentCommentId): void
     {
         $this->parent_comment_id = $parentCommentId;
     }
@@ -39,15 +51,15 @@ class CommentDto
 
     public function setUserDto(UserDto $userDto): void
     {
-        $this->userDto = $userDto;
+        $this->user = $userDto;
     }
 
     public function getUserDto(): UserDto
     {
-        return $this->userDto;
+        return $this->user;
     }
 
-    public function setPostId(int $postId): void
+    public function setPostId(int | null $postId): void
     {
         $this->post_id = $postId;
     }
@@ -67,6 +79,16 @@ class CommentDto
         return $this->body;
     }
 
+    public function setVote(bool | null $vote): void
+    {
+        $this->vote = $vote;
+    }
+
+    public function getVote(): string
+    {
+        return $this->vote;
+    }
+
     public function setKarma(int $karma): void
     {
         $this->karma = $karma;
@@ -77,7 +99,7 @@ class CommentDto
         return $this->karma;
     }
 
-    public function setRepliesNumber(int $replies): void
+    public function setRepliesNumber(int | null $replies): void
     {
         $this->replies = $replies;
     }

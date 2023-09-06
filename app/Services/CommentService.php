@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Mappers\CommentMapper;
 use App\Models\Comment\Comment;
 use App\Models\Comment\dto\CommentCreationRequest;
 use App\Models\Comment\dto\CommentUpdateRequest;
 use App\Models\User;
+use App\Models\Vote\CommentVote;
 use App\Models\Vote\dto\CommentVoteDto;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,18 +15,31 @@ use Illuminate\Support\Facades\DB;
 class CommentService
 {
 
-    public function getPostComments(int $postId){
-//        return Comment::with('user')->where('post_id', '=', $postId);
-        return Comment::all();
+
+    public function __construct(private readonly CommentMapper $commentMapper,
+                                private readonly VoteService $voteService) {}
+
+
+    public function getPostComments(int $postId)
+    {
+
+        $comments =  Comment::with('user')->where('post_id', '=', $postId)->get();
+
+        return $comments->map(function ($comment) {
+
+            return $this->commentMapper->mapToDto($comment);
+        });
+
     }
 
+    public function getCommentReplies($commentId){
 
-    public function getCommentReplies(int $commentId){
-        return Comment::with('user')->where('parent_comment_id', '=', $commentId);
-    }
+        $comments =  Comment::with('user')->where('parent_comment_id', '=', $commentId)->get();
 
-    public function countCommentReplies(int $postId){
-        return Comment::with('user')->where('parent_comment_id', '=', $postId)->count();
+        return $comments->map(function ($comment) {
+
+            return $this->commentMapper->mapToDto($comment);
+        });
     }
 
     public function getComment(int $commentId){
@@ -52,19 +67,21 @@ class CommentService
     }
 
     public function vote(CommentVoteDto $commentVoteDto, User $user){
-        DB::table('comment_votes')->insert(
-            ['user_id' => $user->id, 'comment_id' => $commentVoteDto->id, 'vote' => $commentVoteDto->vote]
-        );
 
-        $comment = Comment::with('user')->find($commentVoteDto->id);
-        if($commentVoteDto->vote==1){
-            $comment->karma = $comment->karma+=1;
-        }
-        else{
-            $comment->karma = $comment->karma-=1;
-        }
+        $commentVote = $this->voteService->getCommentVotesByIds($user->id, $commentVoteDto->id);
 
-        $comment->save();
+        if($commentVote != null){
+            $this->voteService->deleteCommentVote($user->id, $commentVoteDto->id);
+        }
+        $commentVoteNew = new CommentVote();
+        $commentVoteNew->user_id = $user->id;
+        $commentVoteNew->comment_id = $commentVoteDto->id;
+        $commentVoteNew->vote = $commentVoteDto->vote;
+
+
+        $commentVoteNew->save();
+
+        return $this->voteService->getCommentKarma($commentVoteDto->id);
     }
 
     public function newest(){

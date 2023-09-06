@@ -97,13 +97,12 @@ Route::post('/unfollow/{communityId}', [FollowController::class, 'unfollow'])->n
 
 
 Route::prefix('comment')->group(function () {
-    Route::get('/{id}', [CommentController::class, 'getCommentReplies'])->name('comments.getCommentReplies');
+    Route::get('/{id}/replies', [CommentController::class, 'getCommentReplies'])->name('comments.getCommentReplies');
     Route::post('/{id}/edit', [CommentController::class, 'edit'])->name('comments.edit');
     Route::delete('/{id}/delete', [CommentController::class, 'delete'])->name('comments.delete');
-    Route::post('/{id}/upvote', [CommentController::class, 'upvote'])->name('comments.upvote');
-    Route::post('/{id}/downvote', [CommentController::class, 'downvote'])->name('comments.downvote');
-
-
+    Route::post('/{id}/vote', [CommentController::class, 'vote'])->name('comments.vote');
+    Route::delete('/{id}/vote/delete', [CommentController::class, 'deleteVote'])->name('comments.deleteVote');
+    Route::post('/write', [CommentController::class, 'create'])->name('comments.create');
 });
 
 
