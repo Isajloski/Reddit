@@ -23,7 +23,7 @@ class CommunityController extends Controller
     {
         $communities = Community::with('user', 'flairs', 'image')->get();
 
-        return Inertia::render('Community', [
+        return Inertia::render('Communities/Community', [
             'communities' => $communities,
         ]);
     }
