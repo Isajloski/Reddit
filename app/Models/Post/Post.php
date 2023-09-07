@@ -3,10 +3,10 @@
 namespace App\Models\Post;
 
 use App\Models\Comment\Comment;
-use App\Models\Community;
-use App\Models\Flair;
-use App\Models\Image;
-use App\Models\User;
+use App\Models\Community\Community;
+use App\Models\Flair\Flair;
+use App\Models\Image\Image;
+use App\Models\User\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

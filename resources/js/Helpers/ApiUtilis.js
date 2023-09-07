@@ -1,11 +1,12 @@
 import axios from 'axios';
+axios.defaults.baseURL = 'http://127.0.0.1:8000/';
 
 const ApiUtilis = {
     fetchCommunity(id) {
-        return axios.get(`/community/${id}`);
+        return axios.get(`/community/${id}/card`);
     },
     fetchUserCommunities(){
-        return axios.get('communities/user/following');
+        return axios.get('community/user/following');
     },
     createFlair(formData) {
         return axios.post('/flair/create', formData);
@@ -17,7 +18,7 @@ const ApiUtilis = {
         return axios.post(`/flair/${id}/edit`, formData);
     },
     editCommunity(id, editForm) {
-        return axios.post(`/communities/${id}/edit`, editForm);
+        return axios.post(`/community/${id}/edit`, editForm);
     },
     createPost(formData) {
         return axios.post(`/makePost`, formData);
@@ -38,7 +39,7 @@ const ApiUtilis = {
         return axios.delete(`/post/${postVoteDto.postId}/vote/delete`);
     },
     writeComment(commentCreationDto){
-        return axios.post(`/comment/write`, commentCreationDto);
+        return axios.post(`/comment/create`, commentCreationDto);
     },
     getPostComments(postId){
         return axios.get(`post/${postId}/comments`);

@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Follow;
-use Illuminate\Support\Facades\Log;
+use App\Models\Community\Follow;
 
 
 class FollowController extends Controller

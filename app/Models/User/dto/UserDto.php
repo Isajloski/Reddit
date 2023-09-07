@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\dto;
+namespace App\Models\User\dto;
 
 
 class UserDto

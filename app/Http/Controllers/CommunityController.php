@@ -3,23 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Mappers\CommunityMapper;
-use App\Models\Community;
+use App\Mappers\PostMapper;
+use App\Models\Community\Community;
 use App\Services\CommunityService;
+use App\Services\PostService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 
 class CommunityController extends Controller
 {
 
     public function __construct(private readonly CommunityService $communityService,
-                                private readonly CommunityMapper $communityMapper){}
+                                private readonly CommunityMapper $communityMapper,
+                                private readonly PostMapper $postMapper,
+                                private readonly PostService $postService){}
     public function index()
     {
         $communities = Community::with('user', 'flairs', 'image')->get();
 
-        return Inertia::render('Communities/Community', [
+        return Inertia::render('Community', [
             'communities' => $communities,
         ]);
     }
@@ -109,7 +113,7 @@ class CommunityController extends Controller
         return redirect()->route('communities.index');
     }
 
-    public function findById($id)
+    public function findById($id): \Illuminate\Http\JsonResponse|\Inertia\Response
     {
         $community = Community::with('user', 'flairs', 'image')->find($id);
 
@@ -117,9 +121,15 @@ class CommunityController extends Controller
             return response()->json(['message' => 'Community not found'], 404);
         }
 
-        return Inertia::render('Communities/Community', [
-            'communities' => [$community],
+        return Inertia::render('Community', [
+            'community' => [$community],
         ]);
+    }
+
+    public function getCard($id)
+    {
+        return $this->communityService->getCommunityCard($id);
+
     }
 
     public function userCommunities()
@@ -130,6 +140,32 @@ class CommunityController extends Controller
         $user = Auth::user();
         return $this->communityMapper->mapCollectionToDto($this->communityService->getUserCommunities($user));
     }
-    
+
+    public function paginate($id){
+
+        $community = Community::find($id);
+
+        $posts = $this->postService->getCommunityPosts($community)->paginate(2);
+
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
+            return [
+                $this->postMapper->mapToDto($post)
+            ];
+        });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
+    }
+
+    public function rules($id){
+        return $this->communityService->getCommunityRules($id);
+    }
+
+    public function description($id){
+        return $this->communityService->getCommunityDescription($id);
+    }
 
 }

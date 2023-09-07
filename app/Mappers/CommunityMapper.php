@@ -2,8 +2,8 @@
 
 namespace App\Mappers;
 
-use App\Models\Community;
-use App\Models\dto\CommunityDto;
+use App\Models\Community\Community;
+use App\Models\Community\dto\CommunityDto;
 
 class CommunityMapper
 {

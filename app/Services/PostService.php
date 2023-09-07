@@ -2,10 +2,10 @@
 
 namespace App\Services;
 use App\Mappers\PostMapper;
-use App\Models\Community;
+use App\Models\Community\Community;
 use App\Models\Post\dto\PostCreationDto;
 use App\Models\Post\Post;
-use App\Models\User;
+use App\Models\User\User;
 use App\Models\Vote\dto\PostVoteDto;
 use App\Models\Vote\PostVote;
 use Illuminate\Support\Collection;
@@ -89,6 +89,6 @@ class PostService
     }
 
     public function getCommunityPosts(Community $community){
-        return Post::where('community_id', $community->id)->get();
+        return Post::where('community_id', $community->id);
     }
 }

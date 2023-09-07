@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Community;
-use App\Models\Flair;
+use App\Models\Flair\Flair;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Community;
 
+use App\Models\Flair\Flair;
+use App\Models\Image\Image;
+use App\Models\User\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 
 
 class Community extends Model

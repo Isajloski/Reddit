@@ -2,8 +2,8 @@
 
 namespace App\Mappers;
 
-use App\Models\dto\UserDto;
-use App\Models\User;
+use App\Models\User\dto\UserDto;
+use App\Models\User\User;
 
 class UserMapper
 {

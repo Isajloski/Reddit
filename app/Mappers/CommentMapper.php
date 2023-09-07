@@ -4,7 +4,7 @@ namespace App\Mappers;
 
 use App\Models\Comment\Comment;
 use App\Models\Comment\dto\CommentDto;
-use App\Models\User;
+use App\Models\User\User;
 use App\Models\Vote\CommentVote;
 use App\Services\VoteService;
 use Illuminate\Support\Facades\Auth;

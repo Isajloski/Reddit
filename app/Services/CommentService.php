@@ -6,11 +6,10 @@ use App\Mappers\CommentMapper;
 use App\Models\Comment\Comment;
 use App\Models\Comment\dto\CommentCreationRequest;
 use App\Models\Comment\dto\CommentUpdateRequest;
-use App\Models\User;
+use App\Models\User\User;
 use App\Models\Vote\CommentVote;
 use App\Models\Vote\dto\CommentVoteDto;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class CommentService
 {

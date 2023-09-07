@@ -2,9 +2,9 @@
 
 namespace App\Models\Post\dto;
 
-use App\Models\dto\CommunityDto;
-use App\Models\dto\UserDto;
-use App\Models\Image;
+use App\Models\Community\dto\CommunityDto;
+use App\Models\Image\Image;
+use App\Models\User\dto\UserDto;
 
 class PostDto
 {

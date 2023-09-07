@@ -2,11 +2,13 @@
     <div class="w-full mx-auto z-0">
         <div class="pt-2 px-5 md:px-7">
             <div class="grid grid-cols-2 relative">
-                <div class="inline-block relative">
-                    <TestIcon class="z-10 inline-block w-4 h-4"/>
-                    <div class="ml-2 text-white inline-block text-base md:text-lg">{{ communityName }}</div>
-                    <span class="text-xs ml-0.5 bottom-0 absolute text-[#898989] mb-1 font-light">/community</span>
-                </div>
+                <a :href="'/community/'+ id">
+                    <div class="inline-block relative">
+                        <TestIcon class="z-10 inline-block w-4 h-4"/>
+                        <div class="ml-2 text-white inline-block text-base md:text-lg">{{ communityName }}</div>
+                        <span class="text-xs ml-0.5 bottom-0 absolute text-[#898989] mb-1 font-light">/community</span>
+                    </div>
+                </a>
                 <div class="inline-block text-right mr-20">
                     <span
                         class="text-xs bottom-0 text-[#898989] mb-1 font-light hidden md:inline-block">Posted by</span>

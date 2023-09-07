@@ -1,7 +1,7 @@
 <template>
     <nav class="dark:bg-[#141414] relative">
         <div class="max-w-screen-xl flex flex-wrap  content-center items-center justify-between mx-auto p-4">
-            <a href="#" class="flex items-center content-center m-auto">
+            <a href="/" class="flex items-center content-center m-auto">
                 <ApplicationLogo class="w-32"/>
             </a>
             <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">

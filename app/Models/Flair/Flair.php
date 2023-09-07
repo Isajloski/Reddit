@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Flair;
 
+use App\Models\Community\Community;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

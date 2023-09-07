@@ -51,24 +51,26 @@ Route::resource('markdown', MarkdownController::class)
     ->only(['index']);
 
 
-Route::prefix('communities')->group(function () {
-    Route::get('/', [CommunityController::class, 'index'])->name('communities.index');
+Route::prefix('community')->group(function () {
+    Route::get('/{id}/paginate', [CommunityController::class, 'paginate'])->name('communities.paginate');
+    Route::get('/create', [CommunityController::class, 'index'])->name('communities.index');
+    Route::post('/create', [CommunityController::class, 'store'])->name('communities.store');
     Route::get('/{id}', [CommunityController::class, 'findById'])->name('communities.findById');
+    Route::get('/{id}/card', [CommunityController::class, 'getCard'])->name('communities.getCard');
     Route::get('/{id}/edit', [CommunityController::class, 'edit'])->name('communities.edit');
+    Route::get('/{id}/rules', [CommunityController::class, 'rules'])->name('communities.rules');
+    Route::get('/{id}/description', [CommunityController::class, 'description'])->name('communities.description');
     Route::post('/{id}/edit', [CommunityController::class, 'update'])->name('communities.update');
     Route::post('/{id}/delete', [CommunityController::class, 'destroy'])->name('communities.destroy');
     Route::post('/{id}/delete', [CommunityController::class, 'destroy'])->name('communities.destroy');
     Route::get('/user/following', [CommunityController::class, 'userCommunities'])->name('communities.userCommunities');
 
 });
-Route::get('/makeCommunity', [CommunityController::class, 'index'])->name('communities.index');
-Route::post('/makeCommunity', [CommunityController::class, 'store'])->name('communities.store');
 
-//post
-Route::get('/makePost', [PostController::class, 'create'])->name('posts.create');
-Route::post('/makePost', [PostController::class, 'store'])->name('posts.store');
 
 Route::prefix('post')->group(function () {
+    Route::get('/create', [PostController::class, 'create'])->name('posts.create');
+    Route::post('/create', [PostController::class, 'store'])->name('posts.store');
     Route::get('/{id}', [PostController::class, 'get']) ->name('posts.get');
     Route::post('/{id}/vote', [PostController::class, 'votePost']) ->name('posts.votePost');
     Route::delete('/{id}/delete', [PostController::class, 'delete'])->name('posts.delete');
@@ -76,7 +78,8 @@ Route::prefix('post')->group(function () {
     Route::post('/{id}/edit', [PostController::class, 'update']) ->name('posts.update');
     Route::delete('/{id}/vote/delete', [PostController::class, 'deleteVotePost'])->name('posts.deleteVotePost');
     Route::get('/{id}/comments', [CommentController::class, 'getPostComments'])->name('posts.getPostComments');
-
+    Route::get('/{id}/comments/sort/newest', [CommentController::class, 'sortByNewest'])->name('comments.sortByNewest');
+    Route::get('/{id}/comments/sort/popular', [CommentController::class, 'sortByPopular'])->name('comments.sortByPopular');
 });
 
 
@@ -86,10 +89,12 @@ Route::get('/posts/recent', [PostController::class, 'getRecentPosts'])->name('po
 Route::get('/posts/paginate', [PostController::class, 'paginate'])->name('posts.paginate');
 
 
-Route::post('/flair/{id}/delete', [FlairController::class, 'destroy'])->name('flair.destroy');
-Route::post('/flair/{id}/edit', [FlairController::class, 'update'])->name('flair.update');
+Route::prefix('flair')->group(function () {
+    Route::post('/{id}/delete', [FlairController::class, 'destroy'])->name('flair.destroy');
+    Route::post('/{id}/edit', [FlairController::class, 'update'])->name('flair.update');
+    Route::post('/create', [FlairController::class, 'store'])->name('flair.create');
+});
 
-Route::post('/flair/create', [FlairController::class, 'store'])->name('flair.create');
 
 
 Route::post('/follow/{communityId}', [FollowController::class, 'follow'])->name('follow');
@@ -102,12 +107,9 @@ Route::prefix('comment')->group(function () {
     Route::delete('/{id}/delete', [CommentController::class, 'delete'])->name('comments.delete');
     Route::post('/{id}/vote', [CommentController::class, 'vote'])->name('comments.vote');
     Route::delete('/{id}/vote/delete', [CommentController::class, 'deleteVote'])->name('comments.deleteVote');
-    Route::post('/write', [CommentController::class, 'create'])->name('comments.create');
+    Route::post('/create', [CommentController::class, 'create'])->name('comments.create');
 });
 
-
-Route::get('post/{id}/comments/sort/newest', [CommentController::class, 'sortByNewest'])->name('comments.sortByNewest');
-Route::get('post/{id}/comments/sort/popular', [CommentController::class, 'sortByPopular'])->name('comments.sortByPopular');
 
 
 

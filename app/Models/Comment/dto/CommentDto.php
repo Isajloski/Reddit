@@ -2,7 +2,7 @@
 
 namespace App\Models\Comment\dto;
 
-use App\Models\dto\UserDto;
+use App\Models\User\dto\UserDto;
 
 class CommentDto
 {

@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Mappers\PostMapper;
-use App\Models\Community;
 use App\Models\Post\dto\PostCreationDto;
 use App\Models\Post\Post;
 use App\Models\Vote\dto\PostVoteDto;
-use App\Models\Vote\PostVote;
 use App\Services\CommunityService;
 use App\Services\PostService;
 use App\Services\VoteService;

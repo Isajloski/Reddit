@@ -1,9 +1,6 @@
 <?php
 
-namespace App\Models\dto;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+namespace App\Models\Community\dto;
 
 class CommunityDto
 {

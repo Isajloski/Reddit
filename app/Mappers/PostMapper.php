@@ -3,11 +3,11 @@
 namespace App\Mappers;
 
 use App\Models\Comment\Comment;
-use App\Models\dto\CommunityDto;
-use App\Models\dto\UserDto;
+use App\Models\Community\dto\CommunityDto;
 use App\Models\Post\dto\PostDetailedDto;
 use App\Models\Post\dto\PostDto;
 use App\Models\Post\Post;
+use App\Models\User\dto\UserDto;
 use App\Services\VoteService;
 use Illuminate\Support\Facades\Auth;
 
