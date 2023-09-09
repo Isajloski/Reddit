@@ -73,6 +73,7 @@
                      :vote="comment.vote"
                      :user-name="comment.user?.userName"
                      @commentDeleteEmitter="handleDelete"
+                     @commentEditEmitter="handleEdit"
             />
         </div>
         <WriteComment :postId="this.id" @commentEmitter="handleComment"/>
@@ -188,6 +189,10 @@ export default {
             if (index !== -1) {
                 this.comments.splice(index, 1);
             }
+        },
+        handleEdit(commentUpdateDto){
+            const index = this.comments.findIndex(comment => comment.id === commentUpdateDto.id);
+            this.comments[index].body = commentUpdateDto.body;
         }
     }
 }

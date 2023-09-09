@@ -17,9 +17,9 @@ return new class extends Migration
             $table->integer('post_id')->unsigned()->nullable();
             $table->integer('parent_comment_id')->unsigned()->nullable();
             $table->string('body');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('post_id')->references('id')->on('posts');
-            $table->foreign('parent_comment_id')->references('id')->on('comments');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();;
+            $table->foreign('post_id')->references('id')->on('posts')->cascadeOnDelete();
+            $table->foreign('parent_comment_id')->references('id')->on('comments')->cascadeOnDelete();
             $table->timestamps();
         });
     }

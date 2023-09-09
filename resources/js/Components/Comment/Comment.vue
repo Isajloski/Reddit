@@ -10,7 +10,7 @@
                         @click="voteUp(this.id)"
                     />
                 </div>
-                <div class=" text-gray-500 text-sm text-center">{{this.childKarma}}</div>
+                <div class=" text-gray-500 text-sm text-center">{{ this.childKarma }}</div>
                 <div>
                     <VoteDownIcon
                         class="w-4 h-4 cursor-pointer"
@@ -30,21 +30,35 @@
                         <span class="text-xs text-gray-400 font-normal">{{ date }}</span>
                     </h3>
                 </div>
-                <p class="text-gray-400 mt-2">
-                    {{ body }}
+                <p class="text-gray-400 mt-2" v-if="!editMode">
+                    {{ childBody }}
                 </p>
+                <textarea v-if="this.editMode"
+                          class="bg-neutral-800 rounded border border-gray-400 text-gray-50
+            leading-normal resize-none w-full h-20 py-2 px-3 font-medium
+            placeholder-gray-400 focus:outline-none focus:bg-neutral-800" v-model="this.editBody"
+                          name="body" placeholder="Comment" required>{{this.body}}</textarea>
                 <div class="flex gap-3 ">
                     <button class="text-right text-pink-700"
-                            @click="toggleWriteReply()">Reply</button>
+                            @click="toggleWriteReply()">Reply
+                    </button>
                     <button class="text-right text-pink-700"
-                            @click="">Edit</button>
+                            @click="toggleEditMode">Edit
+                    </button>
                     <button class="text-right text-pink-700"
-                            @click="handleDelete()">Delete</button>
+                            @click="handleDelete()">Delete
+                    </button>
                     <button class="text-right text-pink-700"
-                            @click="fetchReplies()"> Replies {{repliesNumber}}</button>
+                            @click="fetchReplies()"> Replies {{ repliesNumber }}
+                    </button>
                 </div>
                 <WriteComment v-if="writeReply" @commentEmitter="handleReply"
-                              :parent-id="this.id" />
+                              :parent-id="this.id"/>
+                <div class="w-full flex justify-end px-3 my-3">
+                    <input v-if="this.editMode" type="button" @click="editComment()"
+                           class="bg-blend-darken px-2.5 py-1.5 rounded-md text-white text-sm bg-pink-700 text-lg"
+                           value='Edit Comment'>
+                </div>
             </div>
         </div>
         <div v-for="reply in replies" :key="reply.id">
@@ -58,7 +72,8 @@
                      :replies-number="reply.replies"
                      :vote="reply.vote"
                      :user-name="reply.user?.userName"
-                     @commentDeleteEmitter="handleDelete"
+                     @commentDeleteEmitter="handleDeleteReply(reply.id)"
+                     @commentEditEmitter="handleEditReply($event)"
             />
         </div>
     </div>
@@ -69,10 +84,11 @@ import VoteUpIcon from "@/Components/Icons/VoteUpIcon.vue";
 import VoteDownIcon from "@/Components/Icons/VoteDownIcon.vue";
 import WriteComment from "@/Components/Comment/WriteComment.vue";
 import ApiUtilis from "@/Helpers/ApiUtilis";
+
 export default {
     name: "Comment.vue",
     components: {WriteComment, VoteDownIcon, VoteUpIcon},
-    emits: ['commentDeleteEmitter'],
+    emits: ['commentDeleteEmitter', 'commentEditEmitter'],
     data() {
         return {
             writeReply: false,
@@ -80,6 +96,9 @@ export default {
             voteUpState: false,
             voteDownState: false,
             childKarma: this.karma,
+            editMode: false,
+            editBody: '',
+            childBody: this.body
         }
     },
     created() {
@@ -96,23 +115,29 @@ export default {
             this.voteUpState = false;
         }
     },
-    props : {
+    props: {
         id: Number,
-        userName : String,
-        picture : Image,
-        body : String,
-        post_id : Number,
-        date : String,
+        userName: String,
+        picture: Image,
+        body: String,
+        post_id: Number,
+        date: String,
         parent_comment_id: Number,
-        karma : Number,
+        karma: Number,
         repliesNumber: Number,
         vote: Boolean
     },
     methods: {
-        toggleWriteReply(){
+        toggleWriteReply() {
             this.writeReply = !this.writeReply;
         },
-        handleReply(data){
+        toggleEditMode() {
+            this.editMode = !this.editMode;
+            if (this.editMode) {
+                this.editBody = this.body;
+            }
+        },
+        handleReply(data) {
             this.replies.push(data[0]);
         },
         async voteUp(commentId) {
@@ -152,28 +177,60 @@ export default {
                 } else {
                     const response = await ApiUtilis.voteComment(dto);
                     this.childKarma = response.data;
-                    console.log(response)
                 }
             } catch (error) {
                 console.error('Error fetching options:', error);
             }
         },
-        async handleDelete(){
+        async handleDelete() {
             try {
                 const response = await ApiUtilis.deleteComment(this.id);
-                this.emitToParent(this.id);
+                this.emitDeleteToParent(this.id);
             } catch (error) {
                 console.error('Error fetching options:', error);
             }
         },
-        emitToParent($id) {
+        async handleDeleteReply(id) {
+            try {
+                const response = await ApiUtilis.deleteComment(id);
+                const index = this.replies.findIndex(reply => reply.id === id);
+                if (index !== -1) {
+                    this.replies.splice(index, 1);
+                }
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+        handleEditReply(replyDto) {
+            const index = this.replies.findIndex(reply => reply.id === replyDto.id);
+            this.replies[index].body = replyDto.body;
+        },
+        emitDeleteToParent($id) {
             this.$emit('commentDeleteEmitter', $id);
         },
-        async fetchReplies(){
+        emitEditToParent(commentUpdateDto) {
+            this.$emit('commentEditEmitter', commentUpdateDto);
+        },
+        async editComment() {
+
+            const commentUpdateDto = {
+                id: this.id,
+                body: this.editBody
+            }
+
+            try {
+                const response = await ApiUtilis.editComment(this.id, commentUpdateDto);
+                this.childBody = response.data.body;
+                this.editMode = false;
+                this.emitEditToParent(commentUpdateDto);
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+        async fetchReplies() {
             try {
                 const response = await ApiUtilis.getCommentReplies(this.id);
                 this.replies = response.data;
-                console.log(this.replies)
             } catch (error) {
                 console.error('Error fetching options:', error);
             }

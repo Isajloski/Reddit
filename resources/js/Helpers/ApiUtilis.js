@@ -44,6 +44,9 @@ const ApiUtilis = {
     writeComment(commentCreationDto){
         return axios.post(`/comment/create`, commentCreationDto);
     },
+    editComment(id, commentUpdateDto){
+        return axios.post(`/comment/${id}/edit`, commentUpdateDto);
+    },
     getPostComments(postId){
         return axios.get(`post/${postId}/comments`);
     },

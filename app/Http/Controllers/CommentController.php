@@ -49,6 +49,16 @@ class CommentController extends Controller
 
     }
 
+    public function edit(Request $request, $id){
+        $comment = Comment::find($id);
+        $jsonData = json_decode($request->getContent(), true);
+        $comment->body = $jsonData['body'];
+
+        $comment->save();
+
+        return $comment;
+    }
+
     public function vote(Request $request, int $id){
 
         $user = Auth::user();

@@ -51,7 +51,7 @@ export default {
 </script>
 
 <template>
-    <Head title="Community"><title></title></Head>
+    <Head title="Community"><title>{{this.community.name}}/c</title></Head>
     <Navbar/>
     <div id="left" class="absolute mt-32 md:mt-20 w-auto md:w-1/6 ml-5">
         <Filter class="rounded-xl" @sort="emitSortType($event)"/>
