@@ -8,12 +8,12 @@ use App\Models\Post\Post;
 use App\Models\User\User;
 use App\Models\Vote\dto\PostVoteDto;
 use App\Models\Vote\PostVote;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PostService
 {
-    public function __construct(private readonly PostMapper $postMapper,
+    public function __construct(private readonly CommunityService $communityService,
                                 private readonly VoteService $voteService){}
 
     public function getById(int $id)
@@ -60,32 +60,26 @@ class PostService
         return Post::destroy($id);
     }
 
-    public function getRecentPosts(): Collection
-    {
-        $posts = $this->getAllPosts();
-
-        return $posts->map(function ($post) {
-            return $this->postMapper->mapToDto($post);
-        });
-    }
-
-    public function getNewestPosts(){
-
-        $posts =  $this->getAllPosts();
-
-        return $posts->sortBy('created_at');
-    }
-
-    public function getMostPopularPosts()
-    {
-        $posts = $this->getAllPosts();
-
-        return $posts->sortBy('karma');
-    }
 
     public function getAllPosts(): \Illuminate\Database\Eloquent\Collection|array
     {
         return Post::with('user','image', 'community')->get();
+    }
+
+    public function getFollowingPosts() {
+        $user = Auth::user();
+        $communityIds = $this->communityService->getUserCommunities($user)->map(function ($community) {
+            return $community->id;
+        });
+        return Post::whereIn('community_id', $communityIds);
+    }
+
+    public function getTrendingPosts() {
+        return DB::table('posts')
+            ->leftJoin('comments', 'posts.id', '=', 'comments.post_id')
+            ->select('posts.*', DB::raw('COUNT(comments.id) as comment_count'))
+            ->groupBy('posts.id')
+            ->orderByDesc('comment_count');
     }
 
     public function getCommunityPosts(Community $community){

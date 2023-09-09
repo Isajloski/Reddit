@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,7 +22,6 @@ class PostController extends Controller
 {
 
     public function __construct(private readonly PostService $postService,
-                                private readonly CommunityService $communityService,
                                 private readonly VoteService $voteService,
                                 private readonly PostMapper $postMapper) {}
 
@@ -36,16 +36,73 @@ class PostController extends Controller
         ]);
     }
 
-    public function paginate(){
 
-        $posts = $this->getUserPosts()->paginate(2);
+    public function paginateFollowingPosts(Request $request){
 
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getFollowingPosts()->orderBy('created_at', 'desc')->paginate(2);
+        }
+        else{
+            $posts = DB::table('posts')
+                ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                ->groupBy('posts.id')
+                ->orderByDesc('karma')
+                ->paginate(2);
+
+        }
 
         $updatedPosts = $posts->getCollection()->map(function($post) {
-                return [
-                    $this->postMapper->mapToDto($post)
-                ];
-            });
+
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet)
+            ;
+        });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
+    }
+
+    public function paginateTrendingPosts(Request $request){
+
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getTrendingPosts()
+                ->orderBy('created_at', 'desc')->paginate(2);
+        }
+        else{
+            $posts = $this->postService->getTrendingPosts()
+                ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                ->groupBy('posts.id')
+                ->orderByDesc('karma')
+                ->paginate(2);
+
+        }
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
+
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet)
+                ;
+        });
 
 
         $posts->setCollection($updatedPosts);
@@ -65,16 +122,6 @@ class PostController extends Controller
     public function create(): Response
     {
         return Inertia::render('MakePost');
-    }
-
-    public function sortByPopular()
-    {
-        return $this->postMapper->mapCollectionToDto($this->postService->getMostPopularPosts());
-    }
-
-    public function sortByNewest()
-    {
-        return $this->postMapper->mapCollectionToDto($this->postService->getNewestPosts());
     }
 
     /**
@@ -110,26 +157,10 @@ class PostController extends Controller
      * Display the specified resource.
      */
 
-
-
     public function get(int $id)
     {
         return $this->postService->getById($id);
     }
-
-    public function getRecentPosts(): Collection
-    {
-        return $this->postService->getRecentPosts();
-    }
-
-    public function getUserPosts() {
-        $user = Auth::user();
-        $communityIds = $this->communityService->getUserCommunities($user)->map(function ($community) {
-            return $community->id;
-        });
-        return Post::whereIn('community_id', $communityIds);
-    }
-
 
 
     /**

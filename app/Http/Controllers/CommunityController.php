@@ -9,6 +9,7 @@ use App\Services\CommunityService;
 use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 
@@ -141,17 +142,38 @@ class CommunityController extends Controller
         return $this->communityMapper->mapCollectionToDto($this->communityService->getUserCommunities($user));
     }
 
-    public function paginate($id){
+
+    public function paginateCommunityPosts($id, Request $request){
 
         $community = Community::find($id);
 
-        $posts = $this->postService->getCommunityPosts($community)->paginate(2);
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getCommunityPosts($community)->orderBy('created_at', 'desc')->paginate(2);
+        }
+        else{
+
+                $posts = DB::table('posts')
+                    ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                    ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                    ->where('posts.community_id', $id)
+                    ->groupBy('posts.id')
+                    ->orderByDesc('karma')
+                    ->paginate(2);
+        }
+
 
 
         $updatedPosts = $posts->getCollection()->map(function($post) {
-            return [
-                $this->postMapper->mapToDto($post)
-            ];
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet)
+            ;
         });
 
 

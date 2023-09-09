@@ -5,6 +5,9 @@ const ApiUtilis = {
     fetchCommunity(id) {
         return axios.get(`/community/${id}/card`);
     },
+    fetchCommunityPosts(communityId, pageNumber, sortDto){
+        return axios.post(`/community/${communityId}/paginate?page=` + pageNumber, sortDto);
+    },
     fetchUserCommunities(){
         return axios.get('community/user/following');
     },
@@ -55,6 +58,12 @@ const ApiUtilis = {
     },
     getCommentReplies($commentId){
         return axios.get(`/comment/${$commentId}/replies`);
+    },
+    getPaginatedFollowingPosts(pageNumber, sortDto){
+        return axios.post('/posts/following/paginate?page=' + pageNumber, sortDto);
+    },
+    getPaginatedTrendingPosts(pageNumber, sortDto){
+        return axios.post('/posts/trending/paginate?page=' + pageNumber, sortDto);
     }
 };
 

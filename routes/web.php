@@ -52,7 +52,7 @@ Route::resource('markdown', MarkdownController::class)
 
 
 Route::prefix('community')->group(function () {
-    Route::get('/{id}/paginate', [CommunityController::class, 'paginate'])->name('communities.paginate');
+    Route::post('/{id}/paginate', [CommunityController::class, 'paginateCommunityPosts'])->name('communities.paginate');
     Route::get('/create', [CommunityController::class, 'index'])->name('communities.index');
     Route::post('/create', [CommunityController::class, 'store'])->name('communities.store');
     Route::get('/{id}', [CommunityController::class, 'findById'])->name('communities.findById');
@@ -61,7 +61,6 @@ Route::prefix('community')->group(function () {
     Route::get('/{id}/rules', [CommunityController::class, 'rules'])->name('communities.rules');
     Route::get('/{id}/description', [CommunityController::class, 'description'])->name('communities.description');
     Route::post('/{id}/edit', [CommunityController::class, 'update'])->name('communities.update');
-    Route::post('/{id}/delete', [CommunityController::class, 'destroy'])->name('communities.destroy');
     Route::post('/{id}/delete', [CommunityController::class, 'destroy'])->name('communities.destroy');
     Route::get('/user/following', [CommunityController::class, 'userCommunities'])->name('communities.userCommunities');
 
@@ -82,11 +81,10 @@ Route::prefix('post')->group(function () {
     Route::get('/{id}/comments/sort/popular', [CommentController::class, 'sortByPopular'])->name('comments.sortByPopular');
 });
 
-
-Route::get('/posts/sort/popular', [PostController::class, 'sortByPopular'])->name('posts.sortByPopular');
-Route::get('/posts/sort/newest', [PostController::class, 'sortByNewest'])->name('posts.sortByNewest');
-Route::get('/posts/recent', [PostController::class, 'getRecentPosts'])->name('posts.getRecentPosts');
-Route::get('/posts/paginate', [PostController::class, 'paginate'])->name('posts.paginate');
+Route::prefix('posts')->group(function () {
+    Route::post('/following/paginate', [PostController::class, 'paginateFollowingPosts'])->name('posts.paginate');
+    Route::post('/trending/paginate', [PostController::class, 'paginateTrendingPosts'])->name('posts.paginate');
+});
 
 
 Route::prefix('flair')->group(function () {
