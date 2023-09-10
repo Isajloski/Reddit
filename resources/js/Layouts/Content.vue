@@ -17,12 +17,14 @@
                       :description="post.body"
                       :by-user="post.user?.userName"
                       :community-name="post.community?.name"
+                      :community-id="post.community?.id"
                       :comments-number="post.comments_number"
                       :vote = "post.vote"
                       :karma="post.karma"
                       :date="post.date"
                       :image="post.image"
                       :title="post.title"
+                      :flair="post.flair"
                 />
             </div>
         </div>
@@ -54,7 +56,8 @@ export default {
     },
     props : {
         type: String,
-        sort: String
+        sort: String,
+        flair: String | Number
     },
     mounted() {
         window.onscroll = () => {
@@ -81,6 +84,21 @@ export default {
             this.currentPage = 1;
             this.posts = [];
             this.fetchData();
+        },
+        flair(newVal){
+            this.currentPage = 1;
+            if(this.flair.length===0){
+                this.posts=[];
+                return this.fetchData();
+            }
+            else{
+                this.posts = this.posts.filter(post => {
+                    if(post.flair){
+                        return post.flair.id === this.flair
+                    }
+                    else return false;
+                });
+            }
         }
     },
     methods: {
@@ -97,7 +115,6 @@ export default {
                     try {
                         let response = await ApiUtilis.getPaginatedFollowingPosts(this.currentPage, sortDto);
                         const newData = response.data.data;
-                        console.log(newData)
                         this.posts = [...this.posts, ...newData];
                     } catch (error) {
                         console.error('Error fetching data:', error);
@@ -130,7 +147,6 @@ export default {
                     try {
                         let response = await ApiUtilis.fetchCommunityPosts(result, this.currentPage, sortDto)
                         const newData = response.data.data;
-                        console.log(newData)
                         this.posts = [...this.posts, ...newData];
                     } catch (error) {
                         console.error('Error fetching data:', error);

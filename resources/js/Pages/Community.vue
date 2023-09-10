@@ -20,7 +20,8 @@ export default {
     data() {
         return {
             community: Object,
-            sort: 'new'
+            sort: 'new',
+            flairFilter: ''
         }
     },
     created() {
@@ -45,6 +46,9 @@ export default {
         },
         emitSortType(sort){
             this.sort = sort;
+        },
+        handleFlairFilter(flairId){
+            this.flairFilter = flairId;
         }
     }
 }
@@ -55,7 +59,7 @@ export default {
     <Navbar/>
     <div id="left" class="absolute mt-32 md:mt-20 w-auto md:w-1/6 ml-5">
         <Filter class="rounded-xl" @sort="emitSortType($event)"/>
-        <Flairs class="my-3 hidden md:block"/>
+        <Flairs class="my-3 hidden md:block" :flairs="community.flairs" @selectedFlairEmitter="handleFlairFilter($event)"/>
     </div>
     <div id="right" class="absolute mt-10 md:mt-20 w-auto md:w-1/6 md:right-0 mx-5">
         <Create class="rounded-xl"/>
@@ -66,6 +70,6 @@ export default {
                :rules="community.rules"
         />
     </div>
-    <Content :type="'community'" :sort="this.sort"/>
+    <Content :type="'community'" :sort="this.sort" :flair="this.flairFilter"/>
 </template>
 

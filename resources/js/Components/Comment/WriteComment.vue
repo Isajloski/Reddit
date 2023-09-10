@@ -33,8 +33,6 @@ export default {
     methods: {
         async writeComment(){
 
-            console.log(this.parentId)
-
             const commentCreationDto = {
                 post_id: this.postId,
                 parent_comment_id: this.parentId,

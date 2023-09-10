@@ -137,7 +137,8 @@ class PostController extends Controller
             'title' => 'required',
             'body' => 'required',
             'communityId' => 'required',
-            'image' => 'nullable|file'
+            'image' => 'nullable|file',
+            'flair' => 'nullable|integer'
         ]);
 
         $user = Auth::user();
@@ -145,12 +146,13 @@ class PostController extends Controller
         $post->title = $request->input('title');
         $post->body = $request->input('body');
         $post->image_id = null;
+        $post->flair_id = $request->input('flair');
 
         $post->user()->associate($user);
         $post->community()->associate($request->input('communityId'));
         $post->save();
 
-        return redirect(route('posts.index'));
+        return redirect('/');
     }
 
     /**

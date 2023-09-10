@@ -28,8 +28,9 @@ class FlairController extends Controller
         return response()->json(['message' => 'Flair created successfully'], 201);
     }
 
-
-
+    public function getCommunityFlairs($communityId){
+        return Flair::where('community_id', $communityId)->get();
+    }
 
     public function update(Request $request, $id)
     {

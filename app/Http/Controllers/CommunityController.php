@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mappers\CommunityMapper;
 use App\Mappers\PostMapper;
 use App\Models\Community\Community;
+use App\Models\Flair\Flair;
 use App\Services\CommunityService;
 use App\Services\PostService;
 use Illuminate\Http\Request;
@@ -20,13 +21,11 @@ class CommunityController extends Controller
                                 private readonly CommunityMapper $communityMapper,
                                 private readonly PostMapper $postMapper,
                                 private readonly PostService $postService){}
-    public function index()
-    {
-        $communities = Community::with('user', 'flairs', 'image')->get();
 
-        return Inertia::render('Communities/Community', [
-            'communities' => $communities,
-        ]);
+
+    public function createEditForm()
+    {
+        return Inertia::render('Communities/CommunityForm');
     }
 
 
@@ -40,7 +39,8 @@ class CommunityController extends Controller
             'name' => 'required|unique:communities',
             'description' => 'required',
             'rules' => 'required',
-            'image' => 'nullable|file'
+            'image' => 'nullable|file',
+            'flairs' => 'nullable|array'
         ]);
 
         $user = Auth::user();
@@ -61,8 +61,20 @@ class CommunityController extends Controller
 
         $community->user()->associate($user);
         $community->save();
+        $communityId = $community->id;
 
-        return redirect()->route('communities.index');
+        if ($request->has('flairs') && is_array($request->input('flairs'))) {
+            $flairs = $request->input('flairs');
+
+            foreach ($flairs as $flairName) {
+                $flair = new Flair();
+                $flair->name = $flairName;
+                $flair->community_id = $community->id;
+                $flair->save();
+            }
+        }
+
+        return redirect('/community/'.$communityId);
     }
 
 
@@ -114,7 +126,7 @@ class CommunityController extends Controller
         return redirect()->route('communities.index');
     }
 
-    public function findById($id): \Illuminate\Http\JsonResponse|\Inertia\Response
+    public function renderById($id): \Illuminate\Http\JsonResponse|\Inertia\Response
     {
         $community = Community::with('user', 'flairs', 'image')->find($id);
 

@@ -11,6 +11,8 @@ use App\Models\User\User;
 class CommunityService
 {
 
+    public function __construct(private readonly FlairService $flairService) {}
+
     public function getUserCommunities(User $user){
         return Follow::with('community')->where('user_id', $user->id)->get();
     }
@@ -41,6 +43,7 @@ class CommunityService
         $cardDto->rules = $community->rules;
         $cardDto->activeUsers = $this->getActiveUsers($id);
         $cardDto->totalUsers = $this->getTotalUsers($id);
+        $cardDto->flairs = $this->flairService->getCommunitiesFlairs($community->id);
 
         return [$cardDto];
     }

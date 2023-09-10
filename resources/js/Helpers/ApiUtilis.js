@@ -5,6 +5,9 @@ const ApiUtilis = {
     fetchCommunity(id) {
         return axios.get(`/community/${id}/card`);
     },
+    fetchCommunityFlairs(communityId){
+        return axios.get(`flair/community/${communityId}`);
+    },
     fetchCommunityPosts(communityId, pageNumber, sortDto){
         return axios.post(`/community/${communityId}/paginate?page=` + pageNumber, sortDto);
     },

@@ -1,4 +1,5 @@
 <template>
+    <Head><title>Create Post</title></Head>
     <Navbar/>
     <div class="w-auto md:w-3/5 mx-5 md:mx-auto mt-48 md:mt-20 rounded-xl relative bg-[#2d2d2d]">
         <div class="">
@@ -8,11 +9,10 @@
                     <div htmlFor="name" class="py-1 text-white">Community</div>
                     <Dropdown
                         placeholder="Select"
-                        :options="dropdownOptions"
-                        @option-selected="handleSelectedOption"
+                        :options="communityOptions"
+                        @option-selected="handleSelectedCommunity"
                         id="communityId"
                         v-model="form.communityId"></Dropdown>
-<!--                    <input type="text" id="communityId" v-model="form.communityId" class="rounded bg-[#515151] text-white">-->
                 </div>
                 <div class="pb-5">
                     <div htmlFor="" class="py-1 text-white">Title:</div>
@@ -21,6 +21,15 @@
                 <div class="pb-5">
                     <div htmlFor="" class="py-1 text-white">Content:</div>
                     <textarea type="text" id="content" v-model="form.body" class="rounded bg-[#515151] w-96 text-white w-full"></textarea>
+                </div>
+                <div class="pb-5">
+                    <div htmlFor="flair" class="py-1 text-white">Flair</div>
+                    <Dropdown
+                        placeholder="Select"
+                        :options="flairOptions"
+                        @option-selected="handleSelectedFlair"
+                        id="flairId"
+                        v-model="form.flair"></Dropdown>
                 </div>
                 <div class="pb-5">
                     <div class="py-1 text-white">Image:</div>
@@ -43,23 +52,24 @@
 
 <script>
 import Navbar from "@/Components/Navbar/Navbar.vue";
-import {useForm} from "@inertiajs/vue3";
+import {useForm, Head} from "@inertiajs/vue3";
 import Dropdown from '@/Components/Dropdown/Dropdown.vue';
 import ApiUtilis from "@/Helpers/ApiUtilis";
 
 export default {
     name: "MakePost",
-    components: {Dropdown, Navbar},
+    components: {Dropdown, Navbar, Head},
     data(){
         return {
-            dropdownOptions: [],
+            communityOptions: [],
+            flairOptions: [],
             selectedCommunity: null,
         }
     },
     async created() {
         try {
             const response  = await ApiUtilis.fetchUserCommunities();
-            this.dropdownOptions = response.data;
+            this.communityOptions = response.data;
         } catch (error) {
             console.error('Error fetching options:', error);
         }
@@ -69,7 +79,8 @@ export default {
             communityId: '',
             title: '',
             body: '',
-            image: ''
+            image: '',
+            flair: ''
         })
 
         const handleFileUpload = (event) => {
@@ -96,9 +107,21 @@ export default {
         }
     },
     methods: {
-        handleSelectedOption(option){
+        handleSelectedCommunity(option){
             this.selectedCommunity = option;
             this.form.communityId = option;
+            this.fetchFlairs();
+        },
+        handleSelectedFlair(option){
+            this.form.flair = option;
+        },
+        async fetchFlairs(){
+            try {
+                const response  = await ApiUtilis.fetchCommunityFlairs(this.form.communityId);
+                this.flairOptions = response.data;
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
         }
     }
 }

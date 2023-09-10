@@ -2,7 +2,7 @@
     <div class="w-full mx-auto z-0">
         <div class="pt-2 px-5 md:px-7">
             <div class="grid grid-cols-2 relative">
-                <a :href="'/community/'+ id">
+                <a :href="'/community/'+ communityId">
                     <div class="inline-block relative">
                         <TestIcon class="z-10 inline-block w-4 h-4"/>
                         <div class="ml-2 text-white inline-block text-base md:text-lg">{{ communityName }}</div>
@@ -15,7 +15,12 @@
                     <span class="text-xs ml-1 bottom-0 absolute text-white mb-1.5">{{ byUser }}</span>
                 </div>
             </div>
-            <div class="pt-3">
+            <div class="py-1">
+                <div class="px-5 rounded-2xl bg-gray-500 text-sm inline-block">
+                    {{flair && flair.name}}
+                </div>
+            </div>
+            <div class="">
                 <img class="object-cover w-full h-60 object-center rounded"
                      src="https://img.freepik.com/free-photo/beautiful-aerial-shot-fronalpstock-mountains-switzerland-beautiful-pink-blue-sky_181624-9315.jpg?w=1380&t=st=1685478210~exp=1685478810~hmac=1e718a3ae50f16e79ae05aa4a78ce930705b92631f89e1e35cc55ebf9c2b1e63"/>
             </div>
@@ -126,6 +131,7 @@ export default {
     props: {
         id: Number,
         communityName: String,
+        communityId: Number,
         byUser: String,
         karma: Number,
         title: String,
@@ -134,6 +140,7 @@ export default {
         date: String,
         vote: Boolean | null,
         commentsNumber: Number,
+        flair: Object
     },
     methods: {
         async voteUp(postId) {

@@ -53,9 +53,9 @@ Route::resource('markdown', MarkdownController::class)
 
 Route::prefix('community')->group(function () {
     Route::post('/{id}/paginate', [CommunityController::class, 'paginateCommunityPosts'])->name('communities.paginate');
-    Route::get('/create', [CommunityController::class, 'index'])->name('communities.index');
+    Route::get('/create', [CommunityController::class, 'createEditForm'])->name('communities.createEditForm');
     Route::post('/create', [CommunityController::class, 'store'])->name('communities.store');
-    Route::get('/{id}', [CommunityController::class, 'findById'])->name('communities.findById');
+    Route::get('/{id}', [CommunityController::class, 'renderById'])->name('communities.renderById');
     Route::get('/{id}/card', [CommunityController::class, 'getCard'])->name('communities.getCard');
     Route::get('/{id}/edit', [CommunityController::class, 'edit'])->name('communities.edit');
     Route::get('/{id}/rules', [CommunityController::class, 'rules'])->name('communities.rules');
@@ -88,6 +88,7 @@ Route::prefix('posts')->group(function () {
 
 
 Route::prefix('flair')->group(function () {
+    Route::get('/community/{id}', [FlairController::class, 'getCommunityFlairs'])->name('flair.communityFlairs');
     Route::post('/{id}/delete', [FlairController::class, 'destroy'])->name('flair.destroy');
     Route::post('/{id}/edit', [FlairController::class, 'update'])->name('flair.update');
     Route::post('/create', [FlairController::class, 'store'])->name('flair.create');

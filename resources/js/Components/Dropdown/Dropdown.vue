@@ -1,10 +1,12 @@
 <template>
-    <div class="dropdown p-2 bg-[#2D2D2D] text-center text-white rounded inline-block">
-        <slot class="inline-block"></slot>
-        <button type="button" @click="toggleDropdown" class="dropdown-button">
-            {{ selectedOption || placeholder }}
-        </button>
-        <AngleDownIcon class="ml-3 inline-block"/>
+    <div class="dropdown p-2 bg-black text-center text-white rounded inline-block cursor-pointer">
+        <div @click="toggleDropdown">
+            <slot class="inline-block"></slot>
+            <button type="button" class="dropdown-button">
+                {{ selectedOption || placeholder }}
+            </button>
+            <AngleDownIcon class="ml-3 inline-block"/>
+        </div>
         <ul v-if="isOpen" class="dropdown-list">
             <li v-for="{id, name} in options" :key="id" @click="selectOption({id, name})" class="text-start cursor-pointer py-2">
                 {{ name }}

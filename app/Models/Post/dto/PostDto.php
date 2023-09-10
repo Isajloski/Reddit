@@ -3,6 +3,7 @@
 namespace App\Models\Post\dto;
 
 use App\Models\Community\dto\CommunityDto;
+use App\Models\Flair\Flair;
 use App\Models\Image\Image;
 use App\Models\User\dto\UserDto;
 
@@ -17,6 +18,7 @@ class PostDto
     public int $karma;
     public int $comments_number;
     public string $date;
+    public Flair | null $flair;
 
     public function __construct( $id, $title, $body, $date, $karma , $comments_number )
     {
@@ -60,6 +62,10 @@ class PostDto
 
     public function setVote($vote) {
         $this->vote = $vote;
+    }
+
+    public function setFlair(Flair | null $flair) {
+        $this->flair = $flair;
     }
 
     public function setCommentsNumber(int $comments_number) {

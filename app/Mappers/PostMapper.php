@@ -4,6 +4,7 @@ namespace App\Mappers;
 
 use App\Models\Comment\Comment;
 use App\Models\Community\dto\CommunityDto;
+use App\Models\Flair\Flair;
 use App\Models\Post\dto\PostDetailedDto;
 use App\Models\Post\dto\PostDto;
 use App\Models\Post\Post;
@@ -28,6 +29,8 @@ class PostMapper
         $postDto->setVote($voted);
         $postDto->setCommunityDto($communityDto);
         $postDto->setUserDto($userDto);
+        $flair = Flair::find($post->flair_id);
+        $postDto->setFlair($flair);
 
         return $postDto;
     }

@@ -10,6 +10,7 @@ class CommunityCardDto
     public string $rules;
     public int $activeUsers;
     public int $totalUsers;
+    public array $flairs;
 
     public function __construct(){}
 }
