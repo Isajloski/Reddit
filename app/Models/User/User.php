@@ -2,7 +2,7 @@
 
 namespace App\Models\User;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Community\Follow;
 use App\Models\Post\Post;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,11 +15,31 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    public function karma()
+    {
+        return $this->hasOne(UserKarma::class);
+    }
+
+    public function status()
+    {
+        return $this->hasOne(UserStatus::class);
+    }
+
+
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
     }
 
+    public function follows()
+    {
+        return $this->hasMany(Follow::class, 'user_id');
+    }
+
+    public function info()
+    {
+        return $this->hasOne(UserInfo::class, 'user_id');
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -53,3 +73,4 @@ class User extends Authenticatable
 
 
 }
+

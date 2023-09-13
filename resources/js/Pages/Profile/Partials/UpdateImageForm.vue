@@ -1,0 +1,89 @@
+<script setup>
+import InputError from '@/Components/Input/InputError.vue';
+import InputLabel from '@/Components/Input/InputLabel.vue';
+import PrimaryButton from '@/Components/Button/PrimaryButton.vue';
+import TextInput from '@/Components/Input/TextInput.vue';
+import { Link, useForm, usePage } from '@inertiajs/vue3';
+
+const props = defineProps({
+    mustVerifyEmail: Boolean,
+    status: String,
+});
+
+const user = usePage().props.auth.user;
+
+const form = useForm({
+    user: user.id,
+    image: null
+});
+
+function onFileChange(event) {
+    form.image = event.target.files[0];
+}
+
+
+
+
+</script>
+
+<template>
+    <section>
+        <header>
+            <h2 class="text-lg font-medium text-gray-900">Update Image</h2>
+
+            <p class="mt-1 text-sm text-gray-600">
+                Update your account's image.
+            </p>
+        </header>
+
+        <!--User bio: -->
+
+        <form @submit.prevent="form.post(route('profile.image'))" class="mt-6 space-y-6">
+            <div>
+                <InputLabel for="file" value="Image" />
+
+                <input
+                    id="file"
+                    type="file"
+                    class="mt-1 block w-full"
+                    required
+                    autofocus
+                    autocomplete="name"
+                    @change="onFileChange"
+                />
+
+
+                <InputError class="mt-2" :message="form.errors.name" />
+            </div>
+
+            <div v-if="props.mustVerifyEmail && user.email_verified_at === null">
+                <p class="text-sm mt-2 text-gray-800">
+                    Your email address is unverified.
+                    <Link
+                        :href="route('verification.send')"
+                        method="post"
+                        as="button"
+                        class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        Click here to re-send the verification email.
+                    </Link>
+                </p>
+
+                <div
+                    v-show="props.status === 'verification-link-sent'"
+                    class="mt-2 font-medium text-sm text-green-600"
+                >
+                    A new verification link has been sent to your email address.
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <PrimaryButton :disabled="form.processing">Save</PrimaryButton>
+
+                <Transition enter-from-class="opacity-0" leave-to-class="opacity-0" class="transition ease-in-out">
+                    <p v-if="form.recentlySuccessful" class="text-sm text-gray-600">Saved.</p>
+                </Transition>
+            </div>
+        </form>
+    </section>
+</template>

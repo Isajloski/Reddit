@@ -4,6 +4,9 @@ import DeleteUserForm from './Partials/DeleteUserForm.vue';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm.vue';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm.vue';
 import { Head } from '@inertiajs/vue3';
+import Navbar from "@/Components/Navbar/Navbar.vue";
+import UpdateBioForm from "@/Pages/Profile/Partials/UpdateBioForm.vue";
+import UpdateImageForm from "@/Pages/Profile/Partials/UpdateImageForm.vue";
 
 defineProps({
     mustVerifyEmail: Boolean,
@@ -13,6 +16,7 @@ defineProps({
 
 <template>
     <Head title="Profile" />
+    <Navbar/>
 
     <AuthenticatedLayout>
         <template #header>
@@ -21,6 +25,23 @@ defineProps({
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <UpdateBioForm
+                        :must-verify-email="mustVerifyEmail"
+                        :status="status"
+                        class="max-w-xl"
+                    />
+                </div>
+
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <UpdateImageForm
+                        :must-verify-email="mustVerifyEmail"
+                        :status="status"
+                        class="max-w-xl"
+                    />
+                </div>
+
+
                 <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"

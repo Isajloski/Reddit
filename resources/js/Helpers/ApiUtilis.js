@@ -70,7 +70,20 @@ const ApiUtilis = {
     },
     getPaginatedTrendingPosts(pageNumber, sortDto){
         return axios.post('/posts/trending/paginate?page=' + pageNumber, sortDto);
-    }
+    },
+    editUserImage(formData){
+        return axios.post(`/settings/image`, formData);
+    },
+    fetchImage(id) {
+        return axios.get(`/image/${id}`)
+            .then((response) => {
+                return response.data.path;
+            })
+            .catch((error) => {
+                console.error('Error fetching image:', error);
+                throw error; // Rethrow the error for handling in the component
+            });
+    },
 };
 
 export default ApiUtilis;

@@ -3,9 +3,12 @@
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FlairController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MarkdownController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserInfoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -39,6 +42,8 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile', [UserInfoController::class, 'bio'])->name('profile.bio');
+    Route::post('/profile', [UserInfoController::class, 'image'])->name('profile.image');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/logout', [ProfileController::class, 'logout'])->name('profile.logout');
 });
@@ -51,7 +56,7 @@ Route::resource('markdown', MarkdownController::class)
     ->only(['index']);
 
 
-Route::prefix('community')->group(function () {
+Route::prefix('community')->middleware(['user.activity'])->group(function () {
     Route::post('/{id}/paginate', [CommunityController::class, 'paginateCommunityPosts'])->name('communities.paginate');
     Route::get('/create', [CommunityController::class, 'createEditForm'])->name('communities.createEditForm');
     Route::post('/create', [CommunityController::class, 'store'])->name('communities.store');
@@ -67,7 +72,7 @@ Route::prefix('community')->group(function () {
 });
 
 
-Route::prefix('post')->group(function () {
+Route::prefix('post')->middleware(['user.activity'])->group(function () {
     Route::get('/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/create', [PostController::class, 'store'])->name('posts.store');
     Route::get('/{id}', [PostController::class, 'get']) ->name('posts.get');
@@ -110,6 +115,13 @@ Route::prefix('comment')->group(function () {
 });
 
 
+Route::prefix('user')->group(function () {
+    Route::get('/{name}', [UserController::class, 'getUserByName'])->name('users.getUserByName');
+    Route::post('/image', [UserInfoController::class, 'uploadImage'])->name('infos.uploadImage');
+
+});
+
+Route::get('/image/{id}', [ImageController::class, 'getImage'])->name('image.getImage');
 
 
 

@@ -1,11 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Image\Image;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ImageController extends Controller
 {
+    public function getImage($id){
+        $image = Image::findOrFail($id);
+        return $image;
+    }
+
     public function storeImage($file, $path = 'images')
     {
         $filename = $file->getClientOriginalName();
@@ -31,8 +38,6 @@ class ImageController extends Controller
 
         return response()->json(['message' => 'Image deleted successfully']);
     }
-
-
 
 
 
