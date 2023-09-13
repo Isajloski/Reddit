@@ -110,10 +110,28 @@ class PostController extends Controller
         return $posts;
     }
 
+//    public function deleteVotePost($postId){
+//        $user = Auth::user();
+//        return $this->voteService->deletePostVote($user->id, $postId);
+//    }
+
     public function deleteVotePost($postId){
         $user = Auth::user();
+        $userKarmaController = new UserKarmaController();
+        $post = $this->postService->getById($postId);
+
+        $karma = $this->voteService->getPostVotesByIds($user->id, $postId)->vote;
+
+        if($karma == 0){
+            $userKarmaController->upVote($post->user_id);
+        }else{
+            $userKarmaController->downVote($post->user_id);
+        }
+
         return $this->voteService->deletePostVote($user->id, $postId);
     }
+
+
 
 
     /**
@@ -189,6 +207,19 @@ class PostController extends Controller
 
     }
 
+//    public function votePost($id, Request $request){
+//        $user = Auth::user();
+//
+//        $jsonData = json_decode($request->getContent(), true);
+//
+//        $postVoteDto = new PostVoteDto();
+//        $postVoteDto->post_id = $id;
+//        $postVoteDto->vote = $jsonData['vote'];
+//
+//        return $this->postService->vote_Post($postVoteDto, $user);
+//
+//    }
+
     public function votePost($id, Request $request){
         $user = Auth::user();
 
@@ -197,6 +228,21 @@ class PostController extends Controller
         $postVoteDto = new PostVoteDto();
         $postVoteDto->post_id = $id;
         $postVoteDto->vote = $jsonData['vote'];
+//
+//        $vote = $jsonData['vote'];
+
+
+        $userKarmaController = new UserKarmaController();
+        $post = $this->postService->getById($id);
+
+        //        $userKarmaController->downVote($post->user_id);
+
+        if($postVoteDto->vote == 1){
+            $userKarmaController->upVote($post->user_id);
+        }else if($postVoteDto->vote == null){
+            $userKarmaController->downVote($post->user_id);
+
+        }
 
         return $this->postService->vote_Post($postVoteDto, $user);
 

@@ -98,4 +98,9 @@ class CommentService
         $this->getCommentReplies($commentId)->delete();
     }
 
+    public function getById($id)
+    {
+        return Comment::with('user')->find($id);
+    }
+
 }
