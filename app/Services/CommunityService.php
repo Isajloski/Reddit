@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Comment\Comment;
 use App\Models\Community\Community;
 use App\Models\Community\dto\CommunityCardDto;
 use App\Models\Community\Follow;
@@ -14,7 +15,9 @@ class CommunityService
     public function __construct(private readonly FlairService $flairService) {}
 
     public function getUserCommunities(User $user){
-        return Follow::with('community')->where('user_id', $user->id)->get();
+        $communities = Follow::where('user_id', $user->id)->pluck('community_id');
+
+        return Community::whereIn('id', $communities)->get();
     }
 
     public function searchCommunities(){
@@ -25,8 +28,12 @@ class CommunityService
         return Follow::with('community')->where('community_id',$id)->count();
     }
 
-    public function getActiveUsers($id){
-        return Post::with('user')->where('community_id', $id)->count();
+    public function getActiveUsers($id): int
+    {
+        $usersFromPost = Post::select('user_id')->distinct();
+        $usersFromComments = Comment::select('user_id')->distinct();
+
+        return $usersFromPost->union($usersFromComments)->distinct()->count();
     }
 
     public function getAllCommunities(){

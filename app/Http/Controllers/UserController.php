@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mappers\PostMapper;
 use App\Models\Community\Follow;
 use App\Services\CommentService;
 use App\Services\PostService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -17,7 +19,7 @@ class UserController extends Controller
     protected $commentService;
     protected $postService;
 
-    public function __construct(UserService $userService, CommentService $commentService, PostService $postService)
+    public function __construct(UserService $userService, CommentService $commentService, PostService $postService, PostMapper $postMapper)
     {
         $this->userService = $userService;
         $this->commentService = $commentService;
