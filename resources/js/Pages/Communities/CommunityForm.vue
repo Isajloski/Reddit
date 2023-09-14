@@ -41,9 +41,11 @@
                 <div class="bg-[#CC0974] rounded-2xl inline-block">
                     <button type="submit" class="px-4 py-2">Create</button>
                 </div>
-                <div class="border border-[#515151] rounded-2xl inline-block float-right">
-                    <button type="button" class="px-4 py-2 text-white">Cancel</button>
-                </div>
+                <a href="/">
+                    <div class="border border-[#515151] rounded-2xl inline-block float-right">
+                        <div class="px-4 py-2 text-white">Cancel</div>
+                    </div>
+                </a>
             </form>
 
         </div>

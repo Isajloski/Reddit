@@ -8,6 +8,7 @@
         <div class="px-1 md:px-10">
                     <CommunityCard v-if="this.type==='community'"
                     :name="this.community.name"
+                    :id="this.community.id"
                     :type="'community'"
                     :active-users="community.activeUsers"
                     :total-users="community.totalUsers"
@@ -161,7 +162,27 @@ export default {
                 }
             }
             else if(this.type === 'user'){
+                const regexPattern = /[^/]+$/;
 
+                const path = window.location.pathname;
+                const match = path.match(regexPattern);
+
+                if (match) {
+                    const userName = match[0];
+                    try {
+                        let response = await ApiUtilis.fetchUser(userName);
+                        this.community = response.data[0];
+                    } catch (error) {
+                        console.error('Error fetching data:', error);
+                    }
+                    try {
+                        let response = await ApiUtilis.fetchCommunityPosts(userName, this.currentPage, sortDto)
+                        const newData = response.data.data;
+                        this.posts = [...this.posts, ...newData];
+                    } catch (error) {
+                        console.error('Error fetching data:', error);
+                    }
+                }
             }
         },
     },

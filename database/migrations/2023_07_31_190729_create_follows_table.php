@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('follows', function (Blueprint $table) {
-            $table->id();
             $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users');
             $table->integer('community_id')->unsigned();
+            $table->primary(array('user_id', 'community_id'));
+            $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('community_id')->references('id')->on('communities');
             $table->timestamps();
         });

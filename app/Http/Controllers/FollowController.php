@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Community\Follow;
+use Illuminate\Support\Facades\Log;
 
 
 class FollowController extends Controller
@@ -24,25 +25,26 @@ class FollowController extends Controller
 
         $follow->save();
 
-        return response()->json(['message' => 'You are now following the community.']);
+        return $follow;
     }
 
 
     public function unfollow($communityId)
     {
-        $user = auth()->user(); // Assuming you have authentication set up
+        $user = auth()->user();
 
-        $follow = Follow::where([
+        Follow::where([
             'user_id' => $user->id,
-            'community_id' => $communityId,
-        ])->first();
+            'community_id' => $communityId
+        ])->delete();
 
-        if ($follow) {
-            $follow->delete();
-            return response()->json(['message' => 'You have unfollowed the community.']);
-        } else {
-            return response()->json(['message' => 'You were not following the community.']);
-        }
+
+//        if ($follow) {
+//            $follow->delete();
+//            return response()->json(['message' => 'You have unfollowed the community.']);
+//        } else {
+//            return response()->json(['message' => 'You were not following the community.']);
+//        }
     }
 
 

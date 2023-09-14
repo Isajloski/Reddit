@@ -5,6 +5,12 @@ const ApiUtilis = {
     fetchCommunity(id) {
         return axios.get(`/community/${id}/card`);
     },
+    followCommunity(communityId) {
+        return axios.post(`/follow/${communityId}`);
+    },
+    unfollowCommunity(communityId) {
+        return axios.post(`/unfollow/${communityId}`);
+    },
     fetchCommunityFlairs(communityId){
         return axios.get(`flair/community/${communityId}`);
     },
@@ -73,6 +79,15 @@ const ApiUtilis = {
     },
     editUserImage(formData){
         return axios.post(`/settings/image`, formData);
+    },
+    fetchUser(userName){
+        return axios.get(`/user/${userName}`);
+    },
+    fetchUserPosts(userName, pageNumber, sortDto){
+        return axios.post(`/user/${userName}/paginate?page=` + pageNumber, sortDto);
+    },
+    fetchUserFollowingCommunity(communityId){
+        return axios.get(`/user/following/${communityId}`)
     },
     fetchImage(id) {
         return axios.get(`/image/${id}`)
