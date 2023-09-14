@@ -27,7 +27,6 @@ class UserInfoController extends Controller
 
     public function bio(Request $request){
 
-        Log::info("I was called!");
         $id = Auth::user()->id;
 
         $userInfo = UserInfo::where('user_id', $id)->first();

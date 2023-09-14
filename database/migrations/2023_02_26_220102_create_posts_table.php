@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreign('image_id')->references('id')->on('images');
             $table->string('title');
             $table->string('body');
+            $table->boolean('spoiler')->nullable();
             $table->timestamps();
         });
     }

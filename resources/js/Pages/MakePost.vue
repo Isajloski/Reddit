@@ -4,7 +4,7 @@
     <div class="w-auto md:w-3/5 mx-5 md:mx-auto mt-48 md:mt-20 rounded-xl relative bg-[#2d2d2d]">
         <div class="">
             <h1 class="text-white text-2xl pb-5 text-center font-bold">Create Post</h1>
-            <form class="p-5" @submit.prevent="createPost">
+            <form class="p-5" @submit.prevent="createPost" enctype="multipart/form-data" >
                 <div class="pb-5">
                     <div htmlFor="name" class="py-1 text-white">Community</div>
                     <Dropdown
@@ -22,6 +22,23 @@
                     <div htmlFor="" class="py-1 text-white">Content:</div>
                     <textarea type="text" id="content" v-model="form.body" class="rounded bg-[#515151] w-96 text-white w-full"></textarea>
                 </div>
+
+
+                <div class="pb-5">
+                    <div htmlFor="image" class="py-1 text-white">Image:</div>
+                    <input type="file" name="image" id="image" @change="onFileChange" class="rounded bg-[#515151] text-white">
+                </div>
+
+<!--                <div class="pb-5">-->
+<!--                    <div class="py-1 text-white">Link:</div>-->
+<!--                    <input type="text" id="link" class="rounded bg-[#515151] text-white">-->
+<!--                </div>-->
+
+                <div class="pb-5">
+                    <div class="py-1 text-white">Mark as spoiler:</div>
+                    <input type="checkbox" id="spoiler" @click="form.spoiler = !form.spoiler" class="bg-black">
+                </div>
+
                 <div class="pb-5">
                     <div htmlFor="flair" class="py-1 text-white">Flair</div>
                     <Dropdown
@@ -31,20 +48,15 @@
                         id="flairId"
                         v-model="form.flair"></Dropdown>
                 </div>
-                <div class="pb-5">
-                    <div class="py-1 text-white">Image:</div>
-                    <input type="text" id="image"  @change="handleFileUpload" class="rounded bg-[#515151] text-white">
-                </div>
-                <div class="pb-5">
-                    <div class="py-1 text-white">Link:</div>
-                    <input type="text" id="link" class="rounded bg-[#515151] text-white">
-                </div>
+
                 <div class="bg-[#CC0974] rounded-2xl inline-block">
                     <button type="submit" class="px-4 py-2">Create</button>
                 </div>
                 <div class="border border-[#515151] rounded-2xl inline-block float-right">
                     <button type="button" class="px-4 py-2 text-white">Cancel</button>
                 </div>
+
+
             </form>
         </div>
     </div>
@@ -55,6 +67,8 @@ import Navbar from "@/Components/Navbar/Navbar.vue";
 import {useForm, Head} from "@inertiajs/vue3";
 import Dropdown from '@/Components/Dropdown/Dropdown.vue';
 import ApiUtilis from "@/Helpers/ApiUtilis";
+
+
 
 export default {
     name: "MakePost",
@@ -79,14 +93,10 @@ export default {
             communityId: '',
             title: '',
             body: '',
-            image: '',
-            flair: ''
+            image: null,
+            flair: '',
+            spoiler: false
         })
-
-        const handleFileUpload = (event) => {
-            form.data.image = event.target.files[0];
-        };
-
         const createPost = () => {
             form.post(route('posts.create'), {
                 onSuccess: () => {
@@ -102,7 +112,6 @@ export default {
 
         return {
             form,
-            handleFileUpload,
             createPost
         }
     },
@@ -122,6 +131,9 @@ export default {
             } catch (error) {
                 console.error('Error fetching options:', error);
             }
+        },
+        onFileChange(event) {
+            this.form.image = event.target.files[0];
         }
     }
 }

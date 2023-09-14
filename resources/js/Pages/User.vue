@@ -7,7 +7,18 @@
     <div id="right" class="absolute mt-10 md:mt-6 w-auto md:w-1/6 md:right-0 mx-5">
         <ProfileCard :user="user[0]"/>
     </div>
-    <Content/>
+    <Content :type="user" />
+    <div>
+        <div v-for="post in posts" >
+            <div v-if="post.community_id">
+                <p>Post</p>
+            </div>
+            <div v-else>
+                <p>Comment</p>
+            </div>
+        </div>
+
+    </div>
 </template>
 
 <script>
@@ -24,6 +35,7 @@ export default {
     components: {ProfileCard, Navbar,Filter,Create,Content},
     props: {
         user: Object[0],
+        posts: [],
     },
     created() {
         document.title = this.user[0].name;

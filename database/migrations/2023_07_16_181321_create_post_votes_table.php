@@ -16,8 +16,8 @@ return new class extends Migration
             $table->integer('post_id')->unsigned();
             $table->primary(array('user_id', 'post_id'));
             $table->boolean('vote');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('post_id')->references('id')->on('posts');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('post_id')->references('id')->on('posts')->cascadeOnDelete();
             $table->timestamps();
         });
     }

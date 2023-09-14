@@ -36,7 +36,7 @@ const ApiUtilis = {
         return axios.get(`/posts/${id}`);
     },
     deletePost(id){
-        return axios.delete(`/posts/${id}/delete`)
+        return axios.delete(`/post/${id}/delete`)
     },
     votePost(postVoteDto){
         return axios.post(`/post/${postVoteDto.postId}/vote`, postVoteDto);

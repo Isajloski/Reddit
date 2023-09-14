@@ -103,4 +103,12 @@ class CommentService
         return Comment::with('user')->find($id);
     }
 
+    public function getAllCommentsByUserId($id)
+    {
+        return Comment::where('user_id', $id)
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
 }

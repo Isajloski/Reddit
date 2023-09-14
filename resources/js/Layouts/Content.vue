@@ -27,6 +27,13 @@
                       :flair="post.flair"
                 />
             </div>
+            <!--
+
+         -->
+
+
+
+
         </div>
     </div>
 </template>
@@ -149,9 +156,12 @@ export default {
                         const newData = response.data.data;
                         this.posts = [...this.posts, ...newData];
                     } catch (error) {
-                        console.error('Error fetching data:', error);
+                         console.error('Error fetching data:', error);
                     }
                 }
+            }
+            else if(this.type === 'user'){
+
             }
         },
     },

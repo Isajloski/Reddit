@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -163,8 +164,23 @@ class PostController extends Controller
         $post = new Post();
         $post->title = $request->input('title');
         $post->body = $request->input('body');
-        $post->image_id = null;
         $post->flair_id = $request->input('flair');
+        $post->spoiler = $request->boolean('spoiler');
+
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $imageController = new ImageController();
+            $imageId = $imageController->storeImage($file, '/posts');
+            $post->image_id = $imageId;
+            Log::info($file);
+        }
+        else{
+            $post->image_id = null;
+        }
+
+
+
 
         $post->user()->associate($user);
         $post->community()->associate($request->input('communityId'));
@@ -252,10 +268,17 @@ class PostController extends Controller
      * Remove the specified resource from storage.
      */
 
-    public function delete(int $id)
+    public function delete($id)
     {
-        return $this->postService->delete($id);
+        $post = $this->postService->getById($id)->image_id;
+        $this->postService->delete($id);
 
+
+        if(!is_null($post)){
+                $imageController = new ImageController();
+                $imageController->delete($post);
+        }
+        return redirect('/');
     }
 
     public function destroy(Post $post) : RedirectResponse

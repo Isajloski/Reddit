@@ -33,7 +33,6 @@ class UserService
     public function getUserByName($name){
         $user =  User::with('karma','status','info')->where('name', $name)->firstOrFail();
         $this->userActivity($user);
-        Log::info($user);
         return $user;
     }
 

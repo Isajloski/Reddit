@@ -16,9 +16,13 @@
                 </div>
             </div>
             <div class="py-1">
-                <div class="px-5 rounded-2xl bg-gray-500 text-sm inline-block">
+                <div v-if="flair" class="px-3 rounded-2xl bg-gray-500 text-sm inline-block">
                     {{flair && flair.name}}
                 </div>
+                <h1 class=" text-2xl font-semibold text-[#F20085]">{{title}}</h1>
+            </div>
+
+            <div class="">
             </div>
             <div class="">
                 <img class="object-cover w-full h-60 object-center rounded"
@@ -51,13 +55,18 @@
                             <ShareIcon class="w-4 h-4 inline-block ml-3"/>
                             <span class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">Share</span>
                         </div>
+                        <div class="inline-block" @click="deletePost">
+                            <DeleteIcon class="w-4 h-4 inline-block ml-3"/>
+                            <span class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">Delete</span>
+                        </div>
                     </div>
                     <div class="right-0 absolute">
                         <span class="text-xs text-[#898989]">{{ date }}</span>
                     </div>
                 </div>
                 <div class="py-2">
-                    <p class="text-[#898989] pt-2 line-clamp-4 w-full text-sm md:text-base">{{
+
+                    <p v-if="!spoiler" class="text-[#898989] pt-2 line-clamp-4 w-full text-sm md:text-base">{{
                             description
                         }}</p>
                     <p class="pt-1 text-white"> Expand post</p>
@@ -94,10 +103,11 @@ import VoteDownIcon from "@/Components/Icons/VoteDownIcon.vue";
 import CommentIcon from "@/Components/Icons/CommentIcon.vue";
 import ApiUtilis from "@/Helpers/ApiUtilis";
 import WriteComment from "@/Components/Comment/WriteComment.vue";
+import DeleteIcon from "@/Components/Icons/DeleteIcon.vue";
 
 export default {
     name: "Post",
-    components: {WriteComment, CommentIcon, VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon, Comment},
+    components: {DeleteIcon, WriteComment, CommentIcon, VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon, Comment},
     data() {
         return {
             childKarma: this.karma,
@@ -138,6 +148,7 @@ export default {
         image: String,
         description: String,
         date: String,
+        spoiler: Boolean,
         vote: Boolean | null,
         commentsNumber: Number,
         flair: Object
@@ -184,6 +195,9 @@ export default {
             } catch (error) {
                 console.error('Error fetching options:', error);
             }
+        },
+        deletePost(){
+              ApiUtilis.deletePost(this.id);
         },
         toggleComments(){
             this.openCommentSection = !this.openCommentSection;

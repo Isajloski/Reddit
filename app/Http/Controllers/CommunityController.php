@@ -166,6 +166,7 @@ class CommunityController extends Controller
         if($sortBy=="new"){
             $posts = $this->postService->getCommunityPosts($community)->orderBy('created_at', 'desc')->paginate(2);
         }
+
         else{
 
                 $posts = DB::table('posts')

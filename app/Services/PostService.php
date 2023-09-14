@@ -85,4 +85,13 @@ class PostService
     public function getCommunityPosts(Community $community){
         return Post::where('community_id', $community->id);
     }
+
+    public function getAllPostsByUserId($id)
+    {
+        return Post::where('user_id', $id)
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ;
+    }
 }
