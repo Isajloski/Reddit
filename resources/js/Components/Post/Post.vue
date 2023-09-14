@@ -107,6 +107,7 @@ import DeleteIcon from "@/Components/Icons/DeleteIcon.vue";
 
 export default {
     name: "Post",
+    emits: ['deleteEmitter'],
     components: {DeleteIcon, WriteComment, CommentIcon, VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon, Comment},
     data() {
         return {
@@ -196,8 +197,15 @@ export default {
                 console.error('Error fetching options:', error);
             }
         },
-        deletePost(){
-              ApiUtilis.deletePost(this.id);
+        async deletePost(){
+              try{
+                 const response = await ApiUtilis.deletePost(this.id);
+                 this.deleteEmitter(this.id);
+              }
+              catch (error){
+                  console.log("Error", error);
+              }
+
         },
         toggleComments(){
             this.openCommentSection = !this.openCommentSection;
@@ -214,6 +222,9 @@ export default {
         handleEdit(commentUpdateDto){
             const index = this.comments.findIndex(comment => comment.id === commentUpdateDto.id);
             this.comments[index].body = commentUpdateDto.body;
+        },
+        deleteEmitter(postId) {
+            this.$emit('deleteEmitter', postId);
         }
     }
 }

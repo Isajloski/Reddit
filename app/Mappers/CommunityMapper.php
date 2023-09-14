@@ -16,9 +16,14 @@ class CommunityMapper
 
     public function mapCollectionToDto($communities)
     {
-        return $communities->map(function ($community){
-            return $this->mapToDto($community->community);
-        });
+        if($communities === null){
+            return [];
+        }
+        else {
+            return $communities->map(function ($community){
+                return $this->mapToDto($community);
+            });
+        }
     }
 
 }

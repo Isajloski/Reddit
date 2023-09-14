@@ -26,11 +26,10 @@
                       :image="post.image"
                       :title="post.title"
                       :flair="post.flair"
+                      @deleteEmitter="handleDeletePost($event)"
+
                 />
             </div>
-            <!--
-
-         -->
 
 
 
@@ -185,6 +184,12 @@ export default {
                 }
             }
         },
+        handleDeletePost(postId){
+            const index = this.posts.findIndex(post => post.id === postId);
+            if (index !== -1) {
+                this.posts.splice(index, 1);
+            }
+        }
     },
 }
 </script>

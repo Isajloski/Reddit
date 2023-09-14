@@ -6,12 +6,10 @@ use App\Mappers\PostMapper;
 use App\Models\Post\dto\PostCreationDto;
 use App\Models\Post\Post;
 use App\Models\Vote\dto\PostVoteDto;
-use App\Services\CommunityService;
 use App\Services\PostService;
 use App\Services\VoteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -223,18 +221,6 @@ class PostController extends Controller
 
     }
 
-//    public function votePost($id, Request $request){
-//        $user = Auth::user();
-//
-//        $jsonData = json_decode($request->getContent(), true);
-//
-//        $postVoteDto = new PostVoteDto();
-//        $postVoteDto->post_id = $id;
-//        $postVoteDto->vote = $jsonData['vote'];
-//
-//        return $this->postService->vote_Post($postVoteDto, $user);
-//
-//    }
 
     public function votePost($id, Request $request){
         $user = Auth::user();
@@ -244,8 +230,6 @@ class PostController extends Controller
         $postVoteDto = new PostVoteDto();
         $postVoteDto->post_id = $id;
         $postVoteDto->vote = $jsonData['vote'];
-//
-//        $vote = $jsonData['vote'];
 
 
         $userKarmaController = new UserKarmaController();
@@ -278,7 +262,6 @@ class PostController extends Controller
                 $imageController = new ImageController();
                 $imageController->delete($post);
         }
-        return redirect('/');
     }
 
     public function destroy(Post $post) : RedirectResponse
