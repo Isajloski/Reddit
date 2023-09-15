@@ -2,7 +2,7 @@
     <Head><title>Create Community</title></Head>
     <Navbar/>
     <div class="w-auto md:w-3/5 mx-5 md:mx-auto mt-48 md:mt-20 rounded-xl relative bg-[#2d2d2d]">
-        <div v-if="edit" >
+        <div class="">
             <form @submit.prevent="createCommunity" class="p-5">
                 <h1 class="text-white text-2xl pb-5 text-center font-bold">Create Community</h1>
                 <div class="pb-5">
@@ -28,14 +28,13 @@
                         <button type="button" class="px-4 py-2" @click="addFlair()">Add</button>
                     </div>
                 </div>
-
                 <div class="pb-5">
                     <div v-for="flair in flairs">
                         <div class="py-2">
                             <div class="py-2 px-4 rounded-2xl bg-black text-white inline-block">
                                 {{ flair }}
                                 <span class="pl-2 text-sm hover:text-gray-500 cursor-pointer" @click="removeFlair(flair)">x</span>
-                        </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -52,90 +51,106 @@
         </div>
 
 
-        <!-- EDIT -->
-        <div v-else>
+        <!--        <div class="text-center self-center">-->
+        <!--            <ul>-->
+        <!--                <li v-for="community in communities" :key="community.id">-->
+        <!--                    <h3>Community ID: {{ community.id }}</h3>-->
+        <!--                    <h3>Owner: {{ community.user.name }}</h3>-->
+        <!--                    <h3>E-mail Owner: {{community.user.email }}</h3>-->
+        <!--                    <h3>r/{{ community.name }}</h3>-->
+        <!--                    <p>description: {{ community.description }}</p>-->
+        <!--                    <p>Rules: {{ community.rules }}</p>-->
 
-            <form @submit.prevent="editCommunity(community.id)" class="p-5">
-                <h1 class="text-white text-2xl pb-5 text-center font-bold">Edit Community</h1>
-                <div class="pb-5">
-                    <div htmlFor="name" class="py-1 text-white">Name:</div>
-                    <input type="text" id="name" v-model="editForm.name"  :placeholder="community.name" class="rounded bg-[#515151] text-white">
-                </div>
-                <div class="pb-5">
-                    <div htmlFor="description" class="py-1 text-white">Description:</div>
-                    <textarea id="description" v-model="editForm.description" :placeholder="community.description" class="rounded bg-[#515151] w-96 text-white"></textarea>
-                </div>
-                <div class="pb-5">
-                    <div htmlFor="rules" class="py-1 text-white">Rules:</div>
-                    <textarea id="rules" v-model="editForm.rules" class="rounded bg-[#515151] w-96 text-white" :placeholder="community.rules"></textarea>
-                </div>
-
-                <div class="pb-5">
-                    <div htmlFor="image" class="py-1 text-white">Image:</div>
-                    <input type="file" id="image" @change="handleFileUpload" class="rounded bg-[#515151] text-white">
-                </div>
+        <!--                    <img v-if="community.image" :src="community.image.path" alt="Community Image">-->
 
 
+        <!--                    <ul v-if="community.flairs != null">-->
+        <!--                        <p>Flair</p>-->
+        <!--                        <li v-for="flair in community.flairs" :key="flair.id">-->
+        <!--                            <button class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">-->
+        <!--                              <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">-->
+        <!--                                  {{flair.name}}-->
+        <!--                              </span>-->
+        <!--                            </button>-->
+        <!--                            <br/>-->
+        <!--                            <div>-->
+        <!--                                <form @submit.prevent="editFlair(flair.id)">-->
+        <!--                                    <div>-->
+        <!--                                        <label for="flair-name">New Flair Name</label>-->
+        <!--                                        <input type="text" id="flair-name" v-model="flairName" />-->
+        <!--                                    </div>-->
+        <!--                                    <br/>-->
+        <!--                                    <button type="submit"  class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-teal-300 to-lime-300 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-lime-200 dark:focus:ring-lime-800">-->
+        <!--                                      <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">-->
+        <!--                                          EDIT FLAIR-->
+        <!--                                      </span>-->
+        <!--                                    </button>-->
+        <!--                                </form>-->
+        <!--                            </div>-->
+        <!--                            <button @click="deleteFlair(flair.id)" class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400">-->
+        <!--                              <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">-->
+        <!--                                   DELETE-->
+        <!--                              </span>-->
+        <!--                            </button>-->
 
-                <div class="bg-[#CC0974] rounded-2xl inline-block">
-                    <button type="submit" class="px-4 py-2">Change</button>
-                </div>
-                <a href="/">
-                    <div class="border border-[#515151] rounded-2xl inline-block float-right">
-                        <div class="px-4 py-2 text-white">Cancel</div>
-                    </div>
-                </a>
 
-                <br/> <br/><br/>
-                <br/> <br/><br/>
-                <br/> <br/><br/>
+        <!--                        </li>-->
+        <!--                    </ul>-->
 
-                <div htmlFor="name" class="py-1 pt-5 text-white">Flairs:</div>
-                <div class="flex gap-2 py-2">
-                    <input type="text" id="flair-name" v-model="flairName" class="rounded bg-[#515151] text-white"/>
-                    <div class="bg-[#CC0974] rounded-2xl inline-block">
-                        <button type="button" class="px-4 py-2" @click="addFlair()">Add</button>
-                    </div>
-                </div>
+        <!--                    <br/>-->
+        <!--                    <br/>-->
+        <!--                    <form @submit.prevent="createFlair(community.id)">-->
+        <!--                        <div>-->
+        <!--                            <label for="flair-name">Flair Name</label>-->
+        <!--                            <input type="text" id="flair-name" v-model="flairName" />-->
+        <!--                        </div>-->
+        <!--                        <br/>-->
+        <!--                        <button type="submit" class="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400">-->
+        <!--                                      <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">-->
+        <!--                                           CREATE NEW FLAIR-->
+        <!--                                      </span>-->
+        <!--                        </button>-->
+        <!--                    </form>-->
+
+        <!--                    <br/>-->
+        <!--                    <br/>-->
+
+        <!--                    <button class="text-white bg-emerald-500 py-2 px-5 rounded" @click="deleteCommunity(community.id)">Delete</button>-->
+        <!--                    <br/>-->
+        <!--                    <br/>-->
+        <!--                        <button class="text-white bg-emerald-500 py-2 px-4 rounded" @click="showEdit">Edit</button>-->
+        <!--                    <br/>-->
+        <!--                    <br/>-->
 
 
 
 
-                <div class="pb-5">
-                    <div v-for="flair in flairs">
-                        <div class="py-2">
-                            <div class="py-2 px-4 rounded-2xl bg-black text-white inline-block">
-                                {{ flair }}
-                                <span class="pl-2 text-sm hover:text-gray-500 cursor-pointer" @click="removeFlair(flair)">x</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!---            MODERATORS    --->
-                <div htmlFor="name" class="py-1 pt-5 text-white">Moderators:</div>
-                <div class="flex gap-2 py-2">
-                    <input type="text" id="flair-name" v-model="moderatorName" class="rounded bg-[#515151] text-white"/>
-                    <div class="bg-[#CC0974] rounded-2xl inline-block">
-                        <button type="button" class="px-4 py-2" @click="addModerator">Add</button>
-                    </div>
-                </div>
 
-                <div class="pb-5">
-                    <div v-for="moderator in moderators ">
-                        <div class="py-2">
-                            <div class="py-2 px-4 rounded-2xl bg-black text-white inline-block">
-                                {{ moderator.user.name}}
-                                <span class="pl-2 text-sm hover:text-gray-500 cursor-pointer" @click="deleteModerator(moderator)">x</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!--                    <div v-if="showDiv">-->
+        <!--                        <div class="font-medium">-->
+        <!--                            <form @submit.prevent="editCommunity(community.id)">-->
 
-            </form>
+        <!--                                <label htmlFor="name">Name:</label>-->
+        <!--                                <input type="text" id="name" v-model="editForm.name" :placeholder="community.name">-->
+        <!--                                <br>-->
 
-        </div>
+        <!--                                <label htmlFor="description">Description:</label>-->
+        <!--                                <textarea id="description" v-model="editForm.description" :placeholder="community.description" ></textarea>-->
+        <!--                                <br>-->
 
+        <!--                                <label htmlFor="rules">Rules:</label>-->
+        <!--                                <textarea id="rules" :placeholder="community.rules"  v-model="editForm.rules" ></textarea>-->
+        <!--                                <br>-->
+
+
+        <!--                                <button class="text-white bg-red-400 py-2 px-5 rounded" type="submit">Change the settings</button>-->
+        <!--                            </form>-->
+        <!--                        </div>-->
+        <!--                    </div>-->
+        <!--                </li>-->
+        <!--            </ul>-->
+        <!--        </div>-->
     </div>
 
 </template>
@@ -148,16 +163,10 @@ import Navbar from "@/Components/Navbar/Navbar.vue";
 
 export default {
     components: {Navbar, Head},
-    props:{
-        community: Object,
-        edit: Boolean
-    },
     data(){
         return{
             showDiv: false,
             flairName: '',
-            moderatorName: '',
-            moderators: [],
             flairs : []
         };
     },
@@ -174,7 +183,6 @@ export default {
             name: '',
             description: '',
             rules: '',
-            image: '',
             flairs: []
         });
 
@@ -183,7 +191,6 @@ export default {
             form.data.image = file;
             editForm.data.image = file;
         };
-
 
         const createCommunity = () => {
             form.post(route('communities.store'), {
@@ -200,14 +207,13 @@ export default {
 
         return {
             form,
-            createCommunity,
             handleFileUpload,
+            createCommunity,
             editForm
         };
 
 
     },
-
 
     methods: {
         deleteCommunity(id) {
@@ -222,25 +228,6 @@ export default {
                         console.error('Error deleting community:', error);
                     });
             }
-        },
-        addModerator(){
-            const formData = {
-                name: this.moderatorName,
-                community_id: this.community.id,
-            };
-
-            let moderator = ApiUtilis.createModerator(formData);
-            this.moderators.push(moderator);
-            this.fetchModerator();
-
-        },
-        deleteModerator(moderator){
-            ApiUtilis.deleteModerator(moderator.id);
-            this.fetchModerator();
-        },
-        async fetchModerator(){
-            const response =   await  ApiUtilis.fetchModerators(this.community.id);
-            this.moderators = response.data; // Assuming the API response is an array of moderators
         },
         addFlair(){
             if(this.flairName.length !== 0 && !this.flairs.includes(this.flairName)){
@@ -260,8 +247,7 @@ export default {
             this.showDiv = !this.showDiv;
         },
         editCommunity(id) {
-            console.log(id);
-            ApiUtilis.editCommunity(id, this.editForm);
+            ApiUtilis.editCommunity(id,this.editForm);
         },
         deleteFlair(id){
             ApiUtilis.deleteFlair(id);
@@ -279,16 +265,11 @@ export default {
             };
             ApiUtilis.editFlair(id, formData);
         },
-        // handleFileUpload(event) {
-        //     const file = event.target.files[0];
-        //     this.editForm.image = file;
-        //     this.form.image = file;
-        //
-        // }
-
-    },
-    mounted() {
-        this.fetchModerator();
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            this.form.image = file;
+            this.editForm.image = file;
+        },
     }
 
 };
