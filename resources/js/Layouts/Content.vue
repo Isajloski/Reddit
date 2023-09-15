@@ -169,15 +169,10 @@ export default {
                 if (match) {
                     const userName = match[0];
                     try {
-                        let response = await ApiUtilis.fetchUser(userName);
-                        this.community = response.data[0];
-                    } catch (error) {
-                        console.error('Error fetching data:', error);
-                    }
-                    try {
-                        let response = await ApiUtilis.fetchCommunityPosts(userName, this.currentPage, sortDto)
+                        let response = await ApiUtilis.fetchUserPosts(userName, this.currentPage, sortDto);
                         const newData = response.data.data;
                         this.posts = [...this.posts, ...newData];
+
                     } catch (error) {
                         console.error('Error fetching data:', error);
                     }

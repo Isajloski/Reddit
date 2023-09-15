@@ -90,8 +90,6 @@ class PostService
     {
         return Post::where('user_id', $id)
             ->with('user')
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ;
+            ->orderBy('created_at', 'desc');
     }
 }

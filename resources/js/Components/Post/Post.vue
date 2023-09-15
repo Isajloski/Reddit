@@ -10,9 +10,11 @@
                     </div>
                 </a>
                 <div class="inline-block text-right mr-20">
-                    <span
-                        class="text-xs bottom-0 text-[#898989] mb-1 font-light hidden md:inline-block">Posted by</span>
-                    <span class="text-xs ml-1 bottom-0 absolute text-white mb-1.5">{{ byUser }}</span>
+                    <a :href="`/user/` + byUser">
+                        <span
+                            class="text-xs bottom-0 text-[#898989] mb-1 font-light hidden md:inline-block">Posted by</span>
+                        <span class="text-xs ml-1 bottom-0 absolute text-white mb-1.5">{{ byUser }}</span>
+                    </a>
                 </div>
             </div>
             <div class="py-1">
@@ -55,7 +57,7 @@
                             <ShareIcon class="w-4 h-4 inline-block ml-3"/>
                             <span class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">Share</span>
                         </div>
-                        <div class="inline-block" @click="deletePost">
+                        <div class="inline-block cursor-pointer" @click="deletePost">
                             <DeleteIcon class="w-4 h-4 inline-block ml-3"/>
                             <span class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">Delete</span>
                         </div>

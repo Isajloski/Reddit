@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mappers\PostMapper;
 use App\Models\Community\Follow;
+use App\Models\Post\Post;
 use App\Services\CommentService;
 use App\Services\PostService;
 use App\Services\UserService;
@@ -14,19 +15,17 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    //
-    protected $userService;
-    protected $commentService;
-    protected $postService;
 
-    public function __construct(UserService $userService, CommentService $commentService, PostService $postService, PostMapper $postMapper)
-    {
-        $this->userService = $userService;
-        $this->commentService = $commentService;
-        $this->postService = $postService;
-    }
+
+    public function __construct(private readonly UserService $userService,
+                                private readonly CommentService $commentService,
+                                private readonly PostMapper $postMapper,
+                                private readonly PostService $postService){}
+
+
 
     public function paginateUserPosts(string $userName, Request $request){
+
         $user = $this->userService->getUserByName($userName);
 
         $jsonData = json_decode($request->getContent(), true);
@@ -36,7 +35,6 @@ class UserController extends Controller
         if($sortBy=="new"){
             $posts = $this->postService->getAllPostsByUserId($user->id)->paginate(2);
         }
-
         else{
 
             $posts = DB::table('posts')

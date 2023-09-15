@@ -11,7 +11,8 @@ export default {
     components: {Head, Navbar, Link, Filter, Content, Create},
     data() {
         return {
-            sort: 'new'
+            sort: 'new',
+            type: 'home'
         }
     },
     methods : {
@@ -32,6 +33,6 @@ export default {
     <div id="right" class="absolute mt-10 md:mt-20 w-auto md:w-1/6 md:right-0 mx-5">
         <Create class="rounded-xl"/>
     </div>
-    <Content :type="'home'" :sort="this.sort"/>
+    <Content :type="this.type" :sort="this.sort"/>
 </template>
 
