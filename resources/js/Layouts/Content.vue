@@ -13,7 +13,8 @@
                     :active-users="community.activeUsers"
                     :total-users="community.totalUsers"
                     />
-            <div class="md:py-10" v-for="post in posts">
+            <div v-if="posts.length === 0" class="text-white h-screen flex justify-center items-center"> No posts yet.</div>
+            <div class="md:py-10 h-screen" v-for="post in posts">
                 <Post :id="post.id"
                       :description="post.body"
                       :by-user="post.user?.userName"
@@ -27,13 +28,9 @@
                       :title="post.title"
                       :flair="post.flair"
                       @deleteEmitter="handleDeletePost($event)"
-
                 />
             </div>
-
-
-
-
+            <div v-if="posts.length !== 0" class="text-white flex justify-center items-center"> That's all !</div>
         </div>
     </div>
 </template>

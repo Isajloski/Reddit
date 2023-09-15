@@ -83,6 +83,9 @@ const ApiUtilis = {
     fetchUser(userName){
         return axios.get(`/user/${userName}`);
     },
+    fetchCurrentUser(){
+        return axios.get('/user/get/current');
+    },
     fetchUserPosts(userName, pageNumber, sortDto){
         return axios.post(`/user/${userName}/paginate?page=` + pageNumber, sortDto);
     },

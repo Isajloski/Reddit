@@ -1,7 +1,8 @@
 <template>
-    <div class="dropdown p-2 bg-black text-center text-white rounded inline-block cursor-pointer">
+    <div class="dropdown p-2 bg-[#141414] text-center text-white rounded inline-block cursor-pointer">
         <div @click="toggleDropdown">
             <slot class="inline-block"></slot>
+            <UserIcon class="mr-2 w-7 inline-block" v-if="this.navbar"/>
             <button type="button" class="dropdown-button">
                 {{ selectedOption || placeholder }}
             </button>
@@ -17,13 +18,14 @@
 
 <script>
 import AngleDownIcon from "@/Components/Icons/AngleDownIcon.vue";
+import UserIcon from "@/Components/Icons/UserIcon.vue";
 export default {
-    components: {AngleDownIcon},
+    components: {AngleDownIcon, UserIcon},
     props: {
         options: {
             type: Array,
-            required: true
         },
+        navbar: Boolean,
         placeholder: {
             type: String,
             default: 'Select an option',

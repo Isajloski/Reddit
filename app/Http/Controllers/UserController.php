@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Mappers\PostMapper;
 use App\Models\Community\Follow;
-use App\Models\Post\Post;
 use App\Services\CommentService;
 use App\Services\PostService;
 use App\Services\UserService;
@@ -81,6 +80,10 @@ class UserController extends Controller
         $userService = new UserService();
     }
 
+    public function getCurrentUser(){
+
+       return Auth::user();
+    }
 
 
     public function getUserByName($name){
