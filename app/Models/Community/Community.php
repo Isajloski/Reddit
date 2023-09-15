@@ -28,6 +28,11 @@ class Community extends Model
         return $this->hasMany(Flair::class);
     }
 
+    public function moderators()
+    {
+        return $this->hasMany(Moderators::class);
+    }
+
     public function image()
     {
         return $this->belongsTo(Image::class, 'image_id');

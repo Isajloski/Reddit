@@ -5,6 +5,8 @@ use App\Http\Controllers\FlairController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MarkdownController;
+
+use App\Http\Controllers\ModeratorsController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -68,6 +70,9 @@ Route::prefix('community')->middleware(['user.activity'])->group(function () {
     Route::post('/{id}/edit', [CommunityController::class, 'update'])->name('communities.update');
     Route::post('/{id}/delete', [CommunityController::class, 'destroy'])->name('communities.destroy');
     Route::get('/user/following', [CommunityController::class, 'userCommunities'])->name('communities.userCommunities');
+    Route::post('/moderator/create', [ModeratorsController::class, 'store'])->name('moderators.store');
+    Route::post('/moderator/{id}/delete', [ModeratorsController::class, 'destory'])->name('moderators.destory');
+    Route::get('/moderator/{id}', [ModeratorsController::class, 'getModeratorsById'])->name('moderators.getModeratorsById');
 
 });
 

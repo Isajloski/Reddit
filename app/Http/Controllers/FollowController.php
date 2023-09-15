@@ -11,7 +11,6 @@ class FollowController extends Controller
     //
     public function follow($communityId)
     {
-
         $user = auth()->user();
 
         if (!$communityId) {

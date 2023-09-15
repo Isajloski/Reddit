@@ -80,7 +80,11 @@ class CommunityController extends Controller
 
     public function edit($id)
     {
-        $community = Community::find($id);
+        $community = Community::with('flairs','image')->find($id);
+        Log::info("Edit Community: " . $community);
+        return Inertia::render('Communities/EditCommunity', [
+            'community' => $community,
+        ]);
     }
 
     public function update($id, Request $request)
@@ -90,17 +94,39 @@ class CommunityController extends Controller
         }
 
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:communities',
             'description' => 'required',
             'rules' => 'required',
+            'image' => 'nullable|file',
+            'flairs' => 'nullable|array'
         ]);
 
-        $community = Community::findOrFail($id);
+
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $user = Auth::user();
+        $community = Community::find($id);
         $community->name = $request->input('name');
         $community->description = $request->input('description');
         $community->rules = $request->input('rules');
+        $old = $community->image_id;
 
-        $community->save();
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $imageController = new ImageController();
+            $imageId = $imageController->storeImage($file, '/communities');
+            $community->image_id = $imageId;
+            $community->save();
+
+            if(!is_null($old)) {
+                $imageController->delete($old);
+            }
+        }else{
+            Log::info("no image!");
+            $community->image_id = null;
+            $community->save();
 
         return redirect()->route('communities.index');
     }

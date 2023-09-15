@@ -35,6 +35,4 @@ class UserService
         $this->userActivity($user);
         return $user;
     }
-
-
 }

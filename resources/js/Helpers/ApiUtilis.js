@@ -99,6 +99,15 @@ const ApiUtilis = {
                 throw error; // Rethrow the error for handling in the component
             });
     },
+    createModerator(formData) {
+       return  axios.post("/community/moderator/create", formData);
+    },
+    fetchModerators(id) {
+        return axios.get(`/community/moderator/${id}`);
+    },
+    deleteModerator(id) {
+        return axios.post(`/community/moderator/${id}/delete`);
+    }
 };
 
 export default ApiUtilis;

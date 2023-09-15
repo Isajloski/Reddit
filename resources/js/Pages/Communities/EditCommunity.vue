@@ -4,40 +4,24 @@
     <div class="w-auto md:w-3/5 mx-5 md:mx-auto mt-48 md:mt-20 rounded-xl relative bg-[#2d2d2d]">
         <div class="">
             <form @submit.prevent="createCommunity(community.id)" class="p-5">
-                <h1 class="text-white text-2xl pb-5 text-center font-bold">Create Community</h1>
+                <h1 class="text-white text-2xl pb-5 text-center font-bold">Edit Community</h1>
                 <div class="pb-5">
                     <div htmlFor="name" class="py-1 text-white">Name:</div>
-                    <input type="text" id="name" v-model="form.name" placeholder="Name" class="rounded bg-[#515151] text-white">
+                    <input type="text" id="name" v-model="form.name" :placeholder="community.name" class="rounded bg-[#515151] text-white">
                 </div>
                 <div class="pb-5">
                     <div htmlFor="description" class="py-1 text-white">Description:</div>
-                    <textarea id="description" v-model="form.description" placeholder="Description" class="rounded bg-[#515151] w-96 text-white"></textarea>
+                    <textarea id="description" v-model="form.description" :placeholder="community.description" class="rounded bg-[#515151] w-96 text-white"></textarea>
                 </div>
                 <div class="pb-5">
                     <div htmlFor="rules" class="py-1 text-white">Rules:</div>
-                    <textarea id="rules" v-model="form.rules" class="rounded bg-[#515151] w-96 text-white" placeholder="Rules"></textarea>
+                    <textarea id="rules" v-model="form.rules" class="rounded bg-[#515151] w-96 text-white" :placeholder="community.rules"></textarea>
                 </div>
                 <div class="pb-5">
                     <div htmlFor="image" class="py-1 text-white">Image:</div>
                     <input type="file" id="image" @change="handleFileUpload" class="rounded bg-[#515151] text-white">
                 </div>
-                <div htmlFor="name" class="py-1 pt-5 text-white">Flairs:</div>
-                <div class="flex gap-2 py-2">
-                    <input type="text" id="flair-name" v-model="flairName" class="rounded bg-[#515151] text-white"/>
-                    <div class="bg-[#CC0974] rounded-2xl inline-block">
-                        <button type="button" class="px-4 py-2" @click="addFlair()">Add</button>
-                    </div>
-                </div>
-                <div class="pb-5">
-                    <div v-for="flair in flairs">
-                        <div class="py-2">
-                            <div class="py-2 px-4 rounded-2xl bg-black text-white inline-block">
-                                {{ flair }}
-                                <span class="pl-2 text-sm hover:text-gray-500 cursor-pointer" @click="removeFlair(flair)">x</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="bg-[#CC0974] rounded-2xl inline-block">
                     <button type="submit" class="px-4 py-2">Create</button>
                 </div>
@@ -48,10 +32,78 @@
                 </a>
             </form>
 
+
+            <hr/>
+            <hr/>
+            <hr/>
+            <hr/>
+
+
+
+
+    </div>
+
+
+        <div class="p-5 mp-10">
+            <h1 class="text-white text-2xl pb-5 text-center font-bold">Edit Flairs: </h1>
+            <div htmlFor="name" class="py-1 pt-5 text-white">Flairs:</div>
+            <div class="flex gap-2 py-2">
+                <input type="text" id="flair-name" v-model="flairName" class="rounded bg-[#515151] text-white"/>
+                <div class="bg-[#CC0974] rounded-2xl inline-block">
+                    <button type="button" class="px-4 py-2" @click="createFlair()">Add</button>
+                </div>
+            </div>
+
+            <div class="pb-5">
+                <div v-for="flair in community.flairs">
+                    <div class="py-2">
+                        <div class="py-2 px-4 rounded-2xl bg-black text-white inline-block">
+                            {{ flair.name }}
+                            <span class="pl-2 text-sm hover:text-gray-500 cursor-pointer" @click="removeFlair(flair.id)">x</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
 
-        <!--        <div class="text-center self-center">-->
+        <hr/>
+        <hr/>
+        <hr/>
+        <hr/>
+
+
+
+
+
+
+
+    <div class="p-5 mp-10">
+        <h1 class="text-white text-2xl pb-5 text-center font-bold">Edit Moderators: </h1>
+        <div htmlFor="name" class="py-1 pt-5 text-white">Moderators:</div>
+        <div class="flex gap-2 py-2">
+            <input type="text" id="flair-name" v-model="moderatorName" class="rounded bg-[#515151] text-white"/>
+            <div class="bg-[#CC0974] rounded-2xl inline-block">
+                <button type="button" class="px-4 py-2" @click="addModerator()">Add</button>
+            </div>
+        </div>
+
+        <div class="pb-5">
+            <div v-for="moderator in moderators">
+                <div class="py-2">
+                    <div class="py-2 px-4 rounded-2xl bg-black text-white inline-block">
+                        {{ moderator.user.name}}
+                        <span class="pl-2 text-sm hover:text-gray-500 cursor-pointer" @click="deleteModerator(moderator.id)">x</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!--        <div class="text-center self-center">-->
         <!--            <ul>-->
         <!--                <li v-for="community in communities" :key="community.id">-->
         <!--                    <h3>Community ID: {{ community.id }}</h3>-->
@@ -164,13 +216,16 @@ import Navbar from "@/Components/Navbar/Navbar.vue";
 export default {
     props:{
         community: Object,
+
     },
     components: {Navbar, Head},
     data(){
         return{
             showDiv: false,
             flairName: '',
-            flairs : []
+            flairs : [],
+            moderatorName: '',
+            moderators: []
         };
     },
     setup() {
@@ -209,6 +264,7 @@ export default {
         };
 
         return {
+
             form,
             handleFileUpload,
             createCommunity,
@@ -232,20 +288,18 @@ export default {
                     });
             }
         },
-        addFlair(){
-            if(this.flairName.length !== 0 && !this.flairs.includes(this.flairName)){
-                this.flairs.push(this.flairName);
-                this.form.flairs = this.flairs;
-                this.flairName = ''
-            }
+        createFlair() {
+            const formData = {
+                name: this.flairName,
+                community_id: this.community.id,
+            };
+            ApiUtilis.createFlair(formData);
         },
-
-        removeFlair(flairName){
-            const index = this.flairs.findIndex(flair => flair === flairName);
-            if (index !== -1) {
-                this.flairs.splice(index, 1);
-                this.form.flairs = this.flairs;
-            }
+        removeFlair(id){
+            ApiUtilis.deleteFlair(id);
+        },
+        fetchFlairs(){
+            this.flairs = ApiUtilis.fetchCommunityFlairs(this.community.id);
         },
         showEdit() {
             this.showDiv = !this.showDiv;
@@ -255,13 +309,6 @@ export default {
         },
         deleteFlair(id){
             ApiUtilis.deleteFlair(id);
-        },
-        createFlair(id) {
-            const formData = {
-                name: this.flairName,
-                community_id: id,
-            };
-            ApiUtilis.createFlair(formData);
         },
         editFlair(id){
             const formData = {
@@ -274,6 +321,28 @@ export default {
             this.form.image = file;
             this.editForm.image = file;
         },
+        addModerator(){
+            const formData = {
+                name: this.moderatorName,
+                community_id: this.community.id,
+            };
+
+            let moderator = ApiUtilis.createModerator(formData);
+            this.moderators.push(moderator);
+            this.fetchModerator();
+
+        },
+        deleteModerator(moderator){
+            ApiUtilis.deleteModerator(moderator);
+            this.fetchModerator();
+        },
+        async fetchModerator(){
+            const response =   await  ApiUtilis.fetchModerators(this.community.id);
+            this.moderators = response.data; // Assuming the API response is an array of moderators
+        },
+    },
+    mounted() {
+        this.fetchModerator();
     }
 
 };

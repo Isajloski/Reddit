@@ -6,9 +6,10 @@ use App\Models\User\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Follow extends Model
+class Moderators extends Model
 {
     use HasFactory;
+
 
     protected $fillable = [
         'user_id',
@@ -24,6 +25,4 @@ class Follow extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
 }
-

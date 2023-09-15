@@ -63,4 +63,9 @@ class CommunityService
         return Community::find($id)->rules;
     }
 
+    public function getCommunityById($id)
+    {
+        return Community::find($id);
+    }
+
 }

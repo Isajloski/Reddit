@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Community\Community;
 use App\Models\Flair\Flair;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,10 +21,13 @@ class FlairController extends Controller
             'community_id' => 'required',
         ]);
 
+
+        $community = Community::findOrFail($request->input('community_id'));
+
         $flair = new Flair;
         $flair->name = $request->input('name');
         $flair->community_id = $request->input('community_id');
-        $flair->save();
+        $community->flairs()->save($flair);
 
         return response()->json(['message' => 'Flair created successfully'], 201);
     }
