@@ -7,12 +7,15 @@ use App\Mappers\PostMapper;
 use App\Models\Community\Community;
 use App\Models\Flair\Flair;
 use App\Services\CommunityService;
+use App\Services\ModeratorsService;
 use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use App\Policies\CommunityPolicy;
+
 
 
 class CommunityController extends Controller
@@ -29,6 +32,15 @@ class CommunityController extends Controller
         return Inertia::render('Communities/CommunityForm');
     }
 
+
+
+    public function getCommunityImage($id)
+    {
+        $image = $this->communityService->getCommunityById($id)->image_id;
+        $imageController = new ImageController();
+        $path = $imageController->getImage($image);
+        return $path->path;
+    }
 
     public function store(Request $request)
     {
@@ -75,12 +87,21 @@ class CommunityController extends Controller
             }
         }
 
+        $mods = new ModeratorsService();
+
+        $mods->store($user->id, $community->id);
+
         return redirect('/community/'.$communityId);
     }
 
 
     public function edit($id)
     {
+
+        $community = Community::find($id);
+
+        $this->authorize('update', $community);
+
         $community = Community::with('flairs','image')->find($id);
         return Inertia::render('Communities/EditCommunity', [
             'community' => $community,
@@ -89,6 +110,7 @@ class CommunityController extends Controller
 
     public function update($id, Request $request)
     {
+
 
         $request->validate([
             'name' => 'required|unique:communities',
@@ -103,8 +125,11 @@ class CommunityController extends Controller
             return redirect()->route('login');
         }
 
-        $user = Auth::user();
         $community = Community::find($id);
+
+        $this->authorize('update', $community);
+
+        $user = Auth::user();
         $community->name = $request->input('name');
         $community->description = $request->input('description');
         $community->rules = $request->input('rules');
@@ -152,6 +177,8 @@ class CommunityController extends Controller
     public function destroy($id)
     {
         $community = Community::findOrFail($id);
+
+        $this->authorize('destroy', $community);
 
         if ($community->image) {
             $imageId = $community->image_id;

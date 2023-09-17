@@ -8,6 +8,7 @@ use App\Models\Post\Post;
 use App\Models\Vote\dto\PostVoteDto;
 use App\Services\PostService;
 use App\Services\VoteService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Policies\PostPolicy;
+
 
 
 class PostController extends Controller
@@ -35,6 +38,14 @@ class PostController extends Controller
         ]);
     }
 
+
+    public function getPostImage($id)
+    {
+        $image = $this->postService->getById($id)->image_id;
+        $imageController = new ImageController();
+        $path = $imageController->getImage($image);
+        return $path->path;
+    }
 
     public function paginateFollowingPosts(Request $request){
 
@@ -99,8 +110,7 @@ class PostController extends Controller
                 ->where('id','=', $post->id)
                 ->first();
             return
-                $this->postMapper->mapToDto($postGet)
-                ;
+                $this->postMapper->mapToDto($postGet);
         });
 
 
@@ -200,14 +210,18 @@ class PostController extends Controller
     public function edit(int $id)
     {
 
-        return Inertia::render('Posts/EditPost', [
-            'posts' => Post::with('user:id,id','image' )->find($id),
+        $post = Post::with('user:id,id','image' )->find($id);
 
+        $this->authorize('update', $post);
+
+        return Inertia::render('Posts/EditPost', [
+            'posts' => $post
         ]);
     }
 
     /**
      * Update the specified resource in storage.
+     * @throws AuthorizationException
      */
 //    public function update(PostCreationDto $postCreationDto): RedirectResponse
 //    {
@@ -222,11 +236,15 @@ class PostController extends Controller
 
     public function update(Request $request, $id): RedirectResponse
     {
+
         if (!auth()->check()) {
             return redirect()->route('login');
         }
 
         $post = $this->postService->getById($id);
+
+
+        $this->authorize('update', $post);
 
         $user = Auth::user();
         $post->id =   $id;
@@ -258,9 +276,7 @@ class PostController extends Controller
             $post->community()->associate($post->community_id);
             $post->save();
         }
-        return redirect(route('posts.index'));
-
-//        return redirect(route('/community/' . $post->community_id));
+        return redirect('/community/' . $post->community_id);
     }
 
 
@@ -296,6 +312,10 @@ class PostController extends Controller
 
     public function delete($id)
     {
+
+        $post = $this->postService->getById($id);
+        $this->authorize('destroy', $post);
+
         $post = $this->postService->getById($id)->image_id;
         $this->postService->delete($id);
 
@@ -306,6 +326,9 @@ class PostController extends Controller
         }
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     public function destroy(Post $post) : RedirectResponse
     {
         //

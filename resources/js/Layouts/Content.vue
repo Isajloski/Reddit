@@ -8,13 +8,13 @@
         <div class="px-1 md:px-10">
                     <CommunityCard v-if="this.type==='community'"
                     :name="this.community.name"
-                    :id="this.community.id"
+                    :id="community.id"
                     :type="'community'"
                     :active-users="community.activeUsers"
                     :total-users="community.totalUsers"
                     />
             <div v-if="posts.length === 0" class="text-white h-screen flex justify-center items-center"> No posts yet.</div>
-            <div class="md:py-10 h-screen" v-for="post in posts">
+            <div class="md:py-10 py-10" v-for="post in posts">
                 <Post :id="post.id"
                       :description="post.body"
                       :by-user="post.user?.userName"
@@ -101,6 +101,7 @@ export default {
         },
         flair(newVal){
             this.currentPage = 1;
+            console.log(this.flair);
             if(this.flair.length===0){
                 this.posts=[];
                 return this.fetchData();

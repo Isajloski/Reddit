@@ -24,11 +24,10 @@
                 <h1 class=" text-2xl font-semibold text-[#F20085]">{{title}}</h1>
             </div>
 
-            <div class="">
-            </div>
-            <div class="">
-                <img class="object-cover w-full h-60 object-center rounded"
-                     src="https://img.freepik.com/free-photo/beautiful-aerial-shot-fronalpstock-mountains-switzerland-beautiful-pink-blue-sky_181624-9315.jpg?w=1380&t=st=1685478210~exp=1685478810~hmac=1e718a3ae50f16e79ae05aa4a78ce930705b92631f89e1e35cc55ebf9c2b1e63"/>
+
+            <div >
+                <img v-if="image" class="object-cover w-full h-60 object-center rounded"
+                    :src="image" />
             </div>
             <div class="px-2 pt-3">
                 <div class="w-full grid grid-cols-2 relative">
@@ -132,13 +131,19 @@ export default {
             voteUpState: false,
             voteDownState: false,
             openCommentSection: false,
-            comments: []
+            comments: [],
+            image: null
         }
     },
     mounted() {
         ApiUtilis.getPostComments(this.id)
             .then((response) => {
                 this.comments = response.data;
+            })
+
+        ApiUtilis.getPostImage(this.id)
+            .then((response) => {
+                this.image = response.data;
             })
     },
     created() {
@@ -155,6 +160,7 @@ export default {
             this.voteUpState = false;
         }
     },
+
     props: {
         id: Number,
         communityName: String,
@@ -162,7 +168,6 @@ export default {
         byUser: String,
         karma: Number,
         title: String,
-        image: String,
         description: String,
         date: String,
         spoiler: Boolean,

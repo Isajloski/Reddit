@@ -42,15 +42,15 @@
                     <button class="text-right text-pink-700"
                             @click="toggleWriteReply()">Reply
                     </button>
-                <div v-if="owner === user_id">
 
-                    <button class="text-right text-pink-700"
+
+                    <button v-if="owner === user_id" class="text-right text-pink-700"
                             @click="toggleEditMode">Edit
                     </button>
-                    <button class="text-right text-pink-700"
+                    <button v-if="owner === user_id" class="text-right text-pink-700"
                             @click="handleDelete()">Delete
                     </button>
-                </div>
+
                     <button class="text-right text-pink-700"
                             @click="fetchReplies()"> Replies {{ repliesNumber }}
                     </button>
@@ -104,7 +104,8 @@ export default {
             childKarma: this.karma,
             editMode: false,
             editBody: '',
-            childBody: this.body
+            childBody: this.body,
+            image: null
         }
     },
     created() {

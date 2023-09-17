@@ -1,6 +1,7 @@
 <template>
 <div class="flex flex-row pt-10">
-    <img class="w-32 h-32 object-cover rounded border-2 border-white mx-5 md:mx-0" src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Misha-Mansoor.jpg">
+    <img class="w-32 h-32 object-cover rounded border-2 border-white mx-5 md:mx-0"
+         :src="image">
     <div class="px-2 md:px-10">
         <div class="my-auto text-2xl md:text-7xl font-bold text-[#F20085] line-clamp-2">{{ name }}<span class="px-2 text-white text-base md:text-3xl font-normal">/{{ type }}</span></div>
         <div class="flex flex-row pt-2">
@@ -9,12 +10,18 @@
             <svg  class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" width="512" height="512"><path fill="pink" d="M12,17c-2.76,0-5-2.24-5-5s2.24-5,5-5,5,2.24,5,5-2.24,5-5,5Z"/></svg>
             <div class="text-white font-light text-[10px] text-xs mx-1">{{ totalUsers }} Total Users</div>
         </div>
-        <div class="pt-2">
+        <div class="pt-2 inline-block">
             <div class="bg-[#CC0974] rounded-2xl inline-block">
                 <button type="submit" class="px-4 py-1" @click="following? unfollowCommunity() : followCommunity()">
                     {{following ? 'Following' : 'Follow'}}
                 </button>
+
             </div>
+            <div>
+                <p>Hi</p>
+            </div>
+
+
         </div>
     </div>
 </div>
@@ -23,12 +30,15 @@
 
 <script>
 import ApiUtilis from "@/Helpers/ApiUtilis";
+import EditIcon from "@/Components/Icons/EditIcon.vue";
 
 export default {
     name: "CommunityCard",
+    components: {EditIcon},
     data () {
         return {
-            following: ''
+            following: '',
+            image: null
         }
     },
     props : {
@@ -38,9 +48,14 @@ export default {
         totalUsers: Number,
         activeUsers: Number
     },
+    mounted() {
+        this.fetchCommunityImage();
+
+    },
     watch: {
         id(newVal){
             this.fetchIfUserIsFollowing();
+            this.fetchCommunityImage();
         },
         following(newVal){
             this.following = newVal;
@@ -53,6 +68,17 @@ export default {
                 this.following = response.data.length !== 0;
             } catch (error) {
 
+            }
+        },
+        fetchCommunityImage() {
+            if (this.id) {
+                ApiUtilis.getCommunityImage(this.id)
+                    .then((response) => {
+                        this.image = response.data;
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching community image:', error);
+                    });
             }
         },
         async followCommunity(){
@@ -70,7 +96,8 @@ export default {
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
-        }
+        },
+
     }
 }
 </script>

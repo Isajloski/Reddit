@@ -113,6 +113,12 @@ const ApiUtilis = {
     },
     fetchActiveUser() {
          return axios.get(`/active`);
+    },
+    getPostImage(id) {
+        return axios.get(`/posts/image/${id}`);
+    },
+    getCommunityImage(id) {
+        return axios.get(`/community/image/${id}`);
     }
 };
 

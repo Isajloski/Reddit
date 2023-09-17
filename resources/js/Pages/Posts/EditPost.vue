@@ -1,8 +1,7 @@
 <template>
     <Head><title>Edit Post</title></Head>
     <Navbar/>
-    <p>{{posts}}</p>
-    <p>{{flairOptions[0]}}</p>
+
     <div class="w-auto md:w-3/5 mx-5 md:mx-auto mt-48 md:mt-20 rounded-xl relative bg-[#2d2d2d]">
         <div class="">
             <h1 class="text-white text-2xl pb-5 text-center font-bold">Edit Post</h1>
@@ -164,7 +163,6 @@ export default {
                     return "No flair selected.";
                 }
             } else {
-                // Handle the case when flairOptions is not available yet
                 return "Loading flair options...";
             }
         },

@@ -35,17 +35,17 @@ class PostPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(Post $post)
+    public function update(User $user, Post $post)
     {
-        $user = Auth::user();
         return $user->id === $post->user_id;
     }
 
+
     public function destroy(User $user, Post $post)
     {
-        $user = Auth::user();
         return $user->id === $post->user_id;
     }
+
 
 
     /**

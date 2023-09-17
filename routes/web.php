@@ -54,11 +54,9 @@ Route::resource('posts', PostController::class)
     ->only(['index', 'create', 'store', 'update', 'destroy'])
     ->middleware(['auth', 'verified']);
 
-Route::resource('markdown', MarkdownController::class)
-    ->only(['index']);
 
-
-Route::prefix('community')->middleware(['user.activity'])->group(function () {
+Route::prefix('community')->middleware(['user.activity','auth'])->group(function () {
+    Route::get('/image/{id}', [CommunityController::class, 'getCommunityImage'])->name('communities.getCommunityImage');
     Route::post('/{id}/paginate', [CommunityController::class, 'paginateCommunityPosts'])->name('communities.paginate');
     Route::get('/create', [CommunityController::class, 'createEditForm'])->name('communities.createEditForm');
     Route::post('/create', [CommunityController::class, 'store'])->name('communities.store');
@@ -73,11 +71,9 @@ Route::prefix('community')->middleware(['user.activity'])->group(function () {
     Route::post('/moderator/create', [ModeratorsController::class, 'store'])->name('moderators.store');
     Route::post('/moderator/{id}/delete', [ModeratorsController::class, 'destory'])->name('moderators.destory');
     Route::get('/moderator/{id}', [ModeratorsController::class, 'getModeratorsById'])->name('moderators.getModeratorsById');
-
 });
 
-
-Route::prefix('post')->middleware(['user.activity'])->group(function () {
+Route::prefix('post')->middleware(['user.activity','auth'])->group(function () {
     Route::get('/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/create', [PostController::class, 'store'])->name('posts.store');
     Route::get('/{id}', [PostController::class, 'get']) ->name('posts.get');
@@ -91,13 +87,14 @@ Route::prefix('post')->middleware(['user.activity'])->group(function () {
     Route::get('/{id}/comments/sort/popular', [CommentController::class, 'sortByPopular'])->name('comments.sortByPopular');
 });
 
-Route::prefix('posts')->group(function () {
+Route::prefix('posts')->middleware(['auth'])->group(function () {
+    Route::get('/image/{id}', [PostController::class, 'getPostImage'])->name('image.getPostImage');
     Route::post('/following/paginate', [PostController::class, 'paginateFollowingPosts'])->name('posts.paginate');
     Route::post('/trending/paginate', [PostController::class, 'paginateTrendingPosts'])->name('posts.paginate');
 });
 
 
-Route::prefix('flair')->group(function () {
+Route::prefix('flair')->middleware(['auth'])->group(function () {
     Route::get('/community/{id}', [FlairController::class, 'getCommunityFlairs'])->name('flair.communityFlairs');
     Route::post('/{id}/delete', [FlairController::class, 'destroy'])->name('flair.destroy');
     Route::post('/{id}/edit', [FlairController::class, 'update'])->name('flair.update');
@@ -106,11 +103,7 @@ Route::prefix('flair')->group(function () {
 
 
 
-Route::post('/follow/{communityId}', [FollowController::class, 'follow'])->name('follow');
-Route::post('/unfollow/{communityId}', [FollowController::class, 'unfollow'])->name('unfollow');
-
-
-Route::prefix('comment')->group(function () {
+Route::prefix('comment')->middleware(['auth'])->group(function () {
     Route::get('/{id}/replies', [CommentController::class, 'getCommentReplies'])->name('comments.getCommentReplies');
     Route::post('/{id}/edit', [CommentController::class, 'edit'])->name('comments.edit');
     Route::delete('/{id}/delete', [CommentController::class, 'delete'])->name('comments.delete');
@@ -120,7 +113,7 @@ Route::prefix('comment')->group(function () {
 });
 
 
-Route::prefix('user')->group(function () {
+Route::prefix('user')->middleware(['auth'])->group(function () {
     Route::get('/get/current', [UserController::class, 'getCurrentUser'])->name('users.currentUser');
     Route::post('/{userName}/paginate', [UserController::class, 'paginateUserPosts'])->name('user.paginate');
     Route::get('/{name}', [UserController::class, 'getUserByName'])->name('users.getUserByName');
@@ -128,12 +121,14 @@ Route::prefix('user')->group(function () {
     Route::post('/image', [UserInfoController::class, 'uploadImage'])->name('infos.uploadImage');
 });
 
-Route::get('/active', [UserController::class, 'active'])->name('user.active');
+Route::middleware(['auth'])->group(function () {
 
+    Route::get('/active', [UserController::class, 'active'])->name('user.active');
+    Route::get('/image/{id}', [ImageController::class, 'getImage'])->name('image.getImage');
+    Route::post('/follow/{communityId}', [FollowController::class, 'follow'])->name('follow');
+    Route::post('/unfollow/{communityId}', [FollowController::class, 'unfollow'])->name('unfollow');
 
-Route::get('/image/{id}', [ImageController::class, 'getImage'])->name('image.getImage');
-
-
+});
 
 
 require __DIR__.'/auth.php';

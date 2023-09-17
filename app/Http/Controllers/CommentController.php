@@ -17,6 +17,7 @@ class CommentController extends Controller
                                 private readonly VoteService $voteService) {}
 
 
+
     public function getPostComments($id){
         return $this->commentService->getPostComments($id);
     }
@@ -52,6 +53,8 @@ class CommentController extends Controller
 
     public function edit(Request $request, $id){
         $comment = Comment::find($id);
+        $this->authorize('update', $comment);
+
         $jsonData = json_decode($request->getContent(), true);
         $comment->body = $jsonData['body'];
 
@@ -108,6 +111,8 @@ class CommentController extends Controller
     public function deleteVote($id){
         $user = Auth::user();
 
+
+
         $userKarmaController = new UserKarmaController();
         $comment = $this->commentService->getById($id);
         $karma = $this->voteService->getCommentVotesByIds($user->id, $comment->id)->vote;
@@ -125,6 +130,11 @@ class CommentController extends Controller
 
 
     public function delete($commentId){
+
+        $comment = $this->commentService->getById($commentId);
+
+        $this->authorize('delete', $comment);
+
         Comment::destroy($commentId);
     }
 }
