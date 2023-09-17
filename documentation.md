@@ -391,4 +391,284 @@ php artisan migrate
 - `community_id`: За кој community станува збор. 
 
 
+# 6. Архитектура и дизајн
+При развој ние воглавно се потпираме на MVC шаблонот, но и за да ги подобриме перформансите користине и на дополнителен API слој.
+
+- Models : ги содржи сите објекти кои ги користиме. Некои од нив се зачувуваат во база, но некои претставуваат DTOs (Data transfer Object) и служат само за комуникација.
+- View : со помош на Inertia.js (библиотека што го премостува барањето помеѓу Laravel (контролер) и Vue.js (страница)).
+- Controller: се справува со барањата. Прима барања од клиентот, ги обработува, комуницира со сервисот за да добие или ажурира податоци, а потоа враќа одговор на погледот или на самата vuejs апликација.
+- Service: ја се справува бизнис логиката и комуницира со моделите и контролерите.
+
+## 6.1 DTOs
+За API слојот користиме DTOs.
+Цели:
+- едноставно пребарување на податоци
+- скалабилност
+- намалување на бројот на повици
+- трансформација на податоци во друг формат
+- исфрлање и додавање на потребни/непотребни полиња
+- безбедност и енкапсулација
+Сето ова го правиме преку наша прилагодлива имлементација на мапирачи.
+
+#### CommentCreationRequest
+
+Се добива од барањето за пишување на коментар преку CommentMapper.
+
+| Parameter   | Type     | Description              |
+|:------------|:---------|:-------------------------|
+| `body`      | `string` | Содржината на коментарот |
+| `post_id`   | `number` | Родителот на објавата    |
+| `parent_id` | `number` | Родителот на коментарот  |
+
+#### CommentUpdateRequest
+
+Се добива од барањето за едитирање на коментар преку CommentMapper.
+
+| Parameter    | Type     | Description                     |
+|:-------------|:---------|:--------------------------------|
+| `body`       | `string` | Содржината на коментарот        |
+| `comment_id` | `number` | **Required** тековниот коментар |
+
+
+#### CommentDto
+
+Се праќа коментарот ремапиран од моделот Comment преку CommentMapper.
+
+| Parameter           | Type      | Description                                                    |
+|:--------------------|:----------|:---------------------------------------------------------------|
+| `id`                | `number`  | **Required** тековниот коментар                                |
+| `parent_comment_id` | `number`  | Коментар родител на тековниот коментар                         |
+| `UserDto`           | `userDto` | **Required** Корисникот кој го напишал                         |
+| `post_id`           | `number`  | Објава родител на тековниот коментар                           |
+| `body`              | `string`  | Содржина на тековниот коментар                                 |
+| `karma`             | `number`  | **Required** карма                                             |
+| `date`              | `number`  | **Required** датум кога е напишан                              |
+| `replies`           | `number`  | број на реплики                                                |
+| `vote`              | `boolean` | најавениот корисник има гласано на коментарот                  |
+
+
+#### CommunityCardDto
+
+Се праќаaт основни информации за заедницата ремапирана од моделот Community преку CommunityMapper.
+
+| Parameter     | Type     | Description                                        |
+|:--------------|:---------|:---------------------------------------------------|
+| `id`          | `number` | **Required** id на тековната заедница              |
+| `name`        | `string` | **Required** Име на тековната заедница             |
+| `about`       | `string` | **Required** Oпис на тековната заедница            |
+| `rules`       | `string` | **Required** Правила за тековната заедница         |
+| `activeUsers` | `number` | Број на активни корисници преку коментари и објави |
+| `totalUsers`  | `number` | Број на корисници кои членуваат во заедницата      |
+| `flairs`      | `аrray`  | **Required** Категории на заедницата               |
+
+
+#### CommunityDto
+
+Се праќа заедницата со уникатните карактеристики ремапирана од моделот Community преку CommunityMapper.
+
+| Parameter     | Type     | Description                                        |
+|:--------------|:---------|:---------------------------------------------------|
+| `id`          | `number` | **Required** id на тековната заедница              |
+| `name`        | `string` | **Required** Име на тековната заедница             |
+
+
+#### PostCreationDto
+
+Се добива од барањето за пишување објава.
+
+| Parameter      | Type      | Description                                         |
+|:---------------|:----------|:----------------------------------------------------|
+| `community_id` | `number`  | **Required** id на заедницата каде припаѓа објавата |
+| `title`        | `string`  | **Required** Наслов на објавата                     |
+| `body`         | `string`  | **Required** Содржина на објавата                   |
+| `image`        | `file`    | Слика                                               |
+| `flair`        | `id`      | id на одбраната категорија                          |
+| `spoiler`      | `boolean` | Дали се работи за спојлер                           |
+
+#### PostDto
+
+Се праќа објавата ремапирана од моделот Post преку PostMapper.
+
+| Parameter         | Type           | Description                                      |
+|:------------------|:---------------|:-------------------------------------------------|
+| `id`              | `number`       | **Required** id на објавата                      |
+| `title`           | `string`       | **Required** Наслов на објавата                  |
+| `body`            | `string`       | **Required** Содржина на објавата                |
+| `communityDto`    | `CommunityDto` | **Required** Заедницата на која припаѓа објавата |
+| `userDto`         | `UserDto`      | **Required** Корисникот кој ја креирал објавата  |
+| `image`           | `file`         | Слика                                            |
+| `flair`           | `id`           | id на одбраната категорија                       |
+| `spoiler`         | `boolean`      | Дали се работи за спојлер                        |
+| `date`            | `string`       | Датум кога е креирана                            |
+| `comments_number` | `number`       | Колку коментари содржи                           |
+| `karma`           | `number`       | Карма                                            |
+| `vote`            | `boolean`      | Дали најавениот корисник има гласано             |
+
+#### UserDto
+
+Се праќа корисникот ремапирана од моделот User преку UserMapper.
+
+| Parameter  | Type           | Description                   |
+|:-----------|:---------------|:------------------------------|
+| `id`       | `number`       | **Required** id на корисникот |
+| `userName` | `string`       | **Required** Корисничко име   |
+
+
+#### CommentVoteDto
+
+Се добива од барањето за гласање на коментар.
+
+| Parameter | Type      | Description                                             |
+|:----------|:----------|:--------------------------------------------------------|
+| `id`      | `number`  | **Required** id на коментарот                           |
+| `vote`    | `boolean` | **Required** дали корисникот прави upvote 1, downvote 0 |
+
+
+#### PostVoteDto
+
+Се добива од барањето за гласање на објава.
+
+| Parameter | Type      | Description                                             |
+|:----------|:----------|:--------------------------------------------------------|
+| `id`      | `number`  | **Required** id на објавата                             |
+| `vote`    | `boolean` | **Required** дали корисникот прави upvote 1, downvote 0 |
+
+
+
+
+
+## 6.2 Model Mappers
+За секој модел кој треба да го испратиме на API слојот, поминува преку т.н object mapper, кој е обична php класа и е имплементирана при потреба за да се добијат сите придобивки на перформанс, скалабилност и одржливост.
+Користиме методи од сервисите на нашата апликација, преку dependency injection, така што се потребните сервиси се инјектираат во конструкторот на класата, што е вообичаен и препорачан пристап за имплементација на инјекција на зависност. Ова и овозможува на класата експлицитно да ги декларира своите зависности кога е конструирана.
+
+### 6.2.1 Comment Mapper
+```php
+class CommentMapper
+{
+
+    public function __construct(private readonly UserMapper $userMapper,
+    private readonly VoteService $voteService){}
+
+    public function mapToDto(Comment $comment): CommentDto
+    {
+        $positiveVotes = CommentVote::all()->where('comment_id', $comment->id)
+            ->where('vote', 1)->count();
+
+        $negativeVotes = CommentVote::all()->where('comment_id', $comment->id)
+            ->where('vote', 0)->count();
+
+        $karma = $positiveVotes - $negativeVotes;
+
+        $user = User::all()->find($comment->user_id);
+        $AuthUser = Auth::user();
+        $vote = $this->voteService->getCommentVotesByIds($AuthUser->id, $comment->id);
+
+        $userDto = $this->userMapper->mapToDto($user);
+        $commentDto = new CommentDto();
+        $commentDto->setUserDto($userDto);
+        $commentDto->setId($comment->id);
+        $commentDto->setDate($comment->created_at);
+        $commentDto->setParentCommentId($comment->parent_comment_id);
+        $commentDto->setPostId($comment->post_id);
+        $commentDto->setBody($comment->body);
+        $commentDto->setKarma($karma);
+
+        if($vote==null)
+            $commentDto->setVote($vote);
+        else{
+            $commentDto->setVote($vote->vote);
+        }
+
+        $replies = Comment::where('parent_comment_id', $comment->id)->count();
+
+        $commentDto->setRepliesNumber($replies);
+
+        return $commentDto;
+    }
+```
+Тука се поставуваат дополнителни полиња за рендерирање на еден коментар.
+- Се поставува карма така што се прави разлика преку позитивните и негативните гласови.
+- Се зема гласот на корисникот за коментарот (1, 0, null - нема гласано)
+- Се земаат бројот на реплики така што се проверува на колку коментари parent_comment_id е исто со тековниот коментар.
+
+
+### 6.2.2 Community Mapper
+
+````php
+class CommunityMapper
+{
+
+    public function mapToDto(Community $community)
+    {
+        $communityDto = new CommunityDto($community->id, $community->name);
+        return $communityDto;
+    }
+
+    public function mapCollectionToDto($communities)
+    {
+        if($communities === null){
+            return [];
+        }
+        else {
+            return $communities->map(function ($community){
+                return $this->mapToDto($community);
+            });
+        }
+    }
+
+}
+````
+CommunityMapper-от овозможува да не се праќаат сите полиња кои се чуваат во база, туку само оние што ни требаат.
+За реискористливост имаме две функции каде што:
+- мапираме community -> communityDto (ни требаат само име и идентификатор)
+- collection -> communityDto collection (правиме на колекција ремапирање и ја повикуваме mapToDto)
+
+### 6.2.3 Post Mapper
+
+````php
+class PostMapper
+{
+    public function __construct(private readonly VoteService $voteService){}
+
+
+    public function mapToDto(Post $post): PostDto
+    {
+        $karma = $this->voteService->getPostKarma($post->id);
+        $comments_number = Comment::all()->where('post_id', $post->id)->count();
+        $postDto =  new PostDto($post->id, $post->title, $post->body, $post->created_at, $karma, $comments_number);
+        $communityDto = new CommunityDto($post->community_id, $post->community->name);
+        $userDto = new UserDto($post->user_id, $post->user->name);
+        $user = Auth::user();
+        $voted = $this->voteService->getPersonVote($user->id, $post->id);
+        $postDto->setVote($voted);
+        $postDto->setCommunityDto($communityDto);
+        $postDto->setUserDto($userDto);
+        $flair = Flair::find($post->flair_id);
+        $postDto->setFlair($flair);
+
+        return $postDto;
+    }
+}
+````
+Во зависнот од потребите и тука имаме неколку дополнителни полиња и намалување на непотребни полиња:
+- карма - ја земаме од сервисот која што е разлика помеѓу позитивни и негативни гласови.
+- број на коментари - гледаме на колку коментари post_id е идентификаторот на објавата.
+- communityDto - иденктификатор и име на заедницата
+- userDto - корисничко име и идентификатор на корисникот
+- vote - дали тековно најавениот корисник гласал на објавата
+
+### 6.2.4 User Mapper
+
+````php
+class UserMapper
+{
+
+    public function mapToDto(User $user)
+    {
+        return new UserDto($user->id, $user->name);
+    }
+
+}
+````
+Ги исфрламе останатите непотребни полиња поради безбедност и ефикасност.
 
