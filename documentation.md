@@ -1330,7 +1330,7 @@ public function delete($commentId){
     }
 ````
 
-### 6.4.1 Community Controller
+### 6.4.2 Community Controller
 
 #### Враќање на едит форма
 ````php
@@ -1544,5 +1544,662 @@ public function description($id){
         return $this->communityService->getCommunityDescription($id);
     }
 ````
+### 6.4.3 Flair Controller
+
+#### Flair Component
+````php
+public function index(): \Inertia\Response
+    {
+        return Inertia::render('Flairs/Flair');
+    }
+````
+
+#### Креирање на категорија
+````php
+public function store(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required',
+            'community_id' => 'required',
+        ]);
+
+        $flair = new Flair;
+        $flair->name = $request->input('name');
+        $flair->community_id = $request->input('community_id');
+        $flair->save();
+
+        return response()->json(['message' => 'Flair created successfully'], 201);
+    }
+````
+
+#### Категории на заедница
+````php
+public function getCommunityFlairs($communityId){
+        return Flair::where('community_id', $communityId)->get();
+    }
+````
+####
+````php
+public function update(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required',
+        ]);
+
+        $flair = Flair::findOrFail($id);
+
+        $flair->update($validatedData);
+
+        return response()->json($flair);
+    }
+
+````
+
+
+####
+````php
+public function destroy($id)
+    {
+        $flair = Flair::findOrFail($id);
+        $flair->delete();
+
+        return response()->json(['message' => 'Flair deleted']);
+    }
+````
+
+### 6.4.4 Follow Controller
+
+
+#### Следење на заедница
+````php
+public function follow($communityId)
+    {
+
+        $user = auth()->user();
+
+        if (!$communityId) {
+            return response()->json(['message' => 'Invalid community ID.'], 400);
+        }
+
+        $follow = new Follow([
+            'user_id' => $user->id,
+            'community_id' => $communityId,
+        ]);
+
+        $follow->save();
+
+        return $follow;
+    }
+````
+
+#### Одследување на заедница
+````php
+public function unfollow($communityId)
+    {
+        $user = auth()->user();
+
+        Follow::where([
+            'user_id' => $user->id,
+            'community_id' => $communityId
+        ])->delete();
+````
+
+### 6.4.4 Image Controller
+
+#### Враќање на слика
+````php
+public function getImage($id){
+        $image = Image::findOrFail($id);
+        return $image;
+    }
+````
+
+
+#### Зачувување на слика
+````php
+public function storeImage($file, $path = 'images')
+    {
+        $filename = $file->getClientOriginalName();
+        $storedPath = Storage::disk('public')->putFile($path, $file);
+
+        $image = new Image();
+        $image->filename = $filename;
+        $image->path = $storedPath;
+        $image->save();
+
+        return $image->id;
+    }
+````
+
+
+#### Бришење на слика
+````php
+public function delete($id)
+    {
+        $image = Image::findOrFail($id);
+
+        $path = ltrim($image->path, '/storage/');
+
+        Storage::disk('public')->delete($path);
+
+        $image->delete();
+
+        return response()->json(['message' => 'Image deleted successfully']);
+    }
+````
+
+### 6.4.5 Post Controller
+
+
+#### Пагинација на постови кои корисникот ги следи
+````php
+public function paginateFollowingPosts(Request $request){
+
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getFollowingPosts()->orderBy('created_at', 'desc')->paginate(2);
+        }
+        else{
+            $posts = DB::table('posts')
+                ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                ->groupBy('posts.id')
+                ->orderByDesc('karma')
+                ->paginate(2);
+
+        }
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
+
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet)
+            ;
+        });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
+    }
+````
+
+#### Пагинација на трендинг постови
+````php
+public function paginateTrendingPosts(Request $request){
+
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getTrendingPosts()
+                ->orderBy('created_at', 'desc')->paginate(2);
+        }
+        else{
+            $posts = $this->postService->getTrendingPosts()
+                ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                ->groupBy('posts.id')
+                ->orderByDesc('karma')
+                ->paginate(2);
+
+        }
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
+
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet)
+                ;
+        });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
+    }
+````
+
+#### Бришење на глас на објава
+````php
+ public function deleteVotePost($postId){
+        $user = Auth::user();
+        $userKarmaController = new UserKarmaController();
+        $post = $this->postService->getById($postId);
+
+        $karma = $this->voteService->getPostVotesByIds($user->id, $postId)->vote;
+
+        if($karma == 0){
+            $userKarmaController->upVote($post->user_id);
+        }else{
+            $userKarmaController->downVote($post->user_id);
+        }
+
+        return $this->voteService->deletePostVote($user->id, $postId);
+    }
+````
+
+#### Форма за креирање на објава
+````php
+public function create(): Response
+    {
+        return Inertia::render('MakePost');
+    }
+````
+
+#### Зачувување на објава
+````php
+public function store(Request $request): RedirectResponse
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+            'communityId' => 'required',
+            'image' => 'nullable|file',
+            'flair' => 'nullable|integer'
+        ]);
+
+        $user = Auth::user();
+        $post = new Post();
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+        $post->flair_id = $request->input('flair');
+        $post->spoiler = $request->boolean('spoiler');
+
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $imageController = new ImageController();
+            $imageId = $imageController->storeImage($file, '/posts');
+            $post->image_id = $imageId;
+            Log::info($file);
+        }
+        else{
+            $post->image_id = null;
+        }
+        
+        $post->user()->associate($user);
+        $post->community()->associate($request->input('communityId'));
+        $post->save();
+
+        return redirect('/');
+    }
+````
+
+#### Враќање на објава по идентификатор
+````php
+public function get(int $id)
+    {
+        return $this->postService->getById($id);
+    }
+````
+
+#### Форма за едитирање на објава
+````php
+public function edit(int $id)
+    {
+        return Inertia::render('Posts/Edit', [
+            'posts' => Post::with('post:id')->find($id),
+        ]);
+    }
+````
+
+#### Едитирање
+````php
+public function update(PostCreationDto $postCreationDto): RedirectResponse
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+        $this->postService->edit($postCreationDto);
+
+        return redirect(route('posts.index'));
+
+    }
+````
+#### Гласање на објава
+````php
+public function votePost($id, Request $request): int
+    {
+        $user = Auth::user();
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $postVoteDto = new PostVoteDto();
+        $postVoteDto->post_id = $id;
+        $postVoteDto->vote = $jsonData['vote'];
+
+
+        $userKarmaController = new UserKarmaController();
+        $post = $this->postService->getById($id);
+
+        //        $userKarmaController->downVote($post->user_id);
+
+        if($postVoteDto->vote == 1){
+            $userKarmaController->upVote($post->user_id);
+        }else if($postVoteDto->vote == null){
+            $userKarmaController->downVote($post->user_id);
+
+        }
+
+        return $this->postService->vote_Post($postVoteDto, $user);
+
+    }
+````
+ 
+#### Бришење на објава
+````php
+public function delete($id)
+    {
+        $post = $this->postService->getById($id)->image_id;
+        $this->postService->delete($id);
+
+
+        if(!is_null($post)){
+                $imageController = new ImageController();
+                $imageController->delete($post);
+        }
+    }
+````
+
+#### Бришење ма објава
+````php
+public function destroy(Post $post) : RedirectResponse
+    {
+        
+        $this->authorize('delete', $post);
+
+        $post->delete();
+
+        return redirect(route('posts.index'));
+    }
+````
+### 6.4.5 Profile Controller
+
+####
+````php
+public function edit(Request $request): Response
+    {
+        return Inertia::render('Profile/Edit', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => session('status'),
+        ]);
+    }
+
+````
+
+#### Одлогирање на корисник
+````php
+public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect('/login');
+    }
+````
+
+####
+````php
+public function update(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $request->user()->fill($request->validated());
+
+        if ($request->user()->isDirty('email')) {
+            $request->user()->email_verified_at = null;
+        }
+
+        $request->user()->save();
+
+        return Redirect::route('profile.edit');
+    }
+
+````
+
+####
+````php
+public function destroy(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'password' => ['required', 'current-password'],
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
+    }
+````
+
+### 6.4.6 User Controller
+
+#### Пагинација на објави од корисникот
+````php
+public function paginateUserPosts(string $userName, Request $request){
+
+        $user = $this->userService->getUserByName($userName);
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getAllPostsByUserId($user->id)->paginate(2);
+        }
+        else{
+
+            $posts = DB::table('posts')
+                ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                ->where('posts.user_id', $user->id)
+                ->groupBy('posts.id')
+                ->orderByDesc('karma')
+                ->paginate(2);
+        }
+
+
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet);
+        });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
+    }
+
+````
+
+#### Заедници на корисникот
+````php
+public function getUseFollowingCommunity($communityId){
+        $user = Auth::user();
+
+        return Follow::where('user_id', $user->id)->where('community_id',$communityId )->get();
+
+    }
+````
+
+#### Моментално логиран корисник
+````php
+public function getCurrentUser(){
+
+       return Auth::user();
+    }
+
+````
+
+#### Корисник по корисничко име
+````php
+public function getUserByName($name){
+
+        $user = $this->userService->getUserByName($name);
+        $comments = $this->commentService->getAllCommentsByUserId($user->id);
+        $posts = $this->postService->getAllPostsByUserId($user->id);
+        $combined = $comments->concat($posts);
+        $sortedCombined = $combined->sortByDesc('created_at');
+        //CommunityController->paginateCommunityPosts
+
+        return Inertia::render('User', [
+            'user' => [$user],
+            'posts' => $sortedCombined,
+        ]);
+
+    }
+
+````
+
+### 6.4.7 UserInfo Controller
+
+
+####
+````php
+public function store($userId)
+    {
+        $userInfo = new UserInfo([
+            'user_id' => $userId,
+            'image_id' => null,
+            'bio' => ''
+        ]);
+
+        // Associate the UserKarma record with the specified user
+        User::find($userId)->info()->save($userInfo);
+        return redirect()->route('dashboard');
+    }
+
+````
+
+####
+````php
+public function bio(Request $request){
+
+        $id = Auth::user()->id;
+
+        $userInfo = UserInfo::where('user_id', $id)->first();
+
+        $userInfo->update([
+            'bio' => $request->input('bio'),
+        ]);
+
+    }
+````
+
+####
+````php
+public function image(Request $request)
+    {
+        if ($request->hasFile('image')) {
+            $userInfoService = new UserInfoService();
+            $id = Auth::user()->id;
+            $file = $request->file('image');
+            $userInfo = $userInfoService->getById($id);
+            $imageController = new ImageController();
+            $imageId = $imageController->storeImage($file, '/profile');
+            $oldId = $userInfo->image_id;
+
+            $userInfo->update([
+                'image_id' => $imageId,
+            ]);
+
+            if(!is_null($oldId)){
+                $imageController->delete($oldId);
+            }
+
+        }
+    }
+
+````
+
+### 6.4.8 UserKarma Controller
+
+####
+````php
+public function store($userId)
+    {
+
+        $userKarma = new UserKarma([
+            'user_id' => $userId,
+            'karma' => 1,
+        ]);
+
+        // Associate the UserKarma record with the specified user
+        User::find($userId)->karma()->save($userKarma);
+        return redirect()->route('dashboard');
+    }
+
+````
+
+####
+````php
+public function upVote($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        $user->karma->increment('karma');
+
+        return response()->json(['message' => 'Upvoted successfully.']);
+    }
+````
+
+####
+````php
+public function downVote($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        $user->karma->decrement('karma');
+
+        return response()->json(['message' => 'Downvoted successfully.']);
+    }
+````
+
+### 6.4.9 UserKarma Controller
+
+####
+````php
+public function store($id)
+    {
+        UserStatus::create([
+            'user_id' => $id,
+            'active' => true,
+            'activity' => Carbon::now()
+        ]);
+    }
+
+````
+
+####
+````php
+
+````
+
+####
+````php
+
+````
+
 
 
