@@ -4,7 +4,6 @@
     <div class="text-xs lg:text-sm text-white line-clamp-6 lg:line-clamp-none">
         {{ about }}
     </div>
-    <div class="text-[#898989] font-light text-[10px] pt-1">Created 1 year ago</div>
 </div>
 </template>
 

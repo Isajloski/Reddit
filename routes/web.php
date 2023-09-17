@@ -121,6 +121,7 @@ Route::prefix('comment')->group(function () {
 
 
 Route::prefix('user')->group(function () {
+    Route::get('/get/current', [UserController::class, 'getCurrentUser'])->name('users.currentUser');
     Route::post('/{userName}/paginate', [UserController::class, 'paginateUserPosts'])->name('user.paginate');
     Route::get('/{name}', [UserController::class, 'getUserByName'])->name('users.getUserByName');
     Route::get('/following/{communityId}', [UserController::class, 'getUseFollowingCommunity'])->name('users.getUseFollowingCommunity');

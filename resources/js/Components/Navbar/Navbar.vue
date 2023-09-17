@@ -18,14 +18,16 @@
                         </div>
                     </li>
                     <li>
-                        <div class="-mt-3">
+                        <div class="-mt-5">
                             <div class="absolute right-0 grid grid-cols-2">
                                 <div class="m-auto">
-                                    <UserIcon class="w-7 inline-block"/>
-                                    <span class="text-white px-2 mt-1.5">Username</span>
-                                    <AngleDownIcon class="inline-block w-4"/>
+                                    <Dropdown
+                                        :options="[{id: 'profile', name: 'Profile'},{id: 'logout', name: 'Logout'}]"
+                                        :placeholder="user.name" :navbar="true"
+                                        @option-selected="handleRedirect($event)"
+                                    />
                                 </div>
-                                <div class="mt-0.5 px-12">
+                                <div class="mt-2 px-12">
                                     <SettingsIcon class="h-7"/>
                                 </div>
                             </div>
@@ -44,8 +46,37 @@ import SearchIcon from "@/Components/Icons/SearchIcon.vue";
 import UserIcon from "@/Components/Icons/UserIcon.vue";
 import AngleDownIcon from "@/Components/Icons/AngleDownIcon.vue";
 import SettingsIcon from "@/Components/Icons/SettingsIcon.vue";
+import Dropdown from "@/Components/Dropdown/Dropdown.vue";
+import ApiUtilis from "@/Helpers/ApiUtilis";
 
 export default {
-    components: {SettingsIcon, AngleDownIcon, UserIcon, SearchIcon, ApplicationLogo}
+    components: {Dropdown, SettingsIcon, AngleDownIcon, UserIcon, SearchIcon, ApplicationLogo},
+    created() {
+        this.fetchUser();
+    },
+    data() {
+      return {
+          user: Object
+      }
+    },
+    methods: {
+        async fetchUser(){
+            try{
+                const response = await ApiUtilis.fetchCurrentUser();
+                this.user = response.data;
+            }
+            catch (e) {
+                console.log("Error", e);
+            }
+        },
+        handleRedirect(optionSelected){
+            if(optionSelected === 'profile'){
+                window.location.href = '/user/' + this.user.name;
+            }
+            if(optionSelected === 'logout'){
+                window.location.href = '/logout';
+            }
+        }
+    }
 }
 </script>
