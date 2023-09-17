@@ -343,6 +343,14 @@ export default {
     },
     mounted() {
         this.fetchModerator();
+    },
+    created() {
+
+        setInterval(() => {
+            this.fetchModerator();
+            this.fetchFlairs();
+        }, 2000);
+
     }
 
 };

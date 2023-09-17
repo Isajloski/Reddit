@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Post\Post;
 use App\Models\User\User;
+use Illuminate\Support\Facades\Auth;
 
 class PostPolicy
 {
@@ -34,20 +35,18 @@ class PostPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Post $post): bool
+    public function update(Post $post)
     {
-        return $post->user()->is($user);
+        $user = Auth::user();
+        return $user->id === $post->user_id;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Post $post): bool
+    public function destroy(User $user, Post $post)
     {
-        //
-        return $this->update($user, $post);
-
+        $user = Auth::user();
+        return $user->id === $post->user_id;
     }
+
 
     /**
      * Determine whether the user can restore the model.

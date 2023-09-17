@@ -42,16 +42,20 @@
                     <button class="text-right text-pink-700"
                             @click="toggleWriteReply()">Reply
                     </button>
+                <div v-if="owner === user_id">
+
                     <button class="text-right text-pink-700"
                             @click="toggleEditMode">Edit
                     </button>
                     <button class="text-right text-pink-700"
                             @click="handleDelete()">Delete
                     </button>
+                </div>
                     <button class="text-right text-pink-700"
                             @click="fetchReplies()"> Replies {{ repliesNumber }}
                     </button>
                 </div>
+
                 <WriteComment v-if="writeReply" @commentEmitter="handleReply"
                               :parent-id="this.id"/>
                 <div class="w-full flex justify-end px-3 my-3">
@@ -72,6 +76,8 @@
                      :replies-number="reply.replies"
                      :vote="reply.vote"
                      :user-name="reply.user?.userName"
+                     :owner="owner"
+                     :user_id="user_id"
                      @commentDeleteEmitter="handleDeleteReply(reply.id)"
                      @commentEditEmitter="handleEditReply($event)"
             />
@@ -125,7 +131,9 @@ export default {
         parent_comment_id: Number,
         karma: Number,
         repliesNumber: Number,
-        vote: Boolean
+        vote: Boolean,
+        owner: Number,
+        user_id: Number
     },
     methods: {
         toggleWriteReply() {

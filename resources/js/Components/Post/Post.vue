@@ -57,10 +57,21 @@
                             <ShareIcon class="w-4 h-4 inline-block ml-3"/>
                             <span class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">Share</span>
                         </div>
-                        <div class="inline-block cursor-pointer" @click="deletePost">
-                            <DeleteIcon class="w-4 h-4 inline-block ml-3"/>
-                            <span class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">Delete</span>
-                        </div>
+
+
+
+                            <div  v-if="user_id === owner" class="inline-block cursor-pointer" @click="deletePost">
+                                <DeleteIcon class="w-4 h-4 inline-block ml-3"/>
+                                <span class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">Delete</span>
+                            </div>
+
+                                <div v-if="user_id === owner" class="inline-block cursor-pointer">
+                                    <a  :href="`/post/` + id + `/edit`" >
+                                    <EditIcon class="w-4 h-4 inline-block ml-3"/>
+                                    <span class="mx-2 inline-block text-[#898989] text-xs font-light hidden md:inline-block">Edit</span>
+                                    </a>
+                                </div>
+
                     </div>
                     <div class="right-0 absolute">
                         <span class="text-xs text-[#898989]">{{ date }}</span>
@@ -88,6 +99,8 @@
                      :post_id="comment.post_id"
                      :vote="comment.vote"
                      :user-name="comment.user?.userName"
+                     :owner="comment.user.id"
+                     :user_id="user_id"
                      @commentDeleteEmitter="handleDelete"
                      @commentEditEmitter="handleEdit"
             />
@@ -106,11 +119,12 @@ import CommentIcon from "@/Components/Icons/CommentIcon.vue";
 import ApiUtilis from "@/Helpers/ApiUtilis";
 import WriteComment from "@/Components/Comment/WriteComment.vue";
 import DeleteIcon from "@/Components/Icons/DeleteIcon.vue";
+import EditIcon from "@/Components/Icons/EditIcon.vue";
 
 export default {
     name: "Post",
     emits: ['deleteEmitter'],
-    components: {DeleteIcon, WriteComment, CommentIcon, VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon, Comment},
+    components: {EditIcon, DeleteIcon, WriteComment, CommentIcon, VoteDownIcon, VoteUpIcon, ShareIcon, TestIcon, Comment},
     data() {
         return {
             childKarma: this.karma,
@@ -154,7 +168,9 @@ export default {
         spoiler: Boolean,
         vote: Boolean | null,
         commentsNumber: Number,
-        flair: Object
+        flair: Object,
+        owner: Number,
+        user_id: Number
     },
     methods: {
         async voteUp(postId) {

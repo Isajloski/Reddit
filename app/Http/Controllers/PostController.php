@@ -171,13 +171,10 @@ class PostController extends Controller
             $imageController = new ImageController();
             $imageId = $imageController->storeImage($file, '/posts');
             $post->image_id = $imageId;
-            Log::info($file);
         }
         else{
             $post->image_id = null;
         }
-
-
 
 
         $post->user()->associate($user);
@@ -202,23 +199,68 @@ class PostController extends Controller
      */
     public function edit(int $id)
     {
-        return Inertia::render('Posts/Edit', [
-            'posts' => Post::with('post:id')->find($id),
+
+        return Inertia::render('Posts/EditPost', [
+            'posts' => Post::with('user:id,id','image' )->find($id),
+
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(PostCreationDto $postCreationDto): RedirectResponse
+//    public function update(PostCreationDto $postCreationDto): RedirectResponse
+//    {
+//        if (!auth()->check()) {
+//            return redirect()->route('login');
+//        }
+//        $this->postService->edit($postCreationDto);
+//
+//        return redirect(route('posts.index'));
+//
+//    }
+
+    public function update(Request $request, $id): RedirectResponse
     {
         if (!auth()->check()) {
             return redirect()->route('login');
         }
-        $this->postService->edit($postCreationDto);
 
+        $post = $this->postService->getById($id);
+
+        $user = Auth::user();
+        $post->id =   $id;
+        $post->title =   $request->input('title');
+        $post->body =   $request->input('body');
+        if($request->integer('flair') === 0) {
+            $post->flair_id = null;
+        }else{
+            $post->flair_id = $request->integer('flair');
+
+        }
+        $post->spoiler = $request->boolean('spoiler');
+        $old = $post->image_id;
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $imageController = new ImageController();
+            $imageId = $imageController->storeImage($file, '/posts');
+            $post->image_id = $imageId;
+            $post->user()->associate($user);
+            $post->community()->associate($post->community_id);
+            $post->save();
+            if(!is_null($old)) {
+                $imageController->delete($old);
+            }
+        }
+        else {
+            $post->user()->associate($user);
+            $post->community()->associate($post->community_id);
+            $post->save();
+        }
         return redirect(route('posts.index'));
 
+//        return redirect(route('/community/' . $post->community_id));
     }
 
 

@@ -107,6 +107,9 @@ const ApiUtilis = {
     },
     deleteModerator(id) {
         return axios.post(`/community/moderator/${id}/delete`);
+    },
+    fetchActiveUser() {
+         return axios.get(`/active`);
     }
 };
 

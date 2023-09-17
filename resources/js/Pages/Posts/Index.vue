@@ -15,7 +15,6 @@ const form = useForm({
     message: props.posts.message,
 });
 
-const editing = ref(false);
 
 </script>
 

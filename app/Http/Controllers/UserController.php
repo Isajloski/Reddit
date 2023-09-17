@@ -11,7 +11,9 @@ use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use const http\Client\Curl\AUTH_ANY;
 
 class UserController extends Controller
 {
@@ -23,6 +25,11 @@ class UserController extends Controller
                                 private readonly PostService $postService){}
 
 
+
+    public function active(){
+        Log::info("РАБОТАМ");
+        return Auth::user()->id;
+    }
 
     public function paginateUserPosts(string $userName, Request $request){
 
@@ -77,9 +84,6 @@ class UserController extends Controller
         ]);
     }
 
-    public function getById($id){
-        $userService = new UserService();
-    }
 
 
 

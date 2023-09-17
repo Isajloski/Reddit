@@ -5,12 +5,12 @@ use App\Http\Controllers\FlairController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MarkdownController;
-
 use App\Http\Controllers\ModeratorsController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserInfoController;
+use http\Client\Request;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -125,9 +125,10 @@ Route::prefix('user')->group(function () {
     Route::get('/{name}', [UserController::class, 'getUserByName'])->name('users.getUserByName');
     Route::get('/following/{communityId}', [UserController::class, 'getUseFollowingCommunity'])->name('users.getUseFollowingCommunity');
     Route::post('/image', [UserInfoController::class, 'uploadImage'])->name('infos.uploadImage');
-
-
 });
+
+Route::get('/active', [UserController::class, 'active'])->name('user.active');
+
 
 Route::get('/image/{id}', [ImageController::class, 'getImage'])->name('image.getImage');
 

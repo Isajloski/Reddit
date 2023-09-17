@@ -26,8 +26,9 @@
                       :image="post.image"
                       :title="post.title"
                       :flair="post.flair"
+                      :owner="post.user.id"
+                      :user_id="user_id"
                       @deleteEmitter="handleDeletePost($event)"
-
                 />
             </div>
 
@@ -59,6 +60,7 @@ export default {
             community: [],
             currentPage: 1,
             filter: 'Following',
+            user_id: null
         };
     },
     props : {
@@ -67,6 +69,13 @@ export default {
         flair: String | Number
     },
     mounted() {
+
+         ApiUtilis.fetchActiveUser()
+            .then((response) => {
+                this.user_id = response.data;
+            });
+
+
         window.onscroll = () => {
             let bottomOfWindow =
                 document.documentElement.scrollTop +
@@ -186,6 +195,7 @@ export default {
             }
         }
     },
+
 }
 </script>
 

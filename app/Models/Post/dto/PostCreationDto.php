@@ -9,7 +9,7 @@ class PostCreationDto
     public string $title;
     public string $body;
 
-    public function __construct( $id, $title, $body )
+    public function __construct($id = null, $title = null, $body = null)
     {
         $this->id = $id;
         $this->title = $title;

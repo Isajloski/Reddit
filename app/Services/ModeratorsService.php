@@ -12,7 +12,6 @@ class ModeratorsService
     public function getCommunityModeratorsByCommunityId($community_id)
     {
         $moderators = Moderators::with('user')->where('community_id', $community_id)->get();
-        Log::info($moderators);
         return $moderators;
     }
 

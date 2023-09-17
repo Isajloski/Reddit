@@ -12,11 +12,14 @@ import Post from "@/Components/Post/Post.vue";
 import Button from "@/Components/Button/Button.vue";
 import Comment from "@/Components/Comment/Comment.vue";
 import ApiUtilis from "@/Helpers/ApiUtilis";
+import Moderators from "@/Pages/Community/Moderators.vue";
 
 
 export default {
     name: "Community",
-    components: {AboutCard, CommunityCard, Create, Filter, Post, Button, Comment, Flairs, Rules, Navbar, Head, Content},
+    components: {
+        Moderators,
+        AboutCard, CommunityCard, Create, Filter, Post, Button, Comment, Flairs, Rules, Navbar, Head, Content},
     data() {
         return {
             community: Object,
@@ -68,6 +71,9 @@ export default {
         />
         <Rules class="hidden md:block"
                :rules="community.rules"
+        />
+        <Moderators class="my-3 hidden md:block"
+            :community="community"
         />
     </div>
     <Content :type="'community'" :sort="this.sort" :flair="this.flairFilter"/>

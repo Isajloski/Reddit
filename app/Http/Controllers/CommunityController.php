@@ -11,6 +11,7 @@ use App\Services\PostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 
@@ -81,7 +82,6 @@ class CommunityController extends Controller
     public function edit($id)
     {
         $community = Community::with('flairs','image')->find($id);
-        Log::info("Edit Community: " . $community);
         return Inertia::render('Communities/EditCommunity', [
             'community' => $community,
         ]);
@@ -89,9 +89,6 @@ class CommunityController extends Controller
 
     public function update($id, Request $request)
     {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
 
         $request->validate([
             'name' => 'required|unique:communities',
@@ -124,11 +121,30 @@ class CommunityController extends Controller
                 $imageController->delete($old);
             }
         }else{
-            Log::info("no image!");
             $community->image_id = null;
             $community->save();
 
-        return redirect()->route('communities.index');
+        }
+
+
+        $community->user()->associate($user);
+        $community->save();
+        $communityId = $community->id;
+
+
+
+        if ($request->has('flairs') && is_array($request->input('flairs'))) {
+            $flairs = $request->input('flairs');
+
+            foreach ($flairs as $flairName) {
+                $flair = new Flair();
+                $flair->name = $flairName;
+                $flair->community_id = $community->id;
+                $flair->save();
+            }
+        }
+
+        return redirect('/community/'.$communityId);
     }
 
 
@@ -194,13 +210,13 @@ class CommunityController extends Controller
         }
         else{
 
-                $posts = DB::table('posts')
-                    ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
-                    ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
-                    ->where('posts.community_id', $id)
-                    ->groupBy('posts.id')
-                    ->orderByDesc('karma')
-                    ->paginate(2);
+            $posts = DB::table('posts')
+                ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                ->where('posts.community_id', $id)
+                ->groupBy('posts.id')
+                ->orderByDesc('karma')
+                ->paginate(2);
         }
 
 
@@ -211,7 +227,7 @@ class CommunityController extends Controller
                 ->first();
             return
                 $this->postMapper->mapToDto($postGet)
-            ;
+                ;
         });
 
 
