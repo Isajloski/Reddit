@@ -391,4 +391,1815 @@ php artisan migrate
 - `community_id`: За кој community станува збор. 
 
 
+# 6. Архитектура и дизајн
+При развој ние воглавно се потпираме на MVC шаблонот, но и за да ги подобриме перформансите користине и на дополнителен API слој.
+
+- Models : ги содржи сите објекти кои ги користиме. Некои од нив се зачувуваат во база, но некои претставуваат DTOs (Data transfer Object) и служат само за комуникација.
+- View : со помош на Inertia.js (библиотека што го премостува барањето помеѓу Laravel (контролер) и Vue.js (страница)).
+- Controller: се справува со барањата. Прима барања од клиентот, ги обработува, комуницира со сервисот за да добие или ажурира податоци, а потоа враќа одговор на погледот или на самата vuejs апликација.
+- Service: ја се справува бизнис логиката и комуницира со моделите и контролерите.
+
+## 6.1 DTOs
+За API слојот користиме DTOs.
+Цели:
+- едноставно пребарување на податоци
+- скалабилност
+- намалување на бројот на повици
+- трансформација на податоци во друг формат
+- исфрлање и додавање на потребни/непотребни полиња
+- безбедност и енкапсулација
+Сето ова го правиме преку наша прилагодлива имлементација на мапирачи.
+
+#### CommentCreationRequest
+
+Се добива од барањето за пишување на коментар преку CommentMapper.
+
+| Parameter   | Type     | Description              |
+|:------------|:---------|:-------------------------|
+| `body`      | `string` | Содржината на коментарот |
+| `post_id`   | `number` | Родителот на објавата    |
+| `parent_id` | `number` | Родителот на коментарот  |
+
+#### CommentUpdateRequest
+
+Се добива од барањето за едитирање на коментар преку CommentMapper.
+
+| Parameter    | Type     | Description                     |
+|:-------------|:---------|:--------------------------------|
+| `body`       | `string` | Содржината на коментарот        |
+| `comment_id` | `number` | **Required** тековниот коментар |
+
+
+#### CommentDto
+
+Се праќа коментарот ремапиран од моделот Comment преку CommentMapper.
+
+| Parameter           | Type      | Description                                                    |
+|:--------------------|:----------|:---------------------------------------------------------------|
+| `id`                | `number`  | **Required** тековниот коментар                                |
+| `parent_comment_id` | `number`  | Коментар родител на тековниот коментар                         |
+| `UserDto`           | `userDto` | **Required** Корисникот кој го напишал                         |
+| `post_id`           | `number`  | Објава родител на тековниот коментар                           |
+| `body`              | `string`  | Содржина на тековниот коментар                                 |
+| `karma`             | `number`  | **Required** карма                                             |
+| `date`              | `number`  | **Required** датум кога е напишан                              |
+| `replies`           | `number`  | број на реплики                                                |
+| `vote`              | `boolean` | најавениот корисник има гласано на коментарот                  |
+
+
+#### CommunityCardDto
+
+Се праќаaт основни информации за заедницата ремапирана од моделот Community преку CommunityMapper.
+
+| Parameter     | Type     | Description                                        |
+|:--------------|:---------|:---------------------------------------------------|
+| `id`          | `number` | **Required** id на тековната заедница              |
+| `name`        | `string` | **Required** Име на тековната заедница             |
+| `about`       | `string` | **Required** Oпис на тековната заедница            |
+| `rules`       | `string` | **Required** Правила за тековната заедница         |
+| `activeUsers` | `number` | Број на активни корисници преку коментари и објави |
+| `totalUsers`  | `number` | Број на корисници кои членуваат во заедницата      |
+| `flairs`      | `аrray`  | **Required** Категории на заедницата               |
+
+
+#### CommunityDto
+
+Се праќа заедницата со уникатните карактеристики ремапирана од моделот Community преку CommunityMapper.
+
+| Parameter     | Type     | Description                                        |
+|:--------------|:---------|:---------------------------------------------------|
+| `id`          | `number` | **Required** id на тековната заедница              |
+| `name`        | `string` | **Required** Име на тековната заедница             |
+
+
+#### PostCreationDto
+
+Се добива од барањето за пишување објава.
+
+| Parameter      | Type      | Description                                         |
+|:---------------|:----------|:----------------------------------------------------|
+| `community_id` | `number`  | **Required** id на заедницата каде припаѓа објавата |
+| `title`        | `string`  | **Required** Наслов на објавата                     |
+| `body`         | `string`  | **Required** Содржина на објавата                   |
+| `image`        | `file`    | Слика                                               |
+| `flair`        | `id`      | id на одбраната категорија                          |
+| `spoiler`      | `boolean` | Дали се работи за спојлер                           |
+
+#### PostDto
+
+Се праќа објавата ремапирана од моделот Post преку PostMapper.
+
+| Parameter         | Type           | Description                                      |
+|:------------------|:---------------|:-------------------------------------------------|
+| `id`              | `number`       | **Required** id на објавата                      |
+| `title`           | `string`       | **Required** Наслов на објавата                  |
+| `body`            | `string`       | **Required** Содржина на објавата                |
+| `communityDto`    | `CommunityDto` | **Required** Заедницата на која припаѓа објавата |
+| `userDto`         | `UserDto`      | **Required** Корисникот кој ја креирал објавата  |
+| `image`           | `file`         | Слика                                            |
+| `flair`           | `id`           | id на одбраната категорија                       |
+| `spoiler`         | `boolean`      | Дали се работи за спојлер                        |
+| `date`            | `string`       | Датум кога е креирана                            |
+| `comments_number` | `number`       | Колку коментари содржи                           |
+| `karma`           | `number`       | Карма                                            |
+| `vote`            | `boolean`      | Дали најавениот корисник има гласано             |
+
+#### UserDto
+
+Се праќа корисникот ремапирана од моделот User преку UserMapper.
+
+| Parameter  | Type           | Description                   |
+|:-----------|:---------------|:------------------------------|
+| `id`       | `number`       | **Required** id на корисникот |
+| `userName` | `string`       | **Required** Корисничко име   |
+
+
+#### CommentVoteDto
+
+Се добива од барањето за гласање на коментар.
+
+| Parameter | Type      | Description                                             |
+|:----------|:----------|:--------------------------------------------------------|
+| `id`      | `number`  | **Required** id на коментарот                           |
+| `vote`    | `boolean` | **Required** дали корисникот прави upvote 1, downvote 0 |
+
+
+#### PostVoteDto
+
+Се добива од барањето за гласање на објава.
+
+| Parameter | Type      | Description                                             |
+|:----------|:----------|:--------------------------------------------------------|
+| `id`      | `number`  | **Required** id на објавата                             |
+| `vote`    | `boolean` | **Required** дали корисникот прави upvote 1, downvote 0 |
+
+
+
+
+
+## 6.2 Model Mappers
+За секој модел кој треба да го испратиме на API слојот, поминува преку т.н object mapper, кој е обична php класа и е имплементирана при потреба за да се добијат сите придобивки на перформанс, скалабилност и одржливост.
+Користиме методи од сервисите на нашата апликација, преку dependency injection, така што се потребните сервиси се инјектираат во конструкторот на класата, што е вообичаен и препорачан пристап за имплементација на инјекција на зависност. Ова и овозможува на класата експлицитно да ги декларира своите зависности кога е конструирана.
+
+### 6.2.1 Comment Mapper
+```php
+class CommentMapper
+{
+
+    public function __construct(private readonly UserMapper $userMapper,
+    private readonly VoteService $voteService){}
+
+    public function mapToDto(Comment $comment): CommentDto
+    {
+        $positiveVotes = CommentVote::all()->where('comment_id', $comment->id)
+            ->where('vote', 1)->count();
+
+        $negativeVotes = CommentVote::all()->where('comment_id', $comment->id)
+            ->where('vote', 0)->count();
+
+        $karma = $positiveVotes - $negativeVotes;
+
+        $user = User::all()->find($comment->user_id);
+        $AuthUser = Auth::user();
+        $vote = $this->voteService->getCommentVotesByIds($AuthUser->id, $comment->id);
+
+        $userDto = $this->userMapper->mapToDto($user);
+        $commentDto = new CommentDto();
+        $commentDto->setUserDto($userDto);
+        $commentDto->setId($comment->id);
+        $commentDto->setDate($comment->created_at);
+        $commentDto->setParentCommentId($comment->parent_comment_id);
+        $commentDto->setPostId($comment->post_id);
+        $commentDto->setBody($comment->body);
+        $commentDto->setKarma($karma);
+
+        if($vote==null)
+            $commentDto->setVote($vote);
+        else{
+            $commentDto->setVote($vote->vote);
+        }
+
+        $replies = Comment::where('parent_comment_id', $comment->id)->count();
+
+        $commentDto->setRepliesNumber($replies);
+
+        return $commentDto;
+    }
+```
+Тука се поставуваат дополнителни полиња за рендерирање на еден коментар.
+- Се поставува карма така што се прави разлика преку позитивните и негативните гласови.
+- Се зема гласот на корисникот за коментарот (1, 0, null - нема гласано)
+- Се земаат бројот на реплики така што се проверува на колку коментари parent_comment_id е исто со тековниот коментар.
+
+
+### 6.2.2 Community Mapper
+
+````php
+class CommunityMapper
+{
+
+    public function mapToDto(Community $community)
+    {
+        $communityDto = new CommunityDto($community->id, $community->name);
+        return $communityDto;
+    }
+
+    public function mapCollectionToDto($communities)
+    {
+        if($communities === null){
+            return [];
+        }
+        else {
+            return $communities->map(function ($community){
+                return $this->mapToDto($community);
+            });
+        }
+    }
+
+}
+````
+CommunityMapper-от овозможува да не се праќаат сите полиња кои се чуваат во база, туку само оние што ни требаат.
+За реискористливост имаме две функции каде што:
+- мапираме community -> communityDto (ни требаат само име и идентификатор)
+- collection -> communityDto collection (правиме на колекција ремапирање и ја повикуваме mapToDto)
+
+### 6.2.3 Post Mapper
+
+````php
+class PostMapper
+{
+    public function __construct(private readonly VoteService $voteService){}
+
+
+    public function mapToDto(Post $post): PostDto
+    {
+        $karma = $this->voteService->getPostKarma($post->id);
+        $comments_number = Comment::all()->where('post_id', $post->id)->count();
+        $postDto =  new PostDto($post->id, $post->title, $post->body, $post->created_at, $karma, $comments_number);
+        $communityDto = new CommunityDto($post->community_id, $post->community->name);
+        $userDto = new UserDto($post->user_id, $post->user->name);
+        $user = Auth::user();
+        $voted = $this->voteService->getPersonVote($user->id, $post->id);
+        $postDto->setVote($voted);
+        $postDto->setCommunityDto($communityDto);
+        $postDto->setUserDto($userDto);
+        $flair = Flair::find($post->flair_id);
+        $postDto->setFlair($flair);
+
+        return $postDto;
+    }
+}
+````
+Во зависнот од потребите и тука имаме неколку дополнителни полиња и намалување на непотребни полиња:
+- карма - ја земаме од сервисот која што е разлика помеѓу позитивни и негативни гласови.
+- број на коментари - гледаме на колку коментари post_id е идентификаторот на објавата.
+- communityDto - иденктификатор и име на заедницата
+- userDto - корисничко име и идентификатор на корисникот
+- vote - дали тековно најавениот корисник гласал на објавата
+
+### 6.2.4 User Mapper
+
+````php
+class UserMapper
+{
+
+    public function mapToDto(User $user)
+    {
+        return new UserDto($user->id, $user->name);
+    }
+
+}
+````
+Ги исфрламе останатите непотребни полиња поради безбедност и ефикасност.
+
+## 6.3 Services
+Сервисите комуницираат со останатите сервиси и со маперите, на истиот принцип преку dependency injection.
+Се дефинираат во самиот конструктор како private readonly и се користат понатаму.
+
+### 6.3.1 Comment Service
+#### Враќање на коментари кои ги содржи една објава
+````php
+public function getPostComments(int $postId): \Illuminate\Support\Collection
+    {
+
+        $comments =  Comment->where('post_id', '=', $postId)->get();
+
+        return $comments->map(function ($comment) {
+
+            return $this->commentMapper->mapToDto($comment);
+        });
+
+    }
+````
+Јавна функција, која како параметар го прима идентификаторот на објавата и враќа колекција.
+Од база се земаат сите коментари каде што полето post_id има иста вредност како идентификаторот што се праќа на параметар.
+Потоа објектите на таа колекција се ремапираат во соодветното CommentDto и се враќа таа колекција.
+
+#### Враќање на реплики кои ги содржи еден коментар
+````php
+public function getCommentReplies($commentId): \Illuminate\Support\Collection
+    {
+
+        $comments =  Comment->where('parent_comment_id', '=', $commentId)->get();
+
+        return $comments->map(function ($comment) {
+
+            return $this->commentMapper->mapToDto($comment);
+        });
+    }
+````
+Јавна функција, која како параметар го прима идентификаторот на коментарот и враќа колекција.
+Од база се земаат сите коментари каде што полето parent_comment_id има иста вредност како идентификаторот што се праќа на параметар.
+Потоа објектите на таа колекција се ремапираат во соодветното CommentDto и се враќа таа колекција.
+
+
+#### Зачувување на коментар во база
+````php
+public function save(CommentCreationRequest $commentCreationRequest): void
+    {
+        $user = Auth::user();
+
+        $comment = new Comment();
+        $comment->body = $commentCreationRequest->body;
+        $comment->post_id = $commentCreationRequest->post_id;
+        $comment->parent_comment_id = $commentCreationRequest->parent_comment_id;
+        $comment->user_id = $user->id;
+
+        $comment->save();
+
+    }
+````
+Јавна функција која не враќа резултат а, која на параметар прима објект од тип CommentCreationRequest.
+$user = Auth::user();: Оваа линија го враќа моментално автентицираниот корисник користејќи ја фасадата за автентичност на Laravel. Претпоставува дека корисникот е најавен и ги користи автентицираните информации на корисникот за да го поврзе коментарот со корисникот.
+Потоа се поставуваат директно сите полиња на Comment моделот и истиот се зачувува во база.
+
+#### Едитирање на коментар
+````php
+public function edit(CommentUpdateRequest $commentUpdateRequest): void
+    {
+        $comment = Comment->find($commentUpdateRequest->comment_id);
+        $comment->body = $commentUpdateRequest->body;
+
+        $comment->save();
+    }
+````
+Јавна функција која не враќа резултат а, која на параметар прима објект од тип CommentUpdateRequest.
+Се пронајдува коментарот за кој се испраќа $commentUpdateRequest преку поставеното comment_id, па потоа наново се сетира неговото body со тоа од $commentUpdateRequest.
+Се зачувува во база.
+
+
+#### Гласање на коментар
+````php
+public function vote(CommentVoteDto $commentVoteDto, User $user): int
+    {
+
+        $commentVote = $this->voteService->getCommentVotesByIds($user->id, $commentVoteDto->id);
+
+        if($commentVote != null){
+            $this->voteService->deleteCommentVote($user->id, $commentVoteDto->id);
+        }
+        $commentVoteNew = new CommentVote();
+        $commentVoteNew->user_id = $user->id;
+        $commentVoteNew->comment_id = $commentVoteDto->id;
+        $commentVoteNew->vote = $commentVoteDto->vote;
+
+
+        $commentVoteNew->save();
+
+        return $this->voteService->getCommentKarma($commentVoteDto->id);
+    }
+````
+Јавна функција која враќа број како резултат.
+Прво се проверува дали корисникот веќе има гласано на тој коментар (само еднаш може корисникот да гласа на коментар, со 1 или 0). Ако да, тогаш тој глас се брише.
+Се креира нов глас CommentVote и се сетираат неговите полиња и се зачувува во база.
+Потоа се од $this->voteService->getCommentKarma($commentVoteDto->id) се враќа новата апдејтирана карма за тој коментар.
+
+#### Бришење на коментар
+````php
+public function delete(int $commentId): void
+    {
+        Comment::destroy($commentId);
+        $this->getCommentReplies($commentId)->delete();
+    }
+````
+Јавна функција за бришење која на параметар го прима идентификаторот на коментарот кој треба да се избрише.
+Прво се брише само коментарот преку неговиот идентификатор, а потоа се бришат и репликите на тој коментар.
+
+#### Земање на коментар преку идентификатор
+````php
+public function getById($id)
+    {
+        return Comment::with('user')->find($id);
+    }
+````
+Јавна функција која го враќа коментарот или null ако не постои таков.
+На параметар го прима идентификаторот на коментарот.
+
+
+#### Враќање на коментари од корисник
+````php
+public function getAllCommentsByUserId($id)
+    {
+        return Comment::where('user_id', $id)
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+````
+Јавна функција која го прима преку параметар идентификаторот на корисникот за кој се проверува и враќа колекција како резултат.
+Comment::where('user_id', $id) гради барање за базата на податоци за да ги врати записите од табелата со коментари каде што колоната user_id се совпаѓа со даденото $id.
+Потоа се подредуваат преземените коментари по нивната колона create_at во опаѓачки редослед. Ова значи дека неодамна креираните коментари ќе се појават први во сетот на резултати.
+И за крај се земаат совпаѓачките коментари и се враќаат како резултат.
+
+### 6.3.2 Community Service
+
+#### Враќање на сите заедници кои корисникот ги следи
+````php
+public function getUserCommunities(User $user){
+        $communities = Follow::where('user_id', $user->id)->pluck('community_id');
+
+        return Community::whereIn('id', $communities)->get();
+    }
+````
+Јавна функција која на параметар прима корисник за кој сакаме да ги пронајдеме заедниците кои ги следи.
+Се земаат сите Follow објекти каде што user_id има иста вредност со она на корисникот од параметар, и се враќаат како резултат само листа од community_id.
+Како резултат на функцијата се враќаат сите Community кои што се во листата на идентификатори.
+
+
+
+#### Враќање на број на корисници кои ја следат заедницата
+````php
+public function getTotalUsers($id): int
+    {
+        return Follow::with('community')->where('community_id',$id)->count();
+    }
+````
+Јавна функција која на влезен параметер прима идентификатор на заедницата.
+Со query се земаат сите Follow објекти каде што community_id е исто со влезниот идентификатор и се бројат.
+Се враќа вкупниот број.
+
+
+#### Враќање на сите активни корисници
+````php
+public function getActiveUsers($id): int
+    {
+        $usersFromPost = Post::select('user_id')->distinct();
+        $usersFromComments = Comment::select('user_id')->distinct();
+
+        return $usersFromPost->union($usersFromComments)->distinct()->count();
+    }
+````
+Јавна функција која на влезен параметар го прима идентификаторот на заедницата и враќа број на активни корисници.
+Активни корисници се сметаат оние кои пишувале коментари или пишувале објави.
+За таа цел ги земаме сите различни корисници од записите од табелите објави и коментари, и му правиме унија, за на крај повторно да ги извлечеме различните корисници и ги броиме.
+Тој број се враќа како резултат.
+
+
+#### Враќање на сите заедници
+````php
+public function getAllCommunities(): \Illuminate\Database\Eloquent\Collection
+    {
+        return Community::all();
+    }
+````
+Јавна функција која не прима ништо на параметар, а ги враќа сите заедници како колекција.
+
+#### Враќање на основни информации за една заедница
+````php
+public function getCommunityCard($id): array
+    {
+        $community = Community::with('user', 'flairs', 'image')->find($id);
+        $cardDto = new CommunityCardDto();
+        $cardDto->name = $community->name;
+        $cardDto->id = $community->id;
+        $cardDto->about = $community->description;
+        $cardDto->rules = $community->rules;
+        $cardDto->activeUsers = $this->getActiveUsers($id);
+        $cardDto->totalUsers = $this->getTotalUsers($id);
+        $cardDto->flairs = $this->flairService->getCommunitiesFlairs($community->id);
+
+        return [$cardDto];
+    }
+````
+Јавна функција која го прима идентификаторот на заедницата како влезеен параметар и враќа $cardDto како низа.
+Првично се зема Community со сите нејзини релации, па потоа се прави CommunityCardDto со сите негови полиња.
+Се враќа $cardDto како низа.
+
+#### Враќање на описот на заедницата
+````php
+public function getCommunityDescription($id){
+        return Community::find($id)->description;
+    }
+````
+Јавна функција која како параметар го прима идентификаторот на заедницата и го враќа нејзиниот опис.
+
+#### Враќање на правилата на една заедница
+````php
+public function getCommunityRules($id){
+        return Community::find($id)->rules;
+    }
+````
+Јавна функција која како параметар го прима идентификаторот на заедницата и ги враќа правилата.
+
+
+### 6.3.3 Flair Service
+
+#### Враќање на категориите на една заедница
+````php
+public function getCommunitiesFlairs($communityId){
+        return Flair::where('community_id', $communityId)->get()->toArray();
+    }
+````
+Јавна функција која како влезен параметар го прима идентификаторот на заедницата, а враќа низа со категории на заедницата.
+
+
+### 6.3.4 Post Service
+
+
+#### Враќање на тековната објава
+````php
+public function getById(int $id)
+    {
+        return Post::with('user','image','community', 'comments')->find($id);
+    }
+````
+Јавна фунцкија која го прима идентификаторот на објавата, а ја враќа објавата со сите релации како резултат.
+
+
+#### Едитирање на објава
+````php
+public function edit(PostCreationDto $postCreationDto): void
+    {
+        $post = Post::with('image')->find($postCreationDto->id);
+        $post->title = $postCreationDto->title;
+        $post->body = $postCreationDto->body;
+
+        $post->save();
+    }
+````
+Јавна функција која не враќа резултат а прима $postCreationDto како влезен параметар.
+Се бара тековната објава во база, и наново се сетираат насловот и содржината и за зачувува во база.
+
+#### Гласање на објава
+````php
+public function vote_Post(PostVoteDto $postVoteDto, User $user): int
+    {
+       
+        $postVote = $this->voteService->getPostVotesByIds($user->id, $postVoteDto->post_id);
+
+        if($postVote != null){
+            $this->voteService->deletePostVote($user->id, $postVoteDto->post_id);
+        }
+        $postVoteNew = new PostVote();
+        $postVoteNew->user_id = $user->id;
+        $postVoteNew->post_id = $postVoteDto->post_id;
+        $postVoteNew->vote = $postVoteDto->vote;
+
+
+        $postVoteNew->save();
+
+        return $this->voteService->getPostKarma($post->id);
+    }
+````
+Јавна функција која како влезни параметри ги прима $postVoteDto и $user. Враќа број како резултат.
+Првично се проверува дали корисникот има гласано на таа објава, и ако има тој глас се брише.
+Ако нема, се креира PostVote, се сетираат неговите полиња, и за зачувува во база.
+Потоа се зема ново пресметана карма за таа објава, и се враќа како резултат.
+
+#### Бришење на објава
+````php
+public function delete(int $id): int
+    {
+        return Post::destroy($id);
+    }
+````
+Јавна функција која како параметар го прима идентификаторот на објавата, ја брише таа објава и го враќа бројот на записи кои се избришани.
+
+#### Враќање на објави на заедници кои ги следи корисникот
+````php
+public function getFollowingPosts() {
+        $user = Auth::user();
+        $communityIds = $this->communityService->getUserCommunities($user)->map(function ($community) {
+            return $community->id;
+        });
+        return Post::whereIn('community_id', $communityIds);
+    }
+````
+Јавна функција која не прима ништо на параметар, но ги враќа сите објави кои ги следи корисникот.
+Се зема корисникот од автентикација со претпоставка дека е најавен.
+Потоа се земаат сите идентификатори од сите заедници во кои тој членува.
+И за крај се филтирираат сите објави исе враќаат само оние кои ги има во листата.
+
+#### Враќање на најкоментирани објави од сите заедници
+````php
+public function getTrendingPosts(): \Illuminate\Database\Query\Builder
+    {
+        return DB::table('posts')
+            ->leftJoin('comments', 'posts.id', '=', 'comments.post_id')
+            ->select('posts.*', DB::raw('COUNT(comments.id) as comment_count'))
+            ->groupBy('posts.id')
+            ->orderByDesc('comment_count');
+    }
+````
+Јавна функција која не прима ништо на влезен параметар, а враќа query Builder.
+Конструира барање за базата на податоци за да ги врати трендинг објавите со спојување на табелите „објави“ и „коментари“, броејќи го бројот на коментари за секоја објава и подредувајќи го резултатот врз основа на бројот на коментари во опаѓачки редослед.
+
+#### Враќање на сите објави заедница
+````php
+public function getCommunityPosts(Community $community){
+        return Post::where('community_id', $community->id);
+    }
+````
+Јавна функција која како параметар прима Community објект, и ги враќа сите објави кои го содржат идентификаторот на тој објект.
+
+
+#### Враќање на објави од даден корисник
+````php
+public function getAllPostsByUserId($id)
+    {
+        return Post::where('user_id', $id)
+            ->with('user')
+            ->orderBy('created_at', 'desc');
+    }
+````
+Јавна функција која како параметар го прима идентификаторот за даден корисник, и ги враќа неговите објави во опаѓачки редослед.
+
+### 6.3.4 UserInfo Service
+
+#### Враќање на UserInfo на даден корисник
+````php
+public function getById($id){
+        return UserInfo::where('user_id', $id)->first();
+    }
+````
+Јавна функција која како параметар го прима идентификаторот на корисникот, а го враќа UserInfo кој се совпаѓа со него. 
+
+### 6.3.5 User Service
+
+#### Враќање на логираниот корисникот
+````php
+public function getLoggedInUser(): ?\Illuminate\Contracts\Auth\Authenticatable
+    {
+        return Auth::user();
+    }
+````
+Се враќа логираниот корисник од автентификација.
+
+#### Сменување на статусот на корисник
+````php
+private function userActivity($user): void
+    {
+        if (!is_null($user->id)) {
+            $userStatus = UserStatus::where('user_id', $user->id)->first();
+            if (!is_null($userStatus)) {
+                $userStatus->updateActiveStatus();
+            }
+        }
+
+    }
+````
+Јавна функција која не враќа резултат, а го прима корисникот како влезен параметар.
+
+#### Враќање на корисникот по идентификатор
+````php
+public function getUserById($userId)
+    {
+        return  User::with('karma','status','info')->where('id',$userId)->firstOrFail();
+    }
+````
+
+
+#### Враќање на корисникот по корисничко име
+````php
+public function getUserByName($name){
+        $user =  User::with('karma','status','info')->where('name', $name)->firstOrFail();
+        $this->userActivity($user);
+        return $user;
+    }
+````
+### 6.3.6 Vote Service
+
+#### Враќање на карма на дадена објава
+````php
+public function getPostKarma($postId): int
+    {
+
+        $positiveVotes = PostVote::all()->where('post_id', $postId)
+            ->where('vote', 1)->count();
+
+        $negativeVotes = PostVote::all()->where('post_id', $postId)
+            ->where('vote', 0)->count();
+
+        return $positiveVotes - $negativeVotes;
+
+    }
+````
+Јавна функција која како аргумент го прима идентификаторот на објава, а ја враќа разликата помеѓу позитивни и негативни гласови.
+
+#### Враќање на карма на даден коментар
+````php
+public function getCommentKarma($commmentId): int
+    {
+
+        $positiveVotes = CommentVote::all()->where('comment_id', $commmentId)
+            ->where('vote', 1)->count();
+
+        $negativeVotes = CommentVote::all()->where('comment_id', $commmentId)
+            ->where('vote', 0)->count();
+
+        return $positiveVotes - $negativeVotes;
+
+    }
+````
+Јавна функција која како параметар го прима идентификаторот на даден коменар, а ја враќа разликата помеѓу позитивни и негативни гласови.
+
+
+#### Враќање на глас за објава
+````php
+public function getPersonVote($userId, $postId){
+
+        $vote = $this->getPostVotesByIds($userId, $postId);
+
+        if($vote == null) return null;
+        else return $vote->vote;
+    }
+````
+Јавна функција која како параметар ги прима идентификаторите на корисник и објава, го враќа гласот на корисникот за тековната објава.
+
+
+#### Враќање на глас за коментар
+````php
+public function getPersonCommentVote($userId, $commentId){
+
+        $vote = $this->getCommentVotesByIds($userId, $commentId);
+
+        if($vote == null) return null;
+        else return $vote->vote;
+    }
+````
+Јавна функција која како параметар ги прима идентификаторите на корисник и коментар, го враќа гласот на корисникот за тековниот коментар.
+
+
+#### Враќање на PostVote за корисник и објава
+````php
+public function getPostVotesByIds($userId, $postId){
+
+        return PostVote::where([
+            'user_id' => $userId,
+            'post_id' => $postId
+        ])->first();
+    }
+````
+
+#### Враќање на CommentVote за корисник и коментар
+````php
+public function getCommentVotesByIds($userId, $commentId){
+
+        return CommentVote::where([
+            'user_id' => $userId,
+            'comment_id' => $commentId
+        ])->first();
+    }
+
+````
+
+
+#### Бришење на глас за објава
+````php
+public function deletePostVote($userId, $postId): int
+    {
+
+        PostVote::where([
+            'user_id' => $userId,
+            'post_id' => $postId
+        ])->delete();
+
+        return $this->getPostKarma($postId);
+    }
+````
+Јавна функција која како параметат ги прима идентификаторите на корисник и објава, го брише тој глас,  а ја враќа новата вредност на карма.
+
+
+#### Бришење на глас за коментар
+````php
+public function deleteCommentVote($userId, $commentId): int
+    {
+
+        CommentVote::where([
+            'user_id' => $userId,
+            'comment_id' => $commentId
+        ])->delete();
+
+        return $this->getCommentKarma($commentId);
+    }
+````
+Јавна функција која како параметар ги прима идентификаторите на корисникот и на коментарот, го брише тој глас, и ја враќа новопресметаната карма.
+
+## 6.4 Controllers
+Контролерите комуницираат со сервисите и со маперите преку dependency injection директно во конструкторот.
+
+### 6.4.1 Comment Controller
+
+#### Коментари на објави
+````php
+public function getPostComments($id): \Illuminate\Support\Collection
+    {
+        return $this->commentService->getPostComments($id);
+    }
+````
+Јавна функција која го прима идентификаторот на објавата како параметар, и ја повикува getPostComments од сервисот. 
+Враќа колекција од коментари.
+
+#### Реплики на коментари
+````php 
+public function getCommentReplies($id): \Illuminate\Support\Collection
+    {
+        return $this->commentService->getCommentReplies($id);
+    }
+````
+Јавна функвија која го прима идентификаторот на коментарот родител, и враќа колекција од реплики.
+
+#### Креирање на коментар
+````php
+public function create(Request $request): array
+    {
+        $user = Auth::user();
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $comment = new Comment();
+        $comment->user_id = $user->id;
+
+        if(isset($jsonData['post_id']))
+            $comment->post_id = $jsonData['post_id'];
+
+        if(isset($jsonData['parent_comment_id']))
+            $comment->parent_comment_id = $jsonData['parent_comment_id'];
+
+        $comment->body = $jsonData['body'];
+
+        $comment->save();
+
+        $commentDto = $this->commentMapper->mapToDto($comment);
+
+        return [$commentDto];
+
+    }
+````
+Јавна функција која го прима Request како параметар, а враќа низа од $commentDto.
+Се зема од $jsonData содржината и се проверува дали е сетирана бидејќи post_id и parent_comment_id се опционални, но секогаш едното од нив не е null.
+Се креира Comment обејкт и се сетираат неговите полиња, се зачувува и се враќа како низа.
+
+#### Едитирање на коментар
+````php
+public function edit(Request $request, $id){
+        $comment = Comment::find($id);
+        $jsonData = json_decode($request->getContent(), true);
+        $comment->body = $jsonData['body'];
+
+        $comment->save();
+
+        return $comment;
+    }
+````
+Јавна функција која го прима Request како параметар и идентификаторот на коментарот, а го враќа самиот коментар.
+Се зема од $jsonData содржината и телото на објавата и се зачувува.
+Потоа се враќа самиот коментар како резултат.
+
+
+#### Гласање на коментар
+````php
+public function vote(Request $request, int $id): int
+    {
+
+        $user = Auth::user();
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $commentVoteDto = new CommentVoteDto();
+        $commentVoteDto->id = $jsonData['id'];
+        $commentVoteDto->vote = $jsonData['vote'];
+
+        $userKarmaController = new UserKarmaController();
+        $comment = $this->commentService->getById($id);
+
+
+        if($commentVoteDto->vote == 1){
+            $userKarmaController->upVote($comment->user_id);
+        }else if($commentVoteDto->vote == null){
+            $userKarmaController->downVote($comment->user_id);
+
+        }
+
+        return $this->commentService->vote($commentVoteDto, $user);
+
+    }
+````
+Јавна функција која го прима Request како параметар и идентификаторот на коментарот, а ја враќа тековната карма на коментарот.
+Се зема од $jsonData содржината: идентификаторот на коментарот и гласот (1 или 0).
+Се праќа на сервисот и се враќа карма.
+
+#### Бришење на глас за коментар
+````php
+public function deleteVote($id): int
+    {
+        $user = Auth::user();
+
+        $userKarmaController = new UserKarmaController();
+        $comment = $this->commentService->getById($id);
+        $karma = $this->voteService->getCommentVotesByIds($user->id, $comment->id)->vote;
+
+
+        if($karma == 0){
+            $userKarmaController->upVote($comment->user_id);
+        }else{
+            $userKarmaController->downVote($comment->user_id);
+        }
+
+
+        return $this->voteService->deleteCommentVote($user->id, $id);
+    }
+````
+Јавна функција која го брише гласот за даденито коментар.
+
+
+#### Бришење на коментар
+````php
+public function delete($commentId){
+        Comment::destroy($commentId);
+    }
+````
+
+### 6.4.2 Community Controller
+
+#### Враќање на едит форма
+````php
+public function createEditForm(): \Inertia\Response
+    {
+        return Inertia::render('Communities/CommunityForm');
+    }
+````
+Јавна функција која нема влезен параметар, но ја враќа CommunityForm page-компонентата.
+
+
+#### Креирање на заедница
+````php
+public function store(Request $request)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $request->validate([
+            'name' => 'required|unique:communities',
+            'description' => 'required',
+            'rules' => 'required',
+            'image' => 'nullable|file',
+            'flairs' => 'nullable|array'
+        ]);
+
+        $user = Auth::user();
+        $community = new Community();
+        $community->name = $request->input('name');
+        $community->description = $request->input('description');
+        $community->rules = $request->input('rules');
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $imageController = new ImageController();
+            $imageId = $imageController->storeImage($file, '/communities');
+            $community->image_id = $imageId;
+        }
+        else{
+            $community->image_id = null;
+        }
+
+        $community->user()->associate($user);
+        $community->save();
+        $communityId = $community->id;
+
+        if ($request->has('flairs') && is_array($request->input('flairs'))) {
+            $flairs = $request->input('flairs');
+
+            foreach ($flairs as $flairName) {
+                $flair = new Flair();
+                $flair->name = $flairName;
+                $flair->community_id = $community->id;
+                $flair->save();
+            }
+        }
+
+        return redirect('/community/'.$communityId);
+    }
+````
+
+####
+````php
+public function update($id, Request $request)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'rules' => 'required',
+        ]);
+
+        $community = Community::findOrFail($id);
+        $community->name = $request->input('name');
+        $community->description = $request->input('description');
+        $community->rules = $request->input('rules');
+
+        $community->save();
+
+        return redirect()->route('communities.index');
+    }
+````
+
+####
+````php
+public function destroy($id)
+    {
+        $community = Community::findOrFail($id);
+
+        if ($community->image) {
+            $imageId = $community->image_id;
+        }
+
+
+        $community->delete();
+
+        if($community->image_id != null) {
+            $imageController = new ImageController();
+            $imageController->delete($imageId);
+        }
+
+        return redirect()->route('communities.index');
+    }
+````
+
+
+####
+````php
+public function renderById($id): \Illuminate\Http\JsonResponse|\Inertia\Response
+    {
+        $community = Community::with('user', 'flairs', 'image')->find($id);
+
+        if (!$community) {
+            return response()->json(['message' => 'Community not found'], 404);
+        }
+
+        return Inertia::render('Community', [
+            'community' => [$community],
+        ]);
+    }
+````
+
+
+#### Основни информации за заедница
+````php
+public function getCard($id)
+    {
+        return $this->communityService->getCommunityCard($id);
+
+    }
+````
+
+
+#### Заедници на корисникот
+````php
+public function userCommunities()
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+        $user = Auth::user();
+        return $this->communityMapper->mapCollectionToDto($this->communityService->getUserCommunities($user));
+    }
+````
+
+
+#### Пагинација во заедница
+````php
+public function paginateCommunityPosts($id, Request $request){
+
+        $community = Community::find($id);
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getCommunityPosts($community)->orderBy('created_at', 'desc')->paginate(2);
+        }
+        else{
+
+                $posts = DB::table('posts')
+                    ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                    ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                    ->where('posts.community_id', $id)
+                    ->groupBy('posts.id')
+                    ->orderByDesc('karma')
+                    ->paginate(2);
+        }
+
+
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet)
+            ;
+        });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
+    }
+````
+Јавна функција која преку влезен параметар ги има идентификаторот на заедницата и Request.
+Дополнително, во телото на функцијата се наоѓа sort параметар кој има вредности new или trending.
+Од jsondata се читаат тие вредности и се проверува:
+- ако е new: се земаат сите објави и се сортираат според датум во опаѓачки реднослед, така што најновите ќе бидат први.
+Се прави пагинација со 2 објави по страна.
+- ако е trendning: се зема Post табелата и се спојува со PostVotes. Се збираат гласовите на објавите каде што community_id е тековното id со алиас карма.
+Се прави сортирање по карма во опаѓачки редослед, така што најгласаните ќе бидат први.
+Потоа се прави ремапирање и се враќаат Post како PostDto.
+
+#### Правила на заедница
+````php
+public function rules($id){
+        return $this->communityService->getCommunityRules($id);
+    }
+````
+
+#### Опис на заедница
+````php
+public function description($id){
+        return $this->communityService->getCommunityDescription($id);
+    }
+````
+### 6.4.3 Flair Controller
+
+#### Flair Component
+````php
+public function index(): \Inertia\Response
+    {
+        return Inertia::render('Flairs/Flair');
+    }
+````
+
+#### Креирање на категорија
+````php
+public function store(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required',
+            'community_id' => 'required',
+        ]);
+
+        $flair = new Flair;
+        $flair->name = $request->input('name');
+        $flair->community_id = $request->input('community_id');
+        $flair->save();
+
+        return response()->json(['message' => 'Flair created successfully'], 201);
+    }
+````
+
+#### Категории на заедница
+````php
+public function getCommunityFlairs($communityId){
+        return Flair::where('community_id', $communityId)->get();
+    }
+````
+####
+````php
+public function update(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required',
+        ]);
+
+        $flair = Flair::findOrFail($id);
+
+        $flair->update($validatedData);
+
+        return response()->json($flair);
+    }
+
+````
+
+
+####
+````php
+public function destroy($id)
+    {
+        $flair = Flair::findOrFail($id);
+        $flair->delete();
+
+        return response()->json(['message' => 'Flair deleted']);
+    }
+````
+
+### 6.4.4 Follow Controller
+
+
+#### Следење на заедница
+````php
+public function follow($communityId)
+    {
+
+        $user = auth()->user();
+
+        if (!$communityId) {
+            return response()->json(['message' => 'Invalid community ID.'], 400);
+        }
+
+        $follow = new Follow([
+            'user_id' => $user->id,
+            'community_id' => $communityId,
+        ]);
+
+        $follow->save();
+
+        return $follow;
+    }
+````
+
+#### Одследување на заедница
+````php
+public function unfollow($communityId)
+    {
+        $user = auth()->user();
+
+        Follow::where([
+            'user_id' => $user->id,
+            'community_id' => $communityId
+        ])->delete();
+````
+
+### 6.4.4 Image Controller
+
+#### Враќање на слика
+````php
+public function getImage($id){
+        $image = Image::findOrFail($id);
+        return $image;
+    }
+````
+
+
+#### Зачувување на слика
+````php
+public function storeImage($file, $path = 'images')
+    {
+        $filename = $file->getClientOriginalName();
+        $storedPath = Storage::disk('public')->putFile($path, $file);
+
+        $image = new Image();
+        $image->filename = $filename;
+        $image->path = $storedPath;
+        $image->save();
+
+        return $image->id;
+    }
+````
+
+
+#### Бришење на слика
+````php
+public function delete($id)
+    {
+        $image = Image::findOrFail($id);
+
+        $path = ltrim($image->path, '/storage/');
+
+        Storage::disk('public')->delete($path);
+
+        $image->delete();
+
+        return response()->json(['message' => 'Image deleted successfully']);
+    }
+````
+
+### 6.4.5 Post Controller
+
+
+#### Пагинација на постови кои корисникот ги следи
+````php
+public function paginateFollowingPosts(Request $request){
+
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getFollowingPosts()->orderBy('created_at', 'desc')->paginate(2);
+        }
+        else{
+            $posts = DB::table('posts')
+                ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                ->groupBy('posts.id')
+                ->orderByDesc('karma')
+                ->paginate(2);
+
+        }
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
+
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet)
+            ;
+        });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
+    }
+````
+
+#### Пагинација на трендинг постови
+````php
+public function paginateTrendingPosts(Request $request){
+
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getTrendingPosts()
+                ->orderBy('created_at', 'desc')->paginate(2);
+        }
+        else{
+            $posts = $this->postService->getTrendingPosts()
+                ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                ->groupBy('posts.id')
+                ->orderByDesc('karma')
+                ->paginate(2);
+
+        }
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
+
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet)
+                ;
+        });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
+    }
+````
+
+#### Бришење на глас на објава
+````php
+ public function deleteVotePost($postId){
+        $user = Auth::user();
+        $userKarmaController = new UserKarmaController();
+        $post = $this->postService->getById($postId);
+
+        $karma = $this->voteService->getPostVotesByIds($user->id, $postId)->vote;
+
+        if($karma == 0){
+            $userKarmaController->upVote($post->user_id);
+        }else{
+            $userKarmaController->downVote($post->user_id);
+        }
+
+        return $this->voteService->deletePostVote($user->id, $postId);
+    }
+````
+
+#### Форма за креирање на објава
+````php
+public function create(): Response
+    {
+        return Inertia::render('MakePost');
+    }
+````
+
+#### Зачувување на објава
+````php
+public function store(Request $request): RedirectResponse
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $request->validate([
+            'title' => 'required',
+            'body' => 'required',
+            'communityId' => 'required',
+            'image' => 'nullable|file',
+            'flair' => 'nullable|integer'
+        ]);
+
+        $user = Auth::user();
+        $post = new Post();
+        $post->title = $request->input('title');
+        $post->body = $request->input('body');
+        $post->flair_id = $request->input('flair');
+        $post->spoiler = $request->boolean('spoiler');
+
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $imageController = new ImageController();
+            $imageId = $imageController->storeImage($file, '/posts');
+            $post->image_id = $imageId;
+            Log::info($file);
+        }
+        else{
+            $post->image_id = null;
+        }
+        
+        $post->user()->associate($user);
+        $post->community()->associate($request->input('communityId'));
+        $post->save();
+
+        return redirect('/');
+    }
+````
+
+#### Враќање на објава по идентификатор
+````php
+public function get(int $id)
+    {
+        return $this->postService->getById($id);
+    }
+````
+
+#### Форма за едитирање на објава
+````php
+public function edit(int $id)
+    {
+        return Inertia::render('Posts/Edit', [
+            'posts' => Post::with('post:id')->find($id),
+        ]);
+    }
+````
+
+#### Едитирање
+````php
+public function update(PostCreationDto $postCreationDto): RedirectResponse
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+        $this->postService->edit($postCreationDto);
+
+        return redirect(route('posts.index'));
+
+    }
+````
+#### Гласање на објава
+````php
+public function votePost($id, Request $request): int
+    {
+        $user = Auth::user();
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $postVoteDto = new PostVoteDto();
+        $postVoteDto->post_id = $id;
+        $postVoteDto->vote = $jsonData['vote'];
+
+
+        $userKarmaController = new UserKarmaController();
+        $post = $this->postService->getById($id);
+
+        //        $userKarmaController->downVote($post->user_id);
+
+        if($postVoteDto->vote == 1){
+            $userKarmaController->upVote($post->user_id);
+        }else if($postVoteDto->vote == null){
+            $userKarmaController->downVote($post->user_id);
+
+        }
+
+        return $this->postService->vote_Post($postVoteDto, $user);
+
+    }
+````
+ 
+#### Бришење на објава
+````php
+public function delete($id)
+    {
+        $post = $this->postService->getById($id)->image_id;
+        $this->postService->delete($id);
+
+
+        if(!is_null($post)){
+                $imageController = new ImageController();
+                $imageController->delete($post);
+        }
+    }
+````
+
+#### Бришење ма објава
+````php
+public function destroy(Post $post) : RedirectResponse
+    {
+        
+        $this->authorize('delete', $post);
+
+        $post->delete();
+
+        return redirect(route('posts.index'));
+    }
+````
+### 6.4.5 Profile Controller
+
+####
+````php
+public function edit(Request $request): Response
+    {
+        return Inertia::render('Profile/Edit', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'status' => session('status'),
+        ]);
+    }
+
+````
+
+#### Одлогирање на корисник
+````php
+public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect('/login');
+    }
+````
+
+####
+````php
+public function update(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $request->user()->fill($request->validated());
+
+        if ($request->user()->isDirty('email')) {
+            $request->user()->email_verified_at = null;
+        }
+
+        $request->user()->save();
+
+        return Redirect::route('profile.edit');
+    }
+
+````
+
+####
+````php
+public function destroy(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'password' => ['required', 'current-password'],
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
+    }
+````
+
+### 6.4.6 User Controller
+
+#### Пагинација на објави од корисникот
+````php
+public function paginateUserPosts(string $userName, Request $request){
+
+        $user = $this->userService->getUserByName($userName);
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        $sortBy = $jsonData['sort'];
+
+        if($sortBy=="new"){
+            $posts = $this->postService->getAllPostsByUserId($user->id)->paginate(2);
+        }
+        else{
+
+            $posts = DB::table('posts')
+                ->leftJoin('post_votes', 'posts.id', '=', 'post_votes.post_id')
+                ->select('posts.*', DB::raw('SUM(CASE WHEN post_votes.vote = 1 THEN 1 ELSE 0 END) as karma'))
+                ->where('posts.user_id', $user->id)
+                ->groupBy('posts.id')
+                ->orderByDesc('karma')
+                ->paginate(2);
+        }
+
+
+
+        $updatedPosts = $posts->getCollection()->map(function($post) {
+            $postGet = \App\Models\Post\Post::query()
+                ->where('id','=', $post->id)
+                ->first();
+            return
+                $this->postMapper->mapToDto($postGet);
+        });
+
+
+        $posts->setCollection($updatedPosts);
+
+        return $posts;
+    }
+
+````
+
+#### Заедници на корисникот
+````php
+public function getUseFollowingCommunity($communityId){
+        $user = Auth::user();
+
+        return Follow::where('user_id', $user->id)->where('community_id',$communityId )->get();
+
+    }
+````
+
+#### Моментално логиран корисник
+````php
+public function getCurrentUser(){
+
+       return Auth::user();
+    }
+
+````
+
+#### Корисник по корисничко име
+````php
+public function getUserByName($name){
+
+        $user = $this->userService->getUserByName($name);
+        $comments = $this->commentService->getAllCommentsByUserId($user->id);
+        $posts = $this->postService->getAllPostsByUserId($user->id);
+        $combined = $comments->concat($posts);
+        $sortedCombined = $combined->sortByDesc('created_at');
+        //CommunityController->paginateCommunityPosts
+
+        return Inertia::render('User', [
+            'user' => [$user],
+            'posts' => $sortedCombined,
+        ]);
+
+    }
+
+````
+
+### 6.4.7 UserInfo Controller
+
+
+####
+````php
+public function store($userId)
+    {
+        $userInfo = new UserInfo([
+            'user_id' => $userId,
+            'image_id' => null,
+            'bio' => ''
+        ]);
+
+        // Associate the UserKarma record with the specified user
+        User::find($userId)->info()->save($userInfo);
+        return redirect()->route('dashboard');
+    }
+
+````
+
+####
+````php
+public function bio(Request $request){
+
+        $id = Auth::user()->id;
+
+        $userInfo = UserInfo::where('user_id', $id)->first();
+
+        $userInfo->update([
+            'bio' => $request->input('bio'),
+        ]);
+
+    }
+````
+
+####
+````php
+public function image(Request $request)
+    {
+        if ($request->hasFile('image')) {
+            $userInfoService = new UserInfoService();
+            $id = Auth::user()->id;
+            $file = $request->file('image');
+            $userInfo = $userInfoService->getById($id);
+            $imageController = new ImageController();
+            $imageId = $imageController->storeImage($file, '/profile');
+            $oldId = $userInfo->image_id;
+
+            $userInfo->update([
+                'image_id' => $imageId,
+            ]);
+
+            if(!is_null($oldId)){
+                $imageController->delete($oldId);
+            }
+
+        }
+    }
+
+````
+
+### 6.4.8 UserKarma Controller
+
+####
+````php
+public function store($userId)
+    {
+
+        $userKarma = new UserKarma([
+            'user_id' => $userId,
+            'karma' => 1,
+        ]);
+
+        // Associate the UserKarma record with the specified user
+        User::find($userId)->karma()->save($userKarma);
+        return redirect()->route('dashboard');
+    }
+
+````
+
+####
+````php
+public function upVote($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        $user->karma->increment('karma');
+
+        return response()->json(['message' => 'Upvoted successfully.']);
+    }
+````
+
+####
+````php
+public function downVote($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        $user->karma->decrement('karma');
+
+        return response()->json(['message' => 'Downvoted successfully.']);
+    }
+````
+
+### 6.4.9 UserKarma Controller
+
+####
+````php
+public function store($id)
+    {
+        UserStatus::create([
+            'user_id' => $id,
+            'active' => true,
+            'activity' => Carbon::now()
+        ]);
+    }
+
+````
+
+####
+````php
+
+````
+
+####
+````php
+
+````
+
+
 
