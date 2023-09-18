@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\UserInfoService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -58,12 +59,21 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        $user_infoService = new UserInfoService();
+
+        $user_info = $user_infoService->getById($user->id);
+
         Auth::logout();
 
         $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        $image = new ImageController();
+        if(!is_null($user_info->image_id)){
+            $image->delete($user_info->image_id);
+        }
 
         return Redirect::to('/');
     }

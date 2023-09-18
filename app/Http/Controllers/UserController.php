@@ -26,7 +26,6 @@ class UserController extends Controller
 
 
     public function active(){
-        Log::info("РАБОТАМ");
         return Auth::user()->id;
     }
 

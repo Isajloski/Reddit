@@ -26,8 +26,10 @@
 
 
             <div >
-                <img v-if="image" class="object-cover w-full h-60 object-center rounded"
-                    :src="image" />
+                <img v-if="image && spoiler" class="object-cover w-full h-60  object-center rounded"
+                     :src="image" />
+                <img v-else-if="image && !spoiler" class="object-cover w-full blur-sm h-60 object-center rounded"
+                     :src="image" />
             </div>
             <div class="px-2 pt-3">
                 <div class="w-full grid grid-cols-2 relative">
@@ -254,5 +256,25 @@ export default {
 </script>
 
 <style scoped>
+
+.blur-sm {
+    filter: blur(2px); /* Adjust the blur value as needed */
+    transition: filter 0.3s; /* Add a transition effect */
+}
+
+.blur-sm:hover {
+    filter: blur(0);
+}
+
+/* Initially blurred */
+.blur-3xl {
+    filter: blur(15px); /* Adjust the blur value as needed */
+    transition: filter 0.3s; /* Add a transition effect */
+}
+
+/* On hover, remove the blur */
+.blur-3xl:hover {
+    filter: blur(0);
+}
 
 </style>

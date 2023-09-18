@@ -24,7 +24,6 @@
                       :vote = "post.vote"
                       :karma="post.karma"
                       :date="post.date"
-                      :image="post.image"
                       :title="post.title"
                       :flair="post.flair"
                       :owner="post.user.id"

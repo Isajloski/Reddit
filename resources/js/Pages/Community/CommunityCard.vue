@@ -9,19 +9,14 @@
             <div class="text-white font-light text-[10px] text-xs mx-1">{{ activeUsers }} Active Users</div>
             <svg  class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 24 24" width="512" height="512"><path fill="pink" d="M12,17c-2.76,0-5-2.24-5-5s2.24-5,5-5,5,2.24,5,5-2.24,5-5,5Z"/></svg>
             <div class="text-white font-light text-[10px] text-xs mx-1">{{ totalUsers }} Total Users</div>
+
         </div>
         <div class="pt-2 inline-block">
             <div class="bg-[#CC0974] rounded-2xl inline-block">
                 <button type="submit" class="px-4 py-1" @click="following? unfollowCommunity() : followCommunity()">
                     {{following ? 'Following' : 'Follow'}}
                 </button>
-
             </div>
-            <div>
-                <p>Hi</p>
-            </div>
-
-
         </div>
     </div>
 </div>
@@ -38,7 +33,7 @@ export default {
     data () {
         return {
             following: '',
-            image: null
+            image: 'https://imgv3.fotor.com/images/blog-cover-image/part-blurry-image.jpg',
         }
     },
     props : {

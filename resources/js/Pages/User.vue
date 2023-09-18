@@ -1,10 +1,10 @@
 <template>
     <Head :title="user[0].name" ></Head>
     <Navbar :user="user"/>
-    <div id="left" class="absolute mt-32 md:mt-6 w-auto md:w-1/6 ml-5">
+    <div id="left" class="absolute mt-32 md:mt-20  w-auto md:w-1/6 ml-5">
         <Filter class="rounded-xl" @sort="emitSortType($event)"/>
     </div>
-    <div id="right" class="absolute mt-10 md:mt-6 w-auto md:w-1/6 md:right-0 mx-5">
+    <div id="right" class="absolute mt-10 md:mt-20  w-auto md:w-1/6 md:right-0 mx-5">
         <ProfileCard :user="user[0]"/>
     </div>
     <Content :type="'user'" :sort="this.sort"/>

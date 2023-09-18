@@ -119,6 +119,9 @@ const ApiUtilis = {
     },
     getCommunityImage(id) {
         return axios.get(`/community/image/${id}`);
+    },
+    getCommentUserImage(id) {
+        return axios.get(`/comment/image/${id}`);
     }
 };
 

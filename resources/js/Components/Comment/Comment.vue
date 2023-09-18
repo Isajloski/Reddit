@@ -1,7 +1,6 @@
 <template>
     <div>
         <div class="flex w-full border border-[#505050] rounded-md p-3">
-
             <div class="flex flex-col gap-1 pr-3 py-3">
                 <div>
                     <VoteUpIcon
@@ -22,7 +21,7 @@
 
             <div class="p-3 w-full">
                 <div class="flex gap-3">
-                    <img src="https://avatars.githubusercontent.com/u/22263436?v=4"
+                    <img :src="image"
                          class="object-cover w-10 h-10 rounded-xl border-2 border-pink-700  shadow-emerald-400" alt="">
                     <h3 class="font-bold text-white">
                         {{ userName }}
@@ -105,7 +104,7 @@ export default {
             editMode: false,
             editBody: '',
             childBody: this.body,
-            image: null
+            image: 'https://imgv3.fotor.com/images/blog-cover-image/part-blurry-image.jpg',
         }
     },
     created() {
@@ -135,6 +134,11 @@ export default {
         vote: Boolean,
         owner: Number,
         user_id: Number
+    },
+    watch: {
+        id(newVal){
+            this.fetchUserImage();
+        }
     },
     methods: {
         toggleWriteReply() {
@@ -243,7 +247,21 @@ export default {
             } catch (error) {
                 console.error('Error fetching options:', error);
             }
+        },
+        fetchUserImage() {
+            if (this.id) {
+                ApiUtilis.getCommentUserImage(this.id)
+                    .then((response) => {
+                        this.image = response.data;
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching community image:', error);
+                    });
+            }
         }
+    },
+    mounted() {
+        this.fetchUserImage();
     }
 }
 </script>

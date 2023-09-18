@@ -6,17 +6,28 @@ use App\Mappers\CommentMapper;
 use App\Models\Comment\Comment;
 use App\Models\Vote\dto\CommentVoteDto;
 use App\Services\CommentService;
+use App\Services\UserInfoService;
 use App\Services\VoteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CommentController extends Controller
 {
     public function __construct(private readonly CommentService $commentService,
                                 private readonly CommentMapper $commentMapper,
-                                private readonly VoteService $voteService) {}
+                                private readonly VoteService $voteServicem,
+                                private readonly UserInfoService $userInfoService) {}
 
 
+    public function getCommentUserImage($id){
+        $user_id = $this->commentService->getById($id)->user_id;
+
+        $image = $this->userInfoService->getById($user_id)->image_id;
+        $imageController = new ImageController();
+        $path = $imageController->getImage($image);
+        return $path->path;
+    }
 
     public function getPostComments($id){
         return $this->commentService->getPostComments($id);

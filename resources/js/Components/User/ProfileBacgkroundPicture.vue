@@ -15,7 +15,7 @@ export default {
     name: 'ProfileBacgkroundPicture',
     data() {
         return {
-            imageUrl: '',
+            imageUrl: 'https://imgv3.fotor.com/images/blog-cover-image/part-blurry-image.jpg',
         };
     },
     methods: {

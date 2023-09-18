@@ -40,16 +40,7 @@ export default {
     },
     data() {
         return {
-            // user: {
-            //     backgroundImage: "https://64.media.tumblr.com/e91fe0f601a164a2da97a310896e07a2/tumblr_pq1caw9c8q1rnvb0co1_540.gif",
-            //     avatar: "https://64.media.tumblr.com/e91fe0f601a164a2da97a310896e07a2/tumblr_pq1caw9c8q1rnvb0co1_540.gif",
-            //     username: "Горан",
-            //     karma: 1000,
-            //     bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget condimentum odio.",
-            //     posts: 500,
-            //     comments: 1000,
-            //     followers: 2000
-            // }
+
         };
     }
 };

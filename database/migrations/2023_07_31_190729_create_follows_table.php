@@ -15,8 +15,8 @@ return new class extends Migration
             $table->integer('user_id')->unsigned();
             $table->integer('community_id')->unsigned();
             $table->primary(array('user_id', 'community_id'));
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('community_id')->references('id')->on('communities');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('community_id')->references('id')->on('communities')->cascadeOnDelete();
             $table->timestamps();
         });
     }

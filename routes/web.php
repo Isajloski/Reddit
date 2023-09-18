@@ -35,7 +35,7 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->middleware(['auth']);
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -50,7 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/logout', [ProfileController::class, 'logout'])->name('profile.logout');
 });
 
-Route::resource('posts', PostController::class)
+    Route::resource('posts', PostController::class)
     ->only(['index', 'create', 'store', 'update', 'destroy'])
     ->middleware(['auth', 'verified']);
 
@@ -104,6 +104,7 @@ Route::prefix('flair')->middleware(['auth'])->group(function () {
 
 
 Route::prefix('comment')->middleware(['auth'])->group(function () {
+    Route::get('/image/{id}', [CommentController::class, 'getCommentUserImage'])->name('comments.getCommentUserImage');
     Route::get('/{id}/replies', [CommentController::class, 'getCommentReplies'])->name('comments.getCommentReplies');
     Route::post('/{id}/edit', [CommentController::class, 'edit'])->name('comments.edit');
     Route::delete('/{id}/delete', [CommentController::class, 'delete'])->name('comments.delete');
