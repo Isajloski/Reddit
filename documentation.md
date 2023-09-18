@@ -2505,17 +2505,314 @@ data () {
 
 Оваа копонента нема методи.
 
+### 7.2.6 Comment
+
+Оваа компонента ни ги прикажува коментарите на објавите.
+
+**Props:**
+
+Ова се дел од полињата кои компонентата ги прима преку props, од нејзината родител компонента - Post.
+````javascript
+props: {
+        id: Number,
+        userName: String,
+        picture: Image,
+        body: String,
+        post_id: Number,
+        date: String,
+        parent_comment_id: Number,
+        karma: Number,
+        repliesNumber: Number,
+        vote: Boolean,
+        owner: Number,
+        user_id: Number
+    }
+````
+
+**Data:**
+
+Состојбите кои се чуваат за компонентата.
+````javascript
+data() {
+        return {
+            writeReply: false,
+            replies: [],
+            voteUpState: false,
+            voteDownState: false,
+            childKarma: this.karma,
+            editMode: false,
+            editBody: '',
+            childBody: this.body,
+            image: 'https://imgv3.fotor.com/images/blog-cover-image/part-blurry-image.jpg',
+        },
+````
+- writeReply - ја прикажува/крие WriteComment компонентата.
+- replies - се листа од коментари кои се реплики и се фечуваат динамички.
+- voteUpState и voteDownState се состојби кои кажуваат дали коментарот е гласан.
+- childKarma - се рефлектира од родителот, но поради гласање ја инстанцираме наново за да можеме да ја промениме нејзината состојба.
+- editMode - состојба која ја го прикажува дизајнот за едитирање на коментар.
+- childBody - при промена на содржината на коментарот, тука се апдејтува.
+- image - предефинирана состојба на сликата.
+
+**Created:**
+
+````javascript
+created() {
+        if (this.vote == null) {
+            this.voteUpState = false;
+            this.voteDownState = false;
+        }
+        if (this.vote === true) {
+            this.voteUpState = true;
+            this.voteDownState = false;
+        }
+        if (this.vote === false) {
+            this.voteDownState = true;
+            this.voteUpState = false;
+        }
+    },
+````
+При креирање на компонентата првично се проверува состојбата на гласот која е.
+
+**Methods:**
+
+````javascript
+toggleWriteReply() {
+    this.writeReply = !this.writeReply;
+},
+````
+Ја менува состојбата на writeReply со спротивната вредност.
+
+````javascript
+toggleEditMode() {
+            this.editMode = !this.editMode;
+            if (this.editMode) {
+                this.editBody = this.body;
+            }
+        },
+````
+Ја менува состојбата editMode со спротивната вредност. Ако е во editMode, иницијалната вредност ја пополнува со body од props.
 
 
+````javascript
+handleReply(data) {
+            this.replies.push(data[0]);
+        },
+````
+На листата со реплики се додава новата.
+
+````javascript
+async voteUp(commentId) {
+            this.voteUpState = !this.voteUpState;
+            this.voteDownState = false;
+
+            const dto = {
+                id: commentId,
+                vote: this.voteUpState ? 1 : 0
+            }
+
+            try {
+                if (dto.vote) {
+                    const response = await ApiUtilis.voteComment(dto);
+                    this.childKarma = response.data;
+                } else {
+                    const response = await ApiUtilis.deleteVoteComment(dto);
+                    this.childKarma = response.data;
+                }
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+````
+За да се гласа на коментар, од иницијалната состојба се менува спротивната.
+Бидејќи гласот може да биди 1,0 или да нема. Ако има вредност праќа повик за да се креира глас или null го брише.
+Новата карма од response се запишува во childKarma.
+
+````javascript
+async voteDown(commentId) {
+            this.voteDownState = !this.voteDownState;
+            this.voteUpState = false;
+
+            const dto = {
+                id: commentId,
+                vote: this.voteDownState ? 0 : 1
+            }
+
+            try {
+                if (dto.vote) {
+                    const response = await ApiUtilis.deleteVoteComment(dto);
+                    this.childKarma = response.data;
+                } else {
+                    const response = await ApiUtilis.voteComment(dto);
+                    this.childKarma = response.data;
+                }
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+````
+За да се гласа на коментар, од иницијалната состојба се менува спротивната.
+Бидејќи гласот може да биди 1,0 или да нема. Ако има вредност праќа повик за да се креира глас или null го брише.
+Новата карма од response се запишува во childKarma.
+
+````javascript
+async handleDelete() {
+            try {
+                const response = await ApiUtilis.deleteComment(this.id);
+                this.emitDeleteToParent(this.id);
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+````
+За да се избрише самиот коментар, се праќа повик до сервер апликацијата. Ако одговорот е успешен,
+се емитува тоа до родител компонентата Post.
+
+````javascript
+async handleDeleteReply(id) {
+            try {
+                const response = await ApiUtilis.deleteComment(id);
+                const index = this.replies.findIndex(reply => reply.id === id);
+                if (index !== -1) {
+                    this.replies.splice(index, 1);
+                }
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+````
+За да се избрише реплика, се праќа повик до сервер апликацијата. Ако тоа е успешно се брише коментарот
+од листата со реплики.
+````javascript
+handleEditReply(replyDto) {
+            const index = this.replies.findIndex(reply => reply.id === replyDto.id);
+            this.replies[index].body = replyDto.body;
+        },
+````
+За успешно да се прикажат промените при промена на содржината на коментарот, го рефлектираме така
+што го наоѓаме тој коментар од листата со реплики и директно ја менуваме неговата содржина.
 
 
+````javascript
+emitDeleteToParent($id) {
+            this.$emit('commentDeleteEmitter', $id);
+        },
+````
+Емитер за бришење на коментар.
+
+````javascript
+emitEditToParent(commentUpdateDto) {
+            this.$emit('commentEditEmitter', commentUpdateDto);
+        },
+````
+Емитер за изменета содржина.
+
+````javascript
+async editComment() {
+
+            const commentUpdateDto = {
+                id: this.id,
+                body: this.editBody
+            }
+
+            try {
+                const response = await ApiUtilis.editComment(this.id, commentUpdateDto);
+                this.childBody = response.data.body;
+                this.editMode = false;
+                this.emitEditToParent(commentUpdateDto);
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+````
+Правиме повик до сервер апликацијата со податоците за дто. Тоа ни го враќа самиот коментар
+доколку е успешно, па соодветно го менуваме телото, го исклучуваме editMode и го емитуваме
+настанот до родителот за да може трајно да се измени содржината.
+
+````javascript
+async fetchReplies() {
+            try {
+                const response = await ApiUtilis.getCommentReplies(this.id);
+                this.replies = response.data;
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+````
+При клик на делот за реплики, се прави потребниот повик кој ги враќа репликите на даден коментар
+и оваа функција и резултатот во сместува во replies.
+
+````javascript
+fetchUserImage() {
+            if (this.id) {
+                ApiUtilis.getCommentUserImage(this.id)
+                    .then((response) => {
+                        this.image = response.data;
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching community image:', error);
+                    });
+            }
+        }
+````
+Ако постои слика за самиот корисник, ја земаме истата преку повик, ако не останува default-ната
+дефинирана во data.
+
+### 7.2.7 WriteComment
+Слично како и Comment, но оваа компонента го прикажува текст боксот за пишување на коментар.
+
+**Props:**
+
+````javascript
+props: {
+        postId : null,
+        parentId: null
+    },
+````
+Иницијални вредности, треба да се прати на што се прави реплика. Дали е коментар или објава.
+
+**Data:**
 
 
+````javascript
+data() {
+        return {
+            body: '',
+        }
+    },
+````
+Иницијална вредност на текст боксот.
+
+**Methods:**
 
 
+````javascript
+async writeComment(){
 
+            const commentCreationDto = {
+                post_id: this.postId,
+                parent_comment_id: this.parentId,
+                body: this.body
+            }
 
+            try {
+                const response = await ApiUtilis.writeComment(commentCreationDto);
+                this.emitToParent(response.data);
+                this.body = '';
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+````
+Пишуваме коментар со креирање на commentCreationDto. Ги поставуваме неговите полиња, и правиме повик
+до сервер апликацијата. Ако пишувањето коментар е успешно, тоа го емитуваме до родител компонентата Comment или Content
+за да ја рефлектираме измената.
 
-
+````javascript
+emitToParent(commentDto) {
+            this.$emit('commentEmitter', commentDto);
+        },
+````
+Емитер за напишаниот коментар.
 
 
