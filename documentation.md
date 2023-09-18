@@ -2406,6 +2406,71 @@ data(){
 - `removeModerator`: има за цел да избрише некој модератор од тој community.
 - `fetchModerator`: има за цел да ги излиста сите `moderators` кои ги сместува во `moderators`.
 
+### 7.1.5 Welcome
+Почетната страна.
+
+**Data:**
+
+````javascript
+data() {
+        return {
+            sort: 'new',
+            type: 'home'
+        }
+    },
+````
+Се чуваат полиња кои се препраќаат на децата на самиот Page.
+
+**Methods:**
+
+````javascript
+emitSortType(sort){
+    this.sort = sort;
+}
+````
+Овој емит е со цел да се препраќа sort преку сестрински компоненти.
+
+### 7.1.6 Community
+Приказ на дадена заедница.
+
+**Data:**
+
+````javascript
+data() {
+    return {
+        community: Object,
+        sort: 'new',
+        flairFilter: ''
+    }
+},
+````
+Се сетираат вредностите на дадените полиња на иницијални вредности.
+
+
+**Меthods:**
+
+````javascript
+async fetchData(){
+    const regexPattern = /[^/]+$/;
+
+    const path = window.location.pathname;
+    const match = path.match(regexPattern);
+
+    if (match) {
+        const result = match[0];
+        try {
+            let response = await ApiUtilis.fetchCommunity(result);
+            this.community = response.data[0];
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+},
+````
+Се фечнува дадената заедница кога компонентата е креирана.
+Од патеката се резолвнува идентификаторот на заедницата и се праќа повик
+за основните информации и се сетираат истите.
+
 
 
 ## Components
@@ -2815,4 +2880,339 @@ emitToParent(commentDto) {
 ````
 Емитер за напишаниот коментар.
 
+### 7.2.8 Dropdown
+Dropdown компонентата е уствари копче кое се отвора за да се одбери опција.
+Наоѓа примена во формите, во филтрите, и во навигаицскиот бар.
 
+**Props:**
+
+````javascript
+props: {
+        options: {
+            type: Array,
+        },
+        navbar: Boolean,
+        placeholder: {
+            type: String,
+            default: 'Select an option',
+        },
+    },
+````
+Прима options што е од тип Array, и треба да се содржи лабела и вредност.
+navbar ни кажува дали се работи за навбар, и placeholder што би се прикажало на копчето
+како преселектирана вредност.
+
+**Data:**
+
+````javascript
+data() {
+        return {
+            isOpen: false,
+            selectedOption: null,
+        };
+    },
+````
+Враќа дали е притиснато копчето, предефинирано не е. И која е вредноста на селектираната опција.
+Никоја не е селектирана иницијално.
+
+**Methods:**
+
+````javascript
+toggleDropdown() {
+            this.isOpen = !this.isOpen;
+        },
+````
+Отвораме/затвораме листата.
+
+````javascript
+selectOption({id, name}) {
+            this.selectedOption = name;
+            this.isOpen = false;
+            this.$emit('option-selected', id);
+        },
+````
+Одбираме опција. Секоја опција треба да  содржи id и name.
+Ги сетираме selectedOption на името на одбраната опција, isOpen на false бидејќи после клик
+го затвораме менито. И за крај го емитуваме резултатот на родител компонентата со неговото id.
+
+### 7.2.9 Filter
+Филтер компонентата престатува филтирање на објавите по вредности нови или популарни.
+
+**Data:**
+
+````javascript
+data() {
+        return {
+            newPosts: Boolean,
+            topPosts: Boolean
+        }
+    },
+````
+Двата можи типови на филтер.
+
+````javascript
+created() {
+        this.newPosts = true;
+        this.topPosts = false;
+    },
+````
+При креирање на компонентата, иницијално поставуваме
+притиснато да биде копчето newPosts.
+
+**Methods:**
+
+
+````javascript
+activateTopPosts(){
+            this.topPosts = true;
+            this.newPosts = false;
+            this.sortEmmiter();
+        },
+````
+При клик на иконата за топ објави, се деактивира
+newPosts и се поставува topPosts на true.
+Резултатот се емитува до родителот.
+
+````javascript
+activateNewestPosts(){
+            this.topPosts = false;
+            this.newPosts = true;
+            this. sortEmmiter();
+        },
+````
+Обратна логика од претходната, при клик на иконата за нови објави, се деактивира
+topPosts и се поставува newPosts на true.
+Резултатот се емитува до родителот.
+
+````javascript
+sortEmmiter(){
+            if(this.topPosts){
+                this.$emit('sort', 'top');
+            }
+            if(this.newPosts){
+                this.$emit('sort', 'new');
+            }
+        }
+````
+Се емитува сорт со неговата вредност.
+
+### 7.2.8 Flairs Component
+Ги листа дефинираните категории на заедницата и вооедно прави филтрирање.
+
+**Data:**
+
+````javascript
+data() {
+        return {
+            selectedFlair: ''
+        }
+    },
+````
+Го чува селектираната категорија, иницијално е празна.
+
+**Props:**
+
+
+````javascript
+props: {
+        flairs: Array
+    },
+````
+
+**Methods:**
+````javascript
+methods: {
+        filter(flair){
+            if(this.selectedFlair!==''){
+                this.selectedFlair = '';
+                this.$emit('selectedFlairEmitter', '');
+            }
+            else{
+                this.selectedFlair = flair.name;
+                this.$emit('selectedFlairEmitter', flair.id);
+            }
+        }
+    }
+````
+Филтер методот го сетира selectedFlair на селектирана вредност и го емитува на родителот.
+Ако два пати се кликне на истата категорија, селектираната вредност се брише и се емитува празна вредност.
+
+### 7.2.9 Icons Component
+За svg сликите, користиме компоненти, и динамички го управуваме на тој начин.
+
+### 7.2.10 Navbar
+За реискористливост, навбарот ни е посебна компонента која е вклучуваме во секоја страница во која што се користи.
+
+**Data:**
+
+````javascript
+data() {
+      return {
+          user: Object
+      }
+    },
+````
+Се чува корисникот во самиот навбар бидејќи таму стои менито за профил и одлогирање.
+
+**Methods:**
+
+````javascript
+async fetchUser(){
+            try{
+                const response = await ApiUtilis.fetchCurrentUser();
+                this.user = response.data;
+            }
+            catch (e) {
+                console.log("Error", e);
+            }
+        },
+````
+Се се зема моменталниот најавен корисник.
+
+````javascript
+handleRedirect(optionSelected){
+            if(optionSelected === 'profile'){
+                window.location.href = '/user/' + this.user.name;
+            }
+            if(optionSelected === 'logout'){
+                window.location.href = '/logout';
+            }
+        }
+````
+Се наведуваат рутите при клик на секое од копчињата.
+
+### 7.2.11 Post Component
+Post компонентата ги рендерира објавите.
+
+**Data:**
+
+````javascript
+data() {
+        return {
+            childKarma: this.karma,
+            childVote: this.vote,
+            voteUpState: false,
+            voteDownState: false,
+            openCommentSection: false,
+            comments: [],
+            image: null
+        }
+    },
+````
+Состојбите на полињата кои се менуваат.
+
+**Props:**
+
+````javascript
+props: {
+        id: Number,
+        communityName: String,
+        communityId: Number,
+        byUser: String,
+        karma: Number,
+        title: String,
+        description: String,
+        date: String,
+        spoiler: Boolean,
+        vote: Boolean | null,
+        commentsNumber: Number,
+        flair: Object,
+        owner: Number,
+        user_id: Number
+    },
+````
+Сите полиња кои се праќаат од родителот.
+
+
+**Methods:**
+
+````javascript
+async voteUp(postId) {
+            this.voteUpState = !this.voteUpState;
+            this.voteDownState = false;
+
+            const dto = {
+                postId: postId,
+                vote: this.voteUpState ? 1 : 0
+            }
+
+            try {
+                if (dto.vote) {
+                    const response = await ApiUtilis.votePost(dto);
+                    this.childKarma = response.data;
+                } else {
+                    const response = await ApiUtilis.deleteVotePost(dto);
+                    this.childKarma = response.data;
+                }
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+````
+Гласање на објавата се прави така што се менува самиот voteUpState.
+Се креира соодветното Dto, и се прави повик до сервер апликацијата.
+Ако гласањето е успешно, се менува childKarma.
+
+
+````javascript
+async voteUp(postId) {
+            this.voteUpState = !this.voteUpState;
+            this.voteDownState = false;
+
+            const dto = {
+                postId: postId,
+                vote: this.voteUpState ? 1 : 0
+            }
+
+            try {
+                if (dto.vote) {
+                    const response = await ApiUtilis.votePost(dto);
+                    this.childKarma = response.data;
+                } else {
+                    const response = await ApiUtilis.deleteVotePost(dto);
+                    this.childKarma = response.data;
+                }
+            } catch (error) {
+                console.error('Error fetching options:', error);
+            }
+        },
+````
+Исто како и voteUp, гласање на објавата се прави така што се менува самиот voteUpState.
+Се креира соодветното Dto, и се прави повик до сервер апликацијата.
+Ако гласањето е успешно, се менува childKarma.
+
+
+````javascript
+async deletePost(){
+              try{
+                 const response = await ApiUtilis.deletePost(this.id);
+                 this.deleteEmitter(this.id);
+              }
+              catch (error){
+                  console.log("Error", error);
+              }
+
+        },
+````
+Се брише објавата преку повик со нејзиниот идентификатор.
+Се емитува до родителот со идентификаторот на избришаната објава.
+
+
+````javascript
+handleDelete(id){
+            const index = this.comments.findIndex(comment => comment.id === id);
+            if (index !== -1) {
+                this.comments.splice(index, 1);
+            }
+        },
+````
+Се брише коментар на објавата.
+
+
+````javascript
+handleEdit(commentUpdateDto){
+            const index = this.comments.findIndex(comment => comment.id === commentUpdateDto.id);
+            this.comments[index].body = commentUpdateDto.body;
+        },
+````
+Се прави измена на коментар.
